@@ -1,6 +1,8 @@
 node_modules/
 .env
 client/node_modules/
+client/dist/
 client/build/
 *.log
 .DS_Store
+coverage/

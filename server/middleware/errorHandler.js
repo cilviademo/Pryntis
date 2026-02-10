@@ -1,5 +1,34 @@
 // Centralized error handling middleware
+
+/**
+ * Extract a human-readable field name from a Postgres unique-violation
+ * detail string, e.g. "Key (email)=(foo@bar.com) already exists."
+ */
+function parseDuplicateDetail(detail) {
+  if (!detail) return null;
+  const match = detail.match(/Key \((.+?)\)=/);
+  return match ? match[1] : null;
+}
+
 function errorHandler(err, req, res, _next) {
+  // ── Handle Postgres duplicate-key errors (code 23505) ──────────
+  if (err.code === '23505') {
+    const field = parseDuplicateDetail(err.detail);
+    const message = field
+      ? `A record with that ${field} already exists`
+      : 'A record with that value already exists';
+
+    return res.status(409).json({
+      success: false,
+      error: {
+        code: 'DUPLICATE_ENTRY',
+        message,
+        details: field ? [{ field, message }] : [],
+      },
+    });
+  }
+
+  // ── Handle AppError and generic errors ─────────────────────────
   const statusCode = err.statusCode || 500;
   const code = err.code || 'INTERNAL_ERROR';
 

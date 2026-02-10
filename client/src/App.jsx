@@ -8,10 +8,24 @@ import ArtistsPage from './pages/ArtistsPage';
 import ArtistDetailPage from './pages/ArtistDetailPage';
 import ProjectsPage from './pages/ProjectsPage';
 import ProjectDetailPage from './pages/ProjectDetailPage';
+import UsersPage from './pages/UsersPage';
+import PassPage from './pages/PassPage';
+import AssetsPage from './pages/AssetsPage';
+import AssetDetailPage from './pages/AssetDetailPage';
+import PlacementsPage from './pages/PlacementsPage';
+import TasksPage from './pages/TasksPage';
+import AnalyticsPage from './pages/AnalyticsPage';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
   return isAuthenticated ? children : <Navigate to="/login" replace />;
+}
+
+function AdminRoute({ children }) {
+  const { isAuthenticated, isAdmin } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!isAdmin) return <Navigate to="/" replace />;
+  return children;
 }
 
 function AppRoutes() {
@@ -36,6 +50,20 @@ function AppRoutes() {
         <Route path="artists/:id" element={<ArtistDetailPage />} />
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="projects/:id" element={<ProjectDetailPage />} />
+        <Route
+          path="users"
+          element={
+            <AdminRoute>
+              <UsersPage />
+            </AdminRoute>
+          }
+        />
+        <Route path="pass" element={<PassPage />} />
+        <Route path="port/assets" element={<AssetsPage />} />
+        <Route path="port/assets/:id" element={<AssetDetailPage />} />
+        <Route path="port/placements" element={<PlacementsPage />} />
+        <Route path="tasks" element={<TasksPage />} />
+        <Route path="analytics" element={<AnalyticsPage />} />
       </Route>
     </Routes>
   );

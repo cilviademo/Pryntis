@@ -38,6 +38,8 @@ router.put(
   artistController.update
 );
 
-router.delete('/:id', authorize('admin'), artistController.delete);
+router.delete('/:id', authorize('admin'), artistController.softDelete);
+
+router.post('/:id/restore', authorize('admin'), artistController.restore);
 
 module.exports = router;

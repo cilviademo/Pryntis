@@ -42,7 +42,9 @@ router.put(
   projectController.update
 );
 
-router.delete('/:id', authorize('admin'), projectController.delete);
+router.delete('/:id', authorize('admin'), projectController.softDelete);
+
+router.post('/:id/restore', authorize('admin'), projectController.restore);
 
 // Collaborators
 router.post(

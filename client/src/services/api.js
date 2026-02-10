@@ -1,6 +1,6 @@
 const API_BASE = '/api/v1';
 
-// Simple token store — AuthContext sets this after login
+// Token store -- AuthContext sets this after login
 let authToken = null;
 
 const api = {
@@ -8,7 +8,50 @@ const api = {
     authToken = token;
   },
 
+  getToken() {
+    return authToken;
+  },
+
   async request(method, path, body) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
+    }
+
+    const options = { method, headers };
+    if (body) options.body = JSON.stringify(body);
+
+    const res = await fetch(`${API_BASE}${path}`, options);
+
+    // Handle non-JSON responses
+    const contentType = res.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      if (!res.ok) {
+        const err = new Error(`Request failed with status ${res.status}`);
+        err.status = res.status;
+        throw err;
+      }
+      return null;
+    }
+
+    const json = await res.json();
+
+    if (!json.success) {
+      const err = new Error(json.error?.message || 'Request failed');
+      err.code = json.error?.code;
+      err.details = json.error?.details;
+      err.status = res.status;
+      throw err;
+    }
+
+    return json.data;
+  },
+
+  /**
+   * Same as request() but returns the full response envelope:
+   * { data, pagination, message }
+   */
+  async getFullResponse(method, path, body) {
     const headers = { 'Content-Type': 'application/json' };
     if (authToken) {
       headers['Authorization'] = `Bearer ${authToken}`;
@@ -28,13 +71,25 @@ const api = {
       throw err;
     }
 
-    return json.data;
+    return {
+      data: json.data,
+      pagination: json.pagination || null,
+      message: json.message || null,
+    };
   },
 
-  get(path) { return this.request('GET', path); },
-  post(path, body) { return this.request('POST', path, body); },
-  put(path, body) { return this.request('PUT', path, body); },
-  del(path) { return this.request('DELETE', path); },
+  get(path) {
+    return this.request('GET', path);
+  },
+  post(path, body) {
+    return this.request('POST', path, body);
+  },
+  put(path, body) {
+    return this.request('PUT', path, body);
+  },
+  del(path) {
+    return this.request('DELETE', path);
+  },
 };
 
 export default api;

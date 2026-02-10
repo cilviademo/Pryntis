@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import api from '../services/api';
-import './LoginPage.css';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -9,20 +7,42 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [touched, setTouched] = useState({ email: false, password: false });
+
+  const validate = () => {
+    if (!email) return 'Email is required';
+    if (!/\S+@\S+\.\S+/.test(email)) return 'Enter a valid email address';
+    if (!password) return 'Password is required';
+    if (password.length < 4) return 'Password must be at least 4 characters';
+    return null;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setTouched({ email: true, password: true });
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     setError('');
     setSubmitting(true);
     try {
-      const data = await login(email, password);
-      api.setToken(data.token);
+      await login(email, password);
     } catch (err) {
-      setError(err.message || 'Login failed');
+      setError(err.message || 'Login failed. Please check your credentials.');
     } finally {
       setSubmitting(false);
     }
   };
+
+  const handleBlur = (field) => () => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
+
+  const emailError = touched.email && !email ? 'Email is required' :
+    touched.email && !/\S+@\S+\.\S+/.test(email) && email ? 'Enter a valid email' : '';
+  const passwordError = touched.password && !password ? 'Password is required' : '';
 
   return (
     <div className="login-page">
@@ -31,7 +51,7 @@ export default function LoginPage() {
           <h1 className="login-brand">Pryntis</h1>
           <p className="login-subtitle">Panel Administration</p>
         </div>
-        <form onSubmit={handleSubmit} className="login-form">
+        <form onSubmit={handleSubmit} className="login-form" noValidate>
           {error && <div className="login-error">{error}</div>}
           <div className="form-group">
             <label htmlFor="email">Email</label>
@@ -40,9 +60,12 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
+              onBlur={handleBlur('email')}
+              placeholder="you@example.com"
               autoFocus
+              autoComplete="email"
             />
+            {emailError && <span className="form-group__error">{emailError}</span>}
           </div>
           <div className="form-group">
             <label htmlFor="password">Password</label>
@@ -51,10 +74,13 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
+              onBlur={handleBlur('password')}
+              placeholder="Enter your password"
+              autoComplete="current-password"
             />
+            {passwordError && <span className="form-group__error">{passwordError}</span>}
           </div>
-          <button type="submit" className="login-btn" disabled={submitting}>
+          <button type="submit" className="btn btn-primary" disabled={submitting} style={{ width: '100%', padding: '12px' }}>
             {submitting ? 'Signing in...' : 'Sign In'}
           </button>
         </form>

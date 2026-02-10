@@ -1,8 +1,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
-const userModel = require('../models/userModel');
+const db = require('../config/db');
 const { AppError } = require('../middleware/errorHandler');
+const { success, created } = require('../utils/response');
 
 const authController = {
   // POST /api/v1/auth/register — admin only
@@ -10,25 +11,24 @@ const authController = {
     try {
       const { email, password, first_name, last_name, role } = req.body;
 
-      const existing = await userModel.findByEmail(email);
-      if (existing) {
+      const { rows: existing } = await db.query(
+        'SELECT id FROM users WHERE email = $1',
+        [email]
+      );
+      if (existing.length > 0) {
         throw new AppError('Email already registered', 409, 'DUPLICATE_EMAIL');
       }
 
       const passwordHash = await bcrypt.hash(password, 12);
-      const user = await userModel.create({
-        email,
-        passwordHash,
-        firstName: first_name,
-        lastName: last_name,
-        role,
-      });
 
-      res.status(201).json({
-        success: true,
-        data: user,
-        message: 'User created successfully',
-      });
+      const { rows } = await db.query(
+        `INSERT INTO users (email, password_hash, first_name, last_name, role)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id, email, first_name, last_name, role, is_active, created_at, updated_at`,
+        [email, passwordHash, first_name, last_name, role || 'viewer']
+      );
+
+      created(res, rows[0], 'User created successfully');
     } catch (err) {
       next(err);
     }
@@ -39,7 +39,12 @@ const authController = {
     try {
       const { email, password } = req.body;
 
-      const user = await userModel.findByEmail(email);
+      const { rows } = await db.query(
+        'SELECT * FROM users WHERE email = $1',
+        [email]
+      );
+      const user = rows[0];
+
       if (!user) {
         throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
       }
@@ -54,25 +59,26 @@ const authController = {
       }
 
       const token = jwt.sign(
-        { id: user.id, email: user.email, role: user.role },
+        {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          token_version: user.token_version,
+        },
         config.jwtSecret,
         { expiresIn: config.jwtExpiresIn }
       );
 
-      res.json({
-        success: true,
-        data: {
-          token,
-          user: {
-            id: user.id,
-            email: user.email,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            role: user.role,
-          },
+      success(res, {
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          role: user.role,
         },
-        message: 'Login successful',
-      });
+      }, 'Login successful');
     } catch (err) {
       next(err);
     }
@@ -81,16 +87,18 @@ const authController = {
   // GET /api/v1/auth/me
   async getProfile(req, res, next) {
     try {
-      const user = await userModel.findById(req.user.id);
+      const { rows } = await db.query(
+        `SELECT id, email, first_name, last_name, role, is_active, created_at, updated_at
+         FROM users WHERE id = $1`,
+        [req.user.id]
+      );
+      const user = rows[0];
+
       if (!user) {
         throw new AppError('User not found', 404, 'NOT_FOUND');
       }
 
-      res.json({
-        success: true,
-        data: user,
-        message: 'Profile retrieved',
-      });
+      success(res, user, 'Profile retrieved');
     } catch (err) {
       next(err);
     }
@@ -100,16 +108,57 @@ const authController = {
   async updateProfile(req, res, next) {
     try {
       const { first_name, last_name, email } = req.body;
-      const user = await userModel.update(req.user.id, { first_name, last_name, email });
-      if (!user) {
+
+      const sets = [];
+      const values = [];
+      let idx = 1;
+
+      if (first_name !== undefined) {
+        sets.push(`first_name = $${idx++}`);
+        values.push(first_name);
+      }
+      if (last_name !== undefined) {
+        sets.push(`last_name = $${idx++}`);
+        values.push(last_name);
+      }
+      if (email !== undefined) {
+        // Check for duplicate email
+        const { rows: dup } = await db.query(
+          'SELECT id FROM users WHERE email = $1 AND id != $2',
+          [email, req.user.id]
+        );
+        if (dup.length > 0) {
+          throw new AppError('Email already in use', 409, 'DUPLICATE_EMAIL');
+        }
+        sets.push(`email = $${idx++}`);
+        values.push(email);
+      }
+
+      if (sets.length === 0) {
+        const { rows } = await db.query(
+          `SELECT id, email, first_name, last_name, role, is_active, created_at, updated_at
+           FROM users WHERE id = $1`,
+          [req.user.id]
+        );
+        if (!rows[0]) {
+          throw new AppError('User not found', 404, 'NOT_FOUND');
+        }
+        return success(res, rows[0], 'Profile retrieved (no changes)');
+      }
+
+      values.push(req.user.id);
+      const { rows } = await db.query(
+        `UPDATE users SET ${sets.join(', ')}, updated_at = NOW()
+         WHERE id = $${idx}
+         RETURNING id, email, first_name, last_name, role, is_active, created_at, updated_at`,
+        values
+      );
+
+      if (!rows[0]) {
         throw new AppError('User not found', 404, 'NOT_FOUND');
       }
 
-      res.json({
-        success: true,
-        data: user,
-        message: 'Profile updated',
-      });
+      success(res, rows[0], 'Profile updated');
     } catch (err) {
       next(err);
     }
