@@ -1,18 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import useDebounce from '../utils/useDebounce';
 import api from '../services/api';
 
 const GENRES = ['Hip-Hop', 'R&B', 'Pop', 'Rock', 'Electronic', 'Jazz', 'Classical', 'Country', 'Latin', 'Afrobeats', 'Other'];
 
 export default function ArtistsPage() {
   const { user } = useAuth();
+  const { addToast } = useToast();
   const canEdit = user?.role === 'admin' || user?.role === 'manager';
 
   const [artists, setArtists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 350);
   const [statusFilter, setStatusFilter] = useState('');
   const [genreFilter, setGenreFilter] = useState('');
   const [page, setPage] = useState(1);
@@ -32,7 +36,7 @@ export default function ArtistsPage() {
     setError('');
     try {
       const params = new URLSearchParams({ page, limit });
-      if (search) params.set('q', search);
+      if (debouncedSearch) params.set('q', debouncedSearch);
       if (statusFilter) params.set('status', statusFilter);
       if (genreFilter) params.set('genre', genreFilter);
       const res = await api.get(`/artists?${params}`);
@@ -45,7 +49,7 @@ export default function ArtistsPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, statusFilter, genreFilter, page]);
+  }, [debouncedSearch, statusFilter, genreFilter, page]);
 
   useEffect(() => {
     fetchArtists();
@@ -53,7 +57,7 @@ export default function ArtistsPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, statusFilter, genreFilter]);
+  }, [debouncedSearch, statusFilter, genreFilter]);
 
   const openCreate = () => {
     setEditing(null);
@@ -91,8 +95,10 @@ export default function ArtistsPage() {
     try {
       if (editing) {
         await api.put(`/artists/${editing.id}`, form);
+        addToast('Artist updated successfully');
       } else {
         await api.post('/artists', form);
+        addToast('Artist created successfully');
       }
       setShowModal(false);
       fetchArtists();

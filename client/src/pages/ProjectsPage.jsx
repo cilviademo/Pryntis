@@ -1,16 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import useDebounce from '../utils/useDebounce';
 import api from '../services/api';
 
 export default function ProjectsPage() {
   const { user } = useAuth();
+  const { addToast } = useToast();
   const canEdit = user?.role === 'admin' || user?.role === 'manager';
 
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 350);
   const [statusFilter, setStatusFilter] = useState('');
   const [sortBy, setSortBy] = useState('updated_at');
   const [page, setPage] = useState(1);
@@ -31,7 +35,7 @@ export default function ProjectsPage() {
     setError('');
     try {
       const params = new URLSearchParams({ page, limit, sort: sortBy });
-      if (search) params.set('q', search);
+      if (debouncedSearch) params.set('q', debouncedSearch);
       if (statusFilter) params.set('status', statusFilter);
       const res = await api.get(`/projects?${params}`);
       const data = Array.isArray(res) ? res : [];
@@ -43,7 +47,7 @@ export default function ProjectsPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, statusFilter, sortBy, page]);
+  }, [debouncedSearch, statusFilter, sortBy, page]);
 
   useEffect(() => {
     fetchProjects();
@@ -51,7 +55,7 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, statusFilter, sortBy]);
+  }, [debouncedSearch, statusFilter, sortBy]);
 
   const openCreate = () => {
     setEditing(null);
@@ -91,8 +95,10 @@ export default function ProjectsPage() {
       if (!payload.target_completion_date) delete payload.target_completion_date;
       if (editing) {
         await api.put(`/projects/${editing.id}`, payload);
+        addToast('Project updated successfully');
       } else {
         await api.post('/projects', payload);
+        addToast('Project created successfully');
       }
       setShowModal(false);
       fetchProjects();

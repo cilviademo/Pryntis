@@ -1,12 +1,31 @@
-import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
 import api from '../services/api';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState(api.getToken());
+  const [loading, setLoading] = useState(!!api.getToken()); // true while rehydrating
+
+  // Rehydrate user from stored token on mount
+  useEffect(() => {
+    const stored = api.getToken();
+    if (!stored) return;
+
+    api.request('GET', '/auth/me')
+      .then((data) => {
+        setUser(data);
+        setToken(stored);
+      })
+      .catch(() => {
+        // Token expired or invalid — clear it silently
+        api.setToken(null);
+        setToken(null);
+        setUser(null);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   const login = useCallback(async (email, password) => {
     setLoading(true);

@@ -1,11 +1,17 @@
 const API_BASE = '/api/v1';
+const TOKEN_KEY = 'pryntis_token';
 
-// Token store -- AuthContext sets this after login
-let authToken = null;
+// Token store — persisted in sessionStorage so page refresh keeps you logged in
+let authToken = sessionStorage.getItem(TOKEN_KEY);
 
 const api = {
   setToken(token) {
     authToken = token;
+    if (token) {
+      sessionStorage.setItem(TOKEN_KEY, token);
+    } else {
+      sessionStorage.removeItem(TOKEN_KEY);
+    }
   },
 
   getToken() {
