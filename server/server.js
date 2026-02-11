@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const config = require('./config');
+const db = require('./config/db');
 const { errorHandler } = require('./middleware/errorHandler');
 const { responseTime } = require('./middleware/responseTime');
 
@@ -33,18 +34,36 @@ app.use('/api/v1/port', portRoutes);
 app.use('/api/v1/tasks', taskRoutes);
 app.use('/api/v1/kpi', kpiRoutes);
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ success: true, message: 'Pryntis Panel API is running' });
+// Health check — verifies DB connectivity
+app.get('/api/health', async (req, res) => {
+  try {
+    const { rows } = await db.query('SELECT NOW() AS time');
+    res.json({ success: true, message: 'Pryntis Panel API is running', db: rows[0].time });
+  } catch (err) {
+    res.status(503).json({ success: false, message: 'Database unreachable', error: err.message });
+  }
 });
 
 // Error handling
 app.use(errorHandler);
 
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(config.port, () => {
+  const server = app.listen(config.port, () => {
     console.log(`Pryntis Panel API running on port ${config.port} [${config.nodeEnv}]`);
   });
+
+  // Graceful shutdown — close HTTP server then drain DB pool
+  function shutdown(signal) {
+    console.log(`\n${signal} received — shutting down gracefully`);
+    server.close(() => {
+      db.pool.end().then(() => {
+        console.log('DB pool drained. Goodbye.');
+        process.exit(0);
+      });
+    });
+  }
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
 module.exports = app;
