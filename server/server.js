@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const config = require('./config');
 const { errorHandler } = require('./middleware/errorHandler');
+const { responseTime } = require('./middleware/responseTime');
 
 // Route imports
 const authRoutes = require('./routes/authRoutes');
@@ -17,6 +18,7 @@ const kpiRoutes = require('./routes/kpiRoutes');
 const app = express();
 
 // Global middleware
+app.use(responseTime);
 app.use(cors());
 app.use(express.json());
 
