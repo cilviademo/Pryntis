@@ -223,7 +223,7 @@ async function seed() {
     [`'Eli Cross: Cinematic Suites'`,   `'Orchestral composition suite for film scoring portfolio'`,          31,  `'in_progress'`, `'2025-12-01'`, `'2026-05-01'`],
     [`'Dak Rey: Desert Highway'`,       `'Country-rap debut album with Southwest desert imagery'`,            32,  `'in_progress'`, `'2025-11-15'`, `'2026-04-15'`],
 
-    [`'Summer Anthology 2025'`,         `'Multi-artist compilation project'`,                                NULL, `'completed'`,   `'2025-04-15'`, `'2025-08-30'`]
+    [`'Summer Anthology 2025'`,         `'Multi-artist compilation project'`,                                null, `'completed'`,   `'2025-04-15'`, `'2025-08-30'`]
   ];
 
   // Build the VALUES clause
@@ -328,7 +328,7 @@ async function seed() {
     [8,  tierPro,        'active',    '2025-06-15', '2026-06-15'],
     [9,  tierBasic,      'active',    '2025-07-01', '2026-07-01'],
     [10, tierPro,        'active',    '2025-03-01', '2026-03-01'],
-    [11, tierFree,       'active',    '2025-01-01', NULL],            // Ra$h — Free (on hiatus)
+    [11, tierFree,       'active',    '2025-01-01', null],            // Ra$h — Free (on hiatus)
     [12, tierBasic,      'expired',   '2024-09-01', '2025-09-01'],   // E.Fitz — expired
     [13, tierBasic,      'active',    '2025-08-01', '2026-08-01'],
     [14, tierPro,        'active',    '2025-04-15', '2026-04-15'],
@@ -338,18 +338,18 @@ async function seed() {
     [18, tierPro,        'active',    '2025-07-01', '2026-07-01'],
     [19, tierBasic,      'active',    '2025-06-01', '2026-06-01'],
     [20, tierPro,        'active',    '2025-05-15', '2026-05-15'],
-    [21, tierFree,       'active',    '2025-10-01', NULL],
+    [21, tierFree,       'active',    '2025-10-01', null],
     [22, tierBasic,      'active',    '2025-09-01', '2026-09-01'],
     [23, tierPro,        'active',    '2025-08-15', '2026-08-15'],
     [24, tierBasic,      'active',    '2025-10-01', '2026-10-01'],
-    [25, tierFree,       'active',    '2025-11-01', NULL],
+    [25, tierFree,       'active',    '2025-11-01', null],
     [26, tierBasic,      'active',    '2025-07-15', '2026-07-15'],
     [27, tierBasic,      'active',    '2025-06-01', '2026-06-01'],
     [28, tierPro,        'active',    '2025-09-15', '2026-09-15'],
     [29, tierBasic,      'expired',   '2024-12-01', '2025-12-01'],
     [30, tierBasic,      'active',    '2025-10-01', '2026-10-01'],
     [31, tierPro,        'active',    '2025-08-01', '2026-08-01'],
-    [32, tierFree,       'active',    '2025-11-15', NULL],
+    [32, tierFree,       'active',    '2025-11-15', null],
     [33, tierBasic,      'suspended', '2025-04-01', '2026-04-01'],
     [34, tierBasic,      'active',    '2025-09-01', '2026-09-01'],
   ];
