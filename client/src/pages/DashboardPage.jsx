@@ -8,14 +8,14 @@ import { capitalize, objToArray, formatCurrency } from '../utils/formatters';
 
 const CHART_COLORS = ['#6c63ff', '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
-/* Health score dimension definitions */
+/* Health score dimension definitions — 6 weighted dimensions (sum = 100) */
 const HEALTH_DIMENSIONS = [
-  { key: 'subscription', label: 'Subscription', max: 20, missingAction: 'Activate or upgrade subscription tier' },
-  { key: 'assets', label: 'Recent Assets', max: 20, missingAction: 'Upload new assets to catalog' },
-  { key: 'placements', label: 'Placements', max: 20, missingAction: 'Pursue new sync/licensing opportunities' },
-  { key: 'no_overdue_tasks', label: 'No Overdue Tasks', max: 10, missingAction: 'Review and resolve overdue tasks' },
-  { key: 'revenue', label: 'Revenue', max: 15, missingAction: 'Follow up on pending payment collection' },
-  { key: 'ownership', label: 'Ownership', max: 15, missingAction: 'Complete ownership and split sheet documentation' },
+  { key: 'momentum', label: 'Momentum', max: 20 },
+  { key: 'delivery', label: 'Delivery Reliability', max: 20 },
+  { key: 'revenue', label: 'Revenue Trajectory', max: 20 },
+  { key: 'audience', label: 'Audience Signals', max: 15 },
+  { key: 'engagement', label: 'Team Engagement', max: 15 },
+  { key: 'compliance', label: 'Compliance', max: 10 },
 ];
 
 const KPI_TOOLTIPS = {
@@ -116,8 +116,9 @@ function KpiTooltip({ kpiKey }) {
 }
 
 function getScoreBarColor(value, max) {
-  if (value === max) return 'var(--color-success)';
-  if (value > 0) return 'var(--color-warning)';
+  const pct = max > 0 ? value / max : 0;
+  if (pct >= 0.8) return 'var(--color-success)';
+  if (pct > 0) return 'var(--color-warning)';
   return 'var(--color-danger)';
 }
 
@@ -398,20 +399,23 @@ export default function DashboardPage() {
 
     const drivers = [];
     const risks = [];
-    const actions = [];
 
     HEALTH_DIMENSIONS.forEach((dim) => {
-      const val = breakdown[dim.key] || 0;
-      if (val === dim.max) {
-        drivers.push(dim.label + ': Full score (' + val + '/' + dim.max + ')');
-      } else if (val > 0) {
-        risks.push(dim.label + ': Partial score (' + val + '/' + dim.max + ')');
-        actions.push(dim.missingAction);
+      const dimData = breakdown[dim.key];
+      const val = dimData ? (dimData.score ?? dimData) : 0;
+      const max = dimData ? (dimData.max ?? dim.max) : dim.max;
+      const ratio = dimData ? (dimData.ratio ?? (max > 0 ? val / max : 0)) : 0;
+      if (ratio >= 0.8) {
+        drivers.push((dimData?.label || dim.label) + ': Strong (' + val + '/' + max + ')');
+      } else if (ratio > 0) {
+        risks.push((dimData?.label || dim.label) + ': ' + val + '/' + max + ' — needs improvement');
       } else {
-        risks.push(dim.label + ': No score (0/' + dim.max + ')');
-        actions.push(dim.missingAction);
+        risks.push((dimData?.label || dim.label) + ': 0/' + max + ' — missing');
       }
     });
+
+    // Server-provided recommended actions
+    const serverActions = selectedArtist.actions || [];
 
     return (
       <div className="modal-overlay" onClick={() => setSelectedArtist(null)}>
@@ -437,21 +441,23 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Score Breakdown Bars */}
+          {/* Why This Score */}
           <div style={{ marginBottom: '24px' }}>
             <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text)', marginBottom: '12px' }}>
-              Score Breakdown
+              Why This Score
             </div>
             {HEALTH_DIMENSIONS.map((dim) => {
-              const val = breakdown[dim.key] || 0;
-              const pct = dim.max > 0 ? (val / dim.max) * 100 : 0;
-              const barColor = getScoreBarColor(val, dim.max);
+              const dimData = breakdown[dim.key];
+              const val = dimData ? (dimData.score ?? dimData) : 0;
+              const max = dimData ? (dimData.max ?? dim.max) : dim.max;
+              const pct = max > 0 ? (val / max) * 100 : 0;
+              const barColor = pct >= 80 ? 'var(--color-success)' : pct > 0 ? 'var(--color-warning)' : 'var(--color-danger)';
               return (
                 <div key={dim.key} style={{ marginBottom: '10px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{dim.label}</span>
+                    <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{dimData?.label || dim.label}</span>
                     <span className="text-sm font-semibold" style={{ color: barColor }}>
-                      {val} / {dim.max}
+                      {val} / {max}
                     </span>
                   </div>
                   <div style={{
@@ -497,14 +503,14 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Recommended Actions */}
-          {actions.length > 0 && (
+          {/* Recommended Actions — server-generated */}
+          {serverActions.length > 0 && (
             <div style={{ marginBottom: '8px' }}>
               <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-warning)', marginBottom: '8px' }}>
                 Recommended Actions
               </div>
               <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: '1.8' }}>
-                {actions.map((a, i) => <li key={i}>{a}</li>)}
+                {serverActions.map((a, i) => <li key={i}>{a.action}</li>)}
               </ul>
             </div>
           )}

@@ -92,6 +92,7 @@ export default function CalendarPage() {
     title: '', type: 'meeting', date: '', startHour: '10', startMin: '00',
     endHour: '11', endMin: '00', linked: '', notes: '',
   });
+  const [draggedEvent, setDraggedEvent] = useState(null);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -168,6 +169,33 @@ export default function CalendarPage() {
     setSelectedEvent(null);
   }
 
+  // Drag-and-drop handlers for rescheduling
+  function handleDragStart(e, event) {
+    setDraggedEvent(event);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', event.id);
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }
+
+  function handleDrop(e, targetDate) {
+    e.preventDefault();
+    if (!draggedEvent) return;
+    setEvents((prev) =>
+      prev.map((ev) =>
+        ev.id === draggedEvent.id ? { ...ev, date: targetDate } : ev
+      )
+    );
+    setDraggedEvent(null);
+  }
+
+  function handleDragEnd() {
+    setDraggedEvent(null);
+  }
+
   function getEventType(key) {
     return EVENT_TYPES.find((t) => t.key === key) || EVENT_TYPES[0];
   }
@@ -205,11 +233,15 @@ export default function CalendarPage() {
           const dayEvents = events.filter((e) => isSameDay(e.date, cell.date));
           const isToday = isSameDay(cell.date, today);
           const isSelected = isSameDay(cell.date, selectedDay);
+          const isDragTarget = draggedEvent && !isSameDay(draggedEvent.date, cell.date);
           return (
             <div
               key={idx}
               className={`cal-day-cell${!cell.currentMonth ? ' cal-day-cell--muted' : ''}${isToday ? ' cal-day-cell--today' : ''}${isSelected ? ' cal-day-cell--selected' : ''}`}
               onClick={() => { setSelectedDay(cell.date); if (view === 'month') setView('day'); }}
+              onDragOver={isDragTarget ? handleDragOver : undefined}
+              onDrop={isDragTarget ? (e) => handleDrop(e, cell.date) : undefined}
+              style={isDragTarget ? { outline: '2px dashed var(--color-primary)', outlineOffset: '-2px' } : undefined}
             >
               <span className="cal-day-number">{cell.day}</span>
               <div className="cal-day-events">
@@ -219,7 +251,10 @@ export default function CalendarPage() {
                     <div
                       key={ev.id}
                       className="cal-event-chip"
-                      style={{ borderLeft: `3px solid ${et.color}` }}
+                      style={{ borderLeft: `3px solid ${et.color}`, cursor: 'grab', opacity: draggedEvent?.id === ev.id ? 0.4 : 1 }}
+                      draggable
+                      onDragStart={(e) => { e.stopPropagation(); handleDragStart(e, ev); }}
+                      onDragEnd={handleDragEnd}
                       onClick={(e) => { e.stopPropagation(); setSelectedEvent(ev); }}
                     >
                       {ev.title.length > 20 ? ev.title.slice(0, 18) + '...' : ev.title}

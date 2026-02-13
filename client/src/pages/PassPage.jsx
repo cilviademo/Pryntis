@@ -1044,6 +1044,40 @@ export default function PassPage() {
       {activeTab === 'roadmap' && (
         <div className="detail-section">
           <h3>Analog Modeling Roadmap</h3>
+
+          {/* Analog Modeling Coming Soon Banner */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(108, 99, 255, 0.15), rgba(59, 130, 246, 0.15))',
+            border: '1px solid rgba(108, 99, 255, 0.3)',
+            borderRadius: 'var(--radius)',
+            padding: '20px 24px',
+            marginBottom: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            flexWrap: 'wrap',
+          }}>
+            <div style={{ fontSize: '32px', lineHeight: 1 }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2">
+                <path d="M9 18V5l12-2v13" />
+                <circle cx="6" cy="18" r="3" />
+                <circle cx="18" cy="16" r="3" />
+              </svg>
+            </div>
+            <div style={{ flex: 1, minWidth: '200px' }}>
+              <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '4px', color: 'var(--color-primary)' }}>
+                Analog Modeling Subscriptions — Coming Soon
+              </div>
+              <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
+                Authentic vintage hardware emulation for modern production. Tape, EQ, compressor, and preamp modeling
+                will be available as add-on subscriptions for Pro and Enterprise tiers starting Q2 2026.
+              </div>
+            </div>
+            <span className="badge badge--in_progress" style={{ fontSize: '11px', padding: '4px 12px' }}>
+              Q2 2026
+            </span>
+          </div>
+
           <p className="text-sm text-secondary mb-16">
             Planned feature releases for the Pryntis analog modeling suite. Each phase introduces new capabilities
             aligned with subscription tier availability.

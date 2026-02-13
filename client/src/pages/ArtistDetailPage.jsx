@@ -6,6 +6,7 @@ import PresencePill from '../components/PresencePill';
 import MediaUploader from '../components/MediaUploader';
 import MediaVersionHistory from '../components/MediaVersionHistory';
 import AudioPlayer from '../components/AudioPlayer';
+import { maskEmail, maskPhone } from '../utils/pii';
 
 export default function ArtistDetailPage() {
   const { id } = useParams();
@@ -95,11 +96,11 @@ export default function ArtistDetailPage() {
           </div>
           <div className="detail-field">
             <span className="detail-field__label">Email</span>
-            <span className="detail-field__value">{artist.email || '--'}</span>
+            <span className="detail-field__value">{artist.email ? maskEmail(artist.email) : '--'}</span>
           </div>
           <div className="detail-field">
             <span className="detail-field__label">Phone</span>
-            <span className="detail-field__value">{artist.phone || '--'}</span>
+            <span className="detail-field__value">{artist.phone ? maskPhone(artist.phone) : '--'}</span>
           </div>
           <div className="detail-field">
             <span className="detail-field__label">Genre</span>

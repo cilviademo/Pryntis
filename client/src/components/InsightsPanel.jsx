@@ -67,13 +67,13 @@ function generateInsights(kpi, healthScores) {
 
   // Health scores
   if (Array.isArray(healthScores) && healthScores.length > 0) {
-    const atRiskArtists = healthScores.filter((h) => (h.score || 0) < 50);
+    const atRiskArtists = healthScores.filter((h) => (h.health_score || 0) < 50);
     if (atRiskArtists.length > 0) {
       insights.push({
         id: 'at-risk-artists',
         severity: atRiskArtists.length > 5 ? 'high' : atRiskArtists.length > 2 ? 'medium' : 'low',
         title: `${atRiskArtists.length} artist${atRiskArtists.length > 1 ? 's' : ''} at risk (health < 50)`,
-        detail: 'Artists with low health scores need attention: missing subscriptions, no recent assets, overdue tasks, or incomplete ownership.',
+        detail: 'Artists with low health scores need attention across momentum, delivery, revenue, audience, engagement, or compliance dimensions.',
         action: 'Review at-risk artists',
         actionType: 'navigate',
         actionRoute: '/analytics',

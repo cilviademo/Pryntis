@@ -34,6 +34,8 @@ const calendarRoutes = require('./routes/calendarRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const pdfRoutes = require('./routes/pdfRoutes');
 const impersonateRoutes = require('./routes/impersonateRoutes');
+const auditRoutes = require('./routes/auditRoutes');
+const ledgerRoutes = require('./routes/ledgerRoutes');
 
 const app = express();
 
@@ -158,6 +160,8 @@ app.use('/api/v1/calendar', calendarRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/pdf', pdfRoutes);
 app.use('/api/v1/admin', impersonateRoutes);
+app.use('/api/v1/audit', auditRoutes);
+app.use('/api/v1/ledger', ledgerRoutes);
 
 // Health check — safe: never expose DB internals or error messages
 app.get('/api/health', async (_req, res) => {

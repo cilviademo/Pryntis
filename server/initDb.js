@@ -240,6 +240,62 @@ async function ensureNewTables() {
         CREATE INDEX IF NOT EXISTS idx_org_member_org ON user_org_memberships(org_id);
       `,
     },
+    {
+      table: 'ledger_accounts',
+      sql: `
+        CREATE TABLE IF NOT EXISTS ledger_accounts (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          artist_id UUID NOT NULL REFERENCES artists(id) ON DELETE CASCADE,
+          project_id UUID REFERENCES projects(id) ON DELETE SET NULL,
+          name VARCHAR(255) NOT NULL,
+          currency VARCHAR(3) NOT NULL DEFAULT 'USD',
+          is_active BOOLEAN NOT NULL DEFAULT true,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+        CREATE INDEX IF NOT EXISTS idx_ledger_artist ON ledger_accounts(artist_id);
+      `,
+    },
+    {
+      table: 'ledger_transactions',
+      sql: `
+        CREATE TABLE IF NOT EXISTS ledger_transactions (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          account_id UUID NOT NULL REFERENCES ledger_accounts(id) ON DELETE CASCADE,
+          type VARCHAR(50) NOT NULL,
+          amount DECIMAL(14,2) NOT NULL,
+          description TEXT NOT NULL DEFAULT '',
+          transaction_date DATE NOT NULL DEFAULT CURRENT_DATE,
+          reference VARCHAR(255),
+          metadata JSONB DEFAULT '{}'::jsonb,
+          created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+        CREATE INDEX IF NOT EXISTS idx_ltx_account ON ledger_transactions(account_id);
+        CREATE INDEX IF NOT EXISTS idx_ltx_type ON ledger_transactions(type);
+        CREATE INDEX IF NOT EXISTS idx_ltx_date ON ledger_transactions(transaction_date DESC);
+      `,
+    },
+    {
+      table: 'royalty_splits',
+      sql: `
+        CREATE TABLE IF NOT EXISTS royalty_splits (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          account_id UUID NOT NULL REFERENCES ledger_accounts(id) ON DELETE CASCADE,
+          role VARCHAR(50) NOT NULL,
+          party_name VARCHAR(255) NOT NULL,
+          artist_pct DECIMAL(5,2) NOT NULL DEFAULT 0,
+          label_pct DECIMAL(5,2) NOT NULL DEFAULT 0,
+          producer_points DECIMAL(5,2) NOT NULL DEFAULT 0,
+          engineer_points DECIMAL(5,2) NOT NULL DEFAULT 0,
+          producer_paid_record_one BOOLEAN NOT NULL DEFAULT false,
+          producer_post_recoup_only BOOLEAN NOT NULL DEFAULT false,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+        CREATE INDEX IF NOT EXISTS idx_splits_account ON royalty_splits(account_id);
+      `,
+    },
   ];
 
   for (const m of migrations) {

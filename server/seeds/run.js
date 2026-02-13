@@ -2420,6 +2420,402 @@ Reviewed by: ________________________  Date: ____/____/________
 Approved by (Head of Catalog): ______  Date: ____/____/________
 
 Next audit scheduled: ____/____/________`, null],
+
+    // ── 16. Artist Onboarding Checklist ──────────────────────────────────
+    ['Artist Onboarding Checklist', 'Ops',
+`ARTIST ONBOARDING CHECKLIST
+========================================================
+
+ARTIST NAME: ________________________
+ONBOARDING MANAGER: ________________________
+START DATE: ____/____/________
+
+PRE-ONBOARDING (Before Day 1)
+-------------------------------
+- [ ] Signed artist agreement / recording contract on file
+- [ ] Verified government-issued ID for OFAC / KYC compliance
+- [ ] Created artist profile in Pryntis Panel with legal name + stage name
+- [ ] Requested hi-res press photo, bio, and social media links
+- [ ] Created shared folder structure (Masters, Stems, Contracts, Press)
+- [ ] Assigned primary A&R or project manager
+- [ ] Sent welcome packet (label handbook, royalty FAQ, contact list)
+
+DAY 1: SYSTEM SETUP
+---------------------
+- [ ] Pryntis Panel account created and credentials shared securely
+- [ ] Artist linked to correct subscription tier
+- [ ] PRO affiliation confirmed (BMI / ASCAP / SESAC / GMR)
+- [ ] Publisher information collected and verified
+- [ ] IPI / CAE number documented in artist profile
+- [ ] SoundExchange registration confirmed
+- [ ] MLC (Mechanical Licensing Collective) registration confirmed
+
+WEEK 1: CATALOG INGESTION
+---------------------------
+- [ ] All existing masters uploaded to asset library
+- [ ] ISRC codes assigned or imported for each track
+- [ ] UPC codes assigned for each release / project
+- [ ] Metadata verified: title, writers, producers, featured artists
+- [ ] Split sheets collected and filed for every track
+- [ ] Ownership records created in Pryntis for each asset
+- [ ] Distributor accounts linked (DistroKid, TuneCore, etc.)
+
+WEEK 2: FINANCIAL SETUP
+-------------------------
+- [ ] Royalty account created in Pryntis ledger
+- [ ] Bank / payment details collected securely
+- [ ] Tax forms collected (W-9 / W-8BEN)
+- [ ] Recoupable expenses documented and loaded
+- [ ] Advance payment schedule confirmed if applicable
+- [ ] First royalty statement date communicated
+
+WEEK 3-4: LAUNCH PLANNING
+---------------------------
+- [ ] Release calendar populated with upcoming projects
+- [ ] Marketing plan drafted and shared
+- [ ] Social media assets prepared (banners, profile photos)
+- [ ] Press contacts identified for PR outreach
+- [ ] Streaming playlist pitch strategy documented
+- [ ] Content ID reference files delivered
+
+SIGN-OFF
+---------
+Onboarding completed by: _______________  Date: ____/____/________
+Artist confirmation: ___________________  Date: ____/____/________`, null],
+
+    // ── 17. Mechanical License Request Template ──────────────────────────
+    ['Mechanical License Request Template', 'Legal',
+`MECHANICAL LICENSE REQUEST
+========================================================
+
+TO:    [PUBLISHER / COPYRIGHT OWNER NAME]
+       [ADDRESS]
+FROM:  [LICENSEE / LABEL NAME]
+       [ADDRESS]
+DATE:  ____/____/________
+
+RE: Request for Mechanical License
+
+Dear [PUBLISHER CONTACT],
+
+We are writing to request a mechanical license for the following
+musical composition:
+
+COMPOSITION DETAILS
+--------------------
+Song Title: [SONG TITLE]
+Writer(s): [SONGWRITER NAMES]
+Publisher(s): [PUBLISHER NAMES]
+ISWC (if known): ________________________
+
+RECORDING DETAILS
+------------------
+Recording Artist: [ARTIST NAME]
+Record Label: [LABEL NAME]
+Planned Release Date: ____/____/________
+Distribution Format: [ ] Physical [ ] Digital [ ] Both
+Territory: [TERRITORY]
+Planned First-Year Pressings/Downloads: ________
+
+LICENSE TYPE REQUESTED
+-----------------------
+[ ] Statutory Rate (per Section 115 of the U.S. Copyright Act)
+[ ] Reduced Rate: $______ per unit (negotiated)
+[ ] Flat Fee: $______ for ______ units
+
+ADDITIONAL INFORMATION
+-----------------------
+- This recording [ ] is / [ ] is not a cover of the original composition.
+- The arrangement [ ] does / [ ] does not alter the fundamental character
+  of the work (if altered, a separate arrangement license may be required).
+- Duration of recording: ____:____ (mm:ss)
+
+Please send the executed license agreement to the address above
+or via email at: [EMAIL ADDRESS].
+
+We look forward to your prompt response.
+
+Sincerely,
+
+___________________________
+[LICENSEE NAME / AUTHORIZED SIGNATORY]
+[TITLE]
+[PHONE]
+[EMAIL]`, null],
+
+    // ── 18. Distribution Partner Evaluation SOP ──────────────────────────
+    ['Distribution Partner Evaluation SOP', 'Ops',
+`DISTRIBUTION PARTNER EVALUATION -- STANDARD OPERATING PROCEDURE
+========================================================
+
+PURPOSE
+--------
+This SOP provides a structured process for evaluating, selecting, and
+onboarding digital music distribution partners. A thorough evaluation
+ensures competitive economics, reliable delivery, and alignment with
+the label's strategic goals.
+
+STEP 1: CANDIDATE IDENTIFICATION
+----------------------------------
+Compile a shortlist of 3-5 distribution partners based on:
+- Market reputation and artist roster quality
+- Geographic coverage and DSP relationships
+- Integration capabilities with existing tools (Pryntis, accounting)
+
+Current Candidates:
++----+------------------+-------------------+--------------------------+
+| #  | Distributor      | Contact           | Initial Assessment       |
++----+------------------+-------------------+--------------------------+
+| 1  | ________________ | _________________ | ________________________ |
+| 2  | ________________ | _________________ | ________________________ |
+| 3  | ________________ | _________________ | ________________________ |
++----+------------------+-------------------+--------------------------+
+
+STEP 2: ECONOMIC ANALYSIS
+---------------------------
+For each candidate, document:
+- Revenue split: ____% to label / ____% to distributor
+- Annual fee or per-release fee: $____________
+- Minimum commitment term: ____________
+- Payment frequency: [ ] Monthly [ ] Quarterly [ ] Other: ________
+- Payment lag from DSP reporting to settlement: ______ days
+- Does the distributor advance against future royalties? [ ] Yes [ ] No
+
+STEP 3: TECHNICAL CAPABILITIES
+---------------------------------
+- [ ] API integration available for automated catalog delivery
+- [ ] Supports all required DSPs (Spotify, Apple Music, Amazon, YouTube, Tidal, etc.)
+- [ ] DDEX compliance for metadata delivery
+- [ ] Real-time or near-real-time streaming analytics
+- [ ] Content ID / rights management included
+- [ ] UPC/ISRC management tools provided
+- [ ] White-label or co-branded artist portal
+
+STEP 4: CONTRACTUAL REVIEW
+-----------------------------
+Legal review checklist:
+- [ ] Exclusivity terms reviewed (exclusive vs non-exclusive catalog)
+- [ ] Territory restrictions documented
+- [ ] Takedown / removal timeline specified (target: < 48 hours)
+- [ ] Rights reversion clause upon termination
+- [ ] Audit rights for royalty accounting
+- [ ] Indemnification terms are balanced
+
+STEP 5: DECISION AND ONBOARDING
+---------------------------------
+Selected Distributor: ________________________
+Approved by: ________________________  Date: ____/____/________
+Contract executed: [ ] Yes  Date: ____/____/________
+
+Onboarding Checklist:
+- [ ] Account created on distributor platform
+- [ ] API credentials received and configured in Pryntis
+- [ ] First catalog batch uploaded as test
+- [ ] Royalty reporting format confirmed and mapped
+- [ ] Internal team trained on new workflow`, null],
+
+    // ── 19. Revenue Reconciliation SOP ───────────────────────────────────
+    ['Revenue Reconciliation SOP (Monthly)', 'Royalties',
+`REVENUE RECONCILIATION -- MONTHLY STANDARD OPERATING PROCEDURE
+========================================================
+
+PURPOSE
+--------
+This SOP outlines the monthly process for reconciling revenue
+reported by distributors, DSPs, and sync partners against internal
+accounting records. Accurate reconciliation prevents royalty
+underpayment and maintains artist trust.
+
+FREQUENCY: Monthly, within 15 business days of receiving statements
+
+STEP 1: COLLECT STATEMENTS
+----------------------------
+- [ ] Download distributor royalty statements for the period
+- [ ] Download sync license payment confirmations
+- [ ] Download direct-deal DSP statements (if applicable)
+- [ ] Collect any mechanical royalty statements from HFA/MLC
+- [ ] Collect PRO performance royalty statements (quarterly align)
+
+STEP 2: DATA IMPORT
+---------------------
+- [ ] Import distributor CSV/XLSX into reconciliation spreadsheet
+- [ ] Map distributor track IDs to internal ISRC codes
+- [ ] Flag any unmatched tracks for manual review
+- [ ] Verify currency conversion rates used (if international)
+
+STEP 3: CROSS-REFERENCE
+--------------------------
+For each revenue line item, verify:
+- [ ] ISRC matches internal catalog
+- [ ] Revenue amount aligns with contract split
+- [ ] Territory matches distribution agreement scope
+- [ ] Payment period matches statement period
+- [ ] No duplicate entries from overlapping distribution deals
+
+STEP 4: VARIANCE ANALYSIS
+----------------------------
+Document all discrepancies:
++-----+----------+-----------+----------+-----------+----------------+
+| #   | ISRC     | Expected  | Reported | Variance  | Status         |
++-----+----------+-----------+----------+-----------+----------------+
+| 1   | ________ | $________ | $_______ | $________ | [ ] Resolved   |
+| 2   | ________ | $________ | $_______ | $________ | [ ] Escalated  |
+| 3   | ________ | $________ | $_______ | $________ | [ ] Pending    |
++-----+----------+-----------+----------+-----------+----------------+
+
+Threshold for escalation: Variances > $50 or > 10% of expected amount
+
+STEP 5: RESOLUTION AND POSTING
+---------------------------------
+- [ ] Contact distributor for all material discrepancies
+- [ ] Document resolution timeline and correspondence
+- [ ] Post confirmed revenue to Pryntis ledger accounts
+- [ ] Update recoupment balances for each artist account
+- [ ] Generate artist-facing royalty statements if quarter-end
+
+SIGN-OFF
+---------
+Reconciliation performed by: _______________  Date: ____/____/________
+Reviewed by: _____________________________  Date: ____/____/________
+Posted to ledger: [ ] Yes  Date: ____/____/________`, null],
+
+    // ── 20. Session Musician Agreement ───────────────────────────────────
+    ['Session Musician Agreement', 'Legal',
+`SESSION MUSICIAN AGREEMENT
+========================================================
+
+PARTIES
+--------
+Engaging Party: [LABEL / ARTIST NAME] ("Employer")
+Session Musician: [MUSICIAN NAME] ("Musician")
+Effective Date: ____/____/________
+
+SESSION DETAILS
+----------------
+Project / Song Title: [PROJECT TITLE]
+Session Date(s): ____/____/________ through ____/____/________
+Studio Location: ________________________
+Instrument(s) Performed: ________________________
+
+SCOPE OF SERVICES
+------------------
+Musician agrees to perform and record musical performances as directed
+by Employer for the above-referenced project. Musician shall:
+- Arrive prepared with all necessary instruments and equipment
+- Perform up to _____ takes per song as reasonably requested
+- Follow the creative direction of the producer / artist
+
+COMPENSATION
+-------------
+a) Session Fee: $[AMOUNT] per session / per song / flat total
+   (circle one)
+b) Payment Due: Within _____ days of session completion
+c) Overtime Rate: $[RATE] per hour after _____ hours per session
+d) Cartage / Equipment Fee: $[AMOUNT] (if applicable)
+
+ROYALTY PARTICIPATION
+----------------------
+[ ] NO backend royalty participation. The session fee above constitutes
+    full payment for all services and rights conveyed.
+
+[ ] YES — Musician shall receive ______% of net master recording
+    royalties from exploitation of the recordings.
+
+RIGHTS AND OWNERSHIP
+---------------------
+- The recordings made under this Agreement shall be considered
+  works made for hire under 17 U.S.C. Section 101.
+- Employer shall own all rights in the master recordings.
+- If work-for-hire doctrine does not apply, Musician hereby assigns
+  all right, title, and interest in the recordings to Employer.
+
+CREDIT
+-------
+Musician shall be credited as: [CREDIT NAME] on [INSTRUMENT]
+Credit shall appear in liner notes and streaming metadata where
+commercially reasonable.
+
+ADDITIONAL TERMS
+-----------------
+- Musician warrants that they are free to enter this Agreement and
+  their performance does not infringe any third-party rights.
+- Musician shall not publicly disclose session details until
+  the official release date unless authorized in writing.
+- This Agreement shall be governed by the laws of ____________.
+
+SIGNATURES
+-----------
+
+___________________________  Date: ____/____/________
+[EMPLOYER / AUTHORIZED REP]
+
+___________________________  Date: ____/____/________
+[MUSICIAN NAME]`, null],
+
+    // ── 21. Content Takedown / DMCA Notice Template ─────────────────────
+    ['Content Takedown / DMCA Notice Template', 'Legal',
+`DMCA TAKEDOWN NOTICE
+========================================================
+
+TO:     [SERVICE PROVIDER / DSP NAME]
+        DMCA Designated Agent
+        [ADDRESS / EMAIL]
+FROM:   [COPYRIGHT OWNER / AUTHORIZED AGENT]
+DATE:   ____/____/________
+
+NOTICE OF CLAIMED INFRINGEMENT
+(Pursuant to 17 U.S.C. Section 512(c))
+
+I, the undersigned, state under penalty of perjury that:
+
+1. IDENTIFICATION OF COPYRIGHTED WORK
+---------------------------------------
+The following copyrighted work(s) have been infringed:
+
+Title: [SONG / ALBUM TITLE]
+ISRC: [ISRC CODE]
+UPC: [UPC CODE]
+Copyright Owner: [OWNER NAME]
+Copyright Registration # (if available): ________________________
+
+2. IDENTIFICATION OF INFRINGING MATERIAL
+------------------------------------------
+The infringing material is located at the following URL(s):
+
+URL 1: ____________________________________________________________
+URL 2: ____________________________________________________________
+URL 3: ____________________________________________________________
+
+Description of infringement: [e.g., unauthorized upload of master
+recording, unauthorized use in user-generated content, etc.]
+
+3. CONTACT INFORMATION
+------------------------
+Name: [FULL LEGAL NAME]
+Title: [TITLE / ROLE]
+Company: [COMPANY NAME]
+Address: [FULL ADDRESS]
+Phone: [PHONE NUMBER]
+Email: [EMAIL ADDRESS]
+
+4. GOOD FAITH STATEMENT
+-------------------------
+I have a good faith belief that the use of the copyrighted material
+described above is not authorized by the copyright owner, its agent,
+or the law.
+
+5. ACCURACY STATEMENT
+-----------------------
+The information in this notification is accurate, and under penalty
+of perjury, I am authorized to act on behalf of the owner of an
+exclusive right that is allegedly infringed.
+
+SIGNATURE
+----------
+
+___________________________  Date: ____/____/________
+[PRINTED NAME]
+[TITLE]`, null],
   ];
 
   for (const [title, category, body, sourceUrl] of templateData) {

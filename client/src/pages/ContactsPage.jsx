@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import useEscapeKey from '../utils/useEscapeKey';
 import api from '../services/api';
 import ExportButton from '../components/ExportButton';
+import { maskEmail, maskPhone } from '../utils/pii';
 
 const ROLE_OPTIONS = ['Lawyer', 'Publisher', 'A&R', 'Music Supervisor', 'Manager', 'Producer', 'Distributor', 'Other'];
 
@@ -150,8 +151,8 @@ export default function ContactsPage() {
                     <td style={{ fontWeight: 600 }}>{c.name}</td>
                     <td>{c.organization || '--'}</td>
                     <td><span className="badge badge--active">{c.role || '--'}</span></td>
-                    <td>{c.email || '--'}</td>
-                    <td>{c.phone || '--'}</td>
+                    <td>{c.email ? maskEmail(c.email) : '--'}</td>
+                    <td>{c.phone ? maskPhone(c.phone) : '--'}</td>
                     <td>
                       {c.relationship_strength ? (
                         <span className={`badge badge--${c.relationship_strength >= 4 ? 'completed' : c.relationship_strength >= 2 ? 'pending' : 'declined'}`}>
@@ -191,8 +192,8 @@ export default function ContactsPage() {
             <div className="detail-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
               <div><strong>Organization:</strong> {selected.organization || '--'}</div>
               <div><strong>Role:</strong> {selected.role || '--'}</div>
-              <div><strong>Email:</strong> {selected.email || '--'}</div>
-              <div><strong>Phone:</strong> {selected.phone || '--'}</div>
+              <div><strong>Email:</strong> {selected.email ? maskEmail(selected.email) : '--'}</div>
+              <div><strong>Phone:</strong> {selected.phone ? maskPhone(selected.phone) : '--'}</div>
               <div><strong>Strength:</strong> {selected.relationship_strength ? strengthLabels[selected.relationship_strength] : '--'}</div>
               <div><strong>Tags:</strong> {Array.isArray(selected.tags) && selected.tags.length > 0 ? selected.tags.join(', ') : '--'}</div>
             </div>

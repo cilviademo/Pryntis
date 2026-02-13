@@ -4,6 +4,7 @@ const config = require('../config');
 const db = require('../config/db');
 const { AppError } = require('../middleware/errorHandler');
 const { success, created } = require('../utils/response');
+const { logAudit } = require('../middleware/auditLog');
 
 const authController = {
   // POST /api/v1/auth/register — admin only
@@ -68,6 +69,8 @@ const authController = {
         config.jwtSecret,
         { expiresIn: config.jwtExpiresIn }
       );
+
+      logAudit(user.id, 'auth.login', 'user', user.id);
 
       success(res, {
         token,

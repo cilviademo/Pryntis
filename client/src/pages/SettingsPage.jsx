@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+
+const PII_SAFE_KEY = 'pryntis_pii_safe';
 
 export default function SettingsPage() {
   const { user, isAdmin } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const [piiSafe, setPiiSafe] = useState(() => localStorage.getItem(PII_SAFE_KEY) === 'true');
 
   return (
     <div>
@@ -24,6 +27,36 @@ export default function SettingsPage() {
             {theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           </button>
         </div>
+      </div>
+
+      {/* PII Safe Mode */}
+      <div className="detail-section">
+        <h3>Privacy</h3>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--color-border)' }}>
+          <div>
+            <div className="font-semibold">PII Safe Mode</div>
+            <div className="text-sm text-secondary" style={{ lineHeight: '1.5', maxWidth: '480px' }}>
+              When enabled, personal identifiable information (email addresses, phone numbers)
+              is masked in the UI. Useful for screen sharing, demos, and presentations.
+            </div>
+          </div>
+          <button
+            className={`btn btn-sm ${piiSafe ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => {
+              const next = !piiSafe;
+              setPiiSafe(next);
+              localStorage.setItem(PII_SAFE_KEY, String(next));
+              window.dispatchEvent(new CustomEvent('pii-safe-change', { detail: { enabled: next } }));
+            }}
+          >
+            {piiSafe ? 'ON — PII Hidden' : 'OFF — PII Visible'}
+          </button>
+        </div>
+        {piiSafe && (
+          <div style={{ padding: '10px 0', fontSize: '12px', color: 'var(--color-warning)' }}>
+            PII Safe Mode is active. Email addresses and phone numbers are masked throughout the application.
+          </div>
+        )}
       </div>
 
       {/* Security */}

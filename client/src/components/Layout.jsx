@@ -5,6 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 import GlobalSearch from './GlobalSearch';
 import NotificationBell from './NotificationBell';
 import ImpersonationBanner from './ImpersonationBanner';
+import Breadcrumbs from './Breadcrumbs';
 
 export default function Layout() {
   const { user, isAdmin, logout } = useAuth();
@@ -158,6 +159,7 @@ export default function Layout() {
 
       <main className="main-content">
         <ImpersonationBanner />
+        <Breadcrumbs />
         <Outlet />
       </main>
     </div>
