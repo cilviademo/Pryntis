@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const config = require('./config');
@@ -43,6 +44,15 @@ app.get('/api/health', async (req, res) => {
     res.status(503).json({ success: false, message: 'Database unreachable', error: err.message });
   }
 });
+
+// In production, serve the built React client
+if (config.nodeEnv === 'production') {
+  const clientDist = path.join(__dirname, '..', 'client', 'dist');
+  app.use(express.static(clientDist));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientDist, 'index.html'));
+  });
+}
 
 // Error handling
 app.use(errorHandler);

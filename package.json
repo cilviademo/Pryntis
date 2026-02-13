@@ -17,6 +17,7 @@
     "reset": "docker compose down -v && docker compose up -d && sleep 4 && npm run db:seed",
     "test": "jest --forceExit --detectOpenHandles",
     "test:smoke": "jest --forceExit --detectOpenHandles --verbose",
+    "build:prod": "cd client && npx vite build",
     "preflight": "node scripts/preflight.js"
   },
   "dependencies": {
