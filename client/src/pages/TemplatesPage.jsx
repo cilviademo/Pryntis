@@ -282,6 +282,18 @@ export default function TemplatesPage() {
               <button className="btn btn-secondary" onClick={() => setSelected(null)}>Close</button>
               <button className="btn btn-secondary" onClick={() => copyToClipboard(selected)}>Copy to Clipboard</button>
               <button className="btn btn-secondary" onClick={() => downloadAsText(selected)}>Download as Text</button>
+              <button className="btn btn-secondary" onClick={() => {
+                const token = localStorage.getItem('pryntis_token');
+                const url = `/api/v1/pdf/templates/${selected.id}/export.pdf`;
+                fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+                  .then(res => res.blob())
+                  .then(blob => {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `${selected.title.replace(/[^a-z0-9]/gi, '-')}.pdf`;
+                    a.click();
+                  });
+              }}>Export PDF</button>
               <button className="btn btn-primary" onClick={useTemplate}>Use Template</button>
               {canEdit && (
                 <button className="btn btn-secondary" onClick={() => openEdit(selected)}>Edit</button>

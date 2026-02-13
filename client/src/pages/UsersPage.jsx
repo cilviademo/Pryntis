@@ -6,7 +6,8 @@ import api from '../services/api';
 export default function UsersPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role === 'admin' || user?.role === 'owner';
+  const [impersonating, setImpersonating] = useState(false);
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -89,6 +90,24 @@ export default function UsersPage() {
     }
   };
 
+  const handleImpersonate = async (targetUser) => {
+    if (targetUser.id === user?.id) return;
+    if (targetUser.role === 'admin' || targetUser.role === 'owner') return;
+    setImpersonating(true);
+    try {
+      const res = await api.post(`/admin/impersonate/${targetUser.id}`);
+      const data = res.data || res;
+      if (data.token) {
+        localStorage.setItem('pryntis_token', data.token);
+        window.location.reload();
+      }
+    } catch (err) {
+      setError(err.message || 'Impersonation failed');
+    } finally {
+      setImpersonating(false);
+    }
+  };
+
   if (!isAdmin) {
     return <div className="empty-state">Access denied. Admin privileges required.</div>;
   }
@@ -150,7 +169,19 @@ export default function UsersPage() {
                     </td>
                     <td>{u.created_at ? new Date(u.created_at).toLocaleDateString() : '--'}</td>
                     <td>
-                      <button className="btn btn-secondary btn-sm" onClick={() => openEdit(u)}>Edit</button>
+                      <div style={{ display: 'flex', gap: '4px' }}>
+                        <button className="btn btn-secondary btn-sm" onClick={() => openEdit(u)}>Edit</button>
+                        {u.id !== user?.id && u.role !== 'admin' && u.role !== 'owner' && (
+                          <button
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => handleImpersonate(u)}
+                            disabled={impersonating}
+                            title="View as this user"
+                          >
+                            Impersonate
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import PresencePill from '../components/PresencePill';
+import MediaUploader from '../components/MediaUploader';
+import MediaVersionHistory from '../components/MediaVersionHistory';
+import AudioPlayer from '../components/AudioPlayer';
 
 export default function ArtistDetailPage() {
   const { id } = useParams();
@@ -69,9 +73,12 @@ export default function ArtistDetailPage() {
           </div>
           <h2>{artist.stage_name || artist.name}</h2>
         </div>
-        <span className={`badge badge--${artist.status}`}>
-          {(artist.status || '').replace(/_/g, ' ')}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <PresencePill roomId={`artist:${id}`} />
+          <span className={`badge badge--${artist.status}`}>
+            {(artist.status || '').replace(/_/g, ' ')}
+          </span>
+        </div>
       </div>
 
       {/* Profile Section */}
@@ -125,10 +132,36 @@ export default function ArtistDetailPage() {
         )}
       </div>
 
+      {/* Media Section */}
+      <div className="detail-section">
+        <h3>Media Files</h3>
+        <MediaVersionHistory ownerType="artist" ownerId={id} canManage={canEdit} />
+        {canEdit && (
+          <div style={{ marginTop: '12px' }}>
+            <MediaUploader ownerType="artist" ownerId={id} onUploadComplete={() => window.location.reload()} />
+          </div>
+        )}
+      </div>
+
       {/* KPI Section */}
       {kpi && (
         <div className="detail-section">
-          <h3>Key Performance Indicators</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ margin: 0 }}>Key Performance Indicators</h3>
+            {canEdit && (
+              <button className="btn btn-secondary btn-sm" onClick={() => {
+                const token = localStorage.getItem('pryntis_token');
+                fetch(`/api/v1/pdf/royalty/statements/${id}.pdf`, { headers: { Authorization: `Bearer ${token}` } })
+                  .then(r => r.blob())
+                  .then(blob => {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `royalty-statement-${(artist.stage_name || artist.name).replace(/[^a-z0-9]/gi, '-')}.pdf`;
+                    a.click();
+                  });
+              }}>Export Royalty PDF</button>
+            )}
+          </div>
           <div className="summary-cards">
             <div className="summary-card">
               <div className="summary-card__label">Gross Revenue</div>

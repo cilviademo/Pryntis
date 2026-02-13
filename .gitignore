@@ -7,3 +7,5 @@ client/build/
 *.log
 .DS_Store
 coverage/
+server/uploads/*
+!server/uploads/.gitkeep

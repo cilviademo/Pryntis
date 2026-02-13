@@ -22,6 +22,8 @@ import ContactsPage from './pages/ContactsPage';
 import TemplatesPage from './pages/TemplatesPage';
 import BusinessOpsPage from './pages/BusinessOpsPage';
 import CalendarPage from './pages/CalendarPage';
+import DeepAnalyticsPage from './pages/DeepAnalyticsPage';
+import SettingsPage from './pages/SettingsPage';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -77,6 +79,15 @@ function AppRoutes() {
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="business" element={<BusinessOpsPage />} />
         <Route path="calendar" element={<CalendarPage />} />
+        <Route path="settings" element={<SettingsPage />} />
+        <Route
+          path="admin/analytics"
+          element={
+            <AdminRoute>
+              <DeepAnalyticsPage />
+            </AdminRoute>
+          }
+        />
       </Route>
     </Routes>
   );

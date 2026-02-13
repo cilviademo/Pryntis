@@ -3,6 +3,8 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import GlobalSearch from './GlobalSearch';
+import NotificationBell from './NotificationBell';
+import ImpersonationBanner from './ImpersonationBanner';
 
 export default function Layout() {
   const { user, isAdmin, logout } = useAuth();
@@ -35,6 +37,9 @@ export default function Layout() {
           <span className="hamburger-line" />
         </button>
         <span className="mobile-brand">Pryntis</span>
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <NotificationBell />
+        </div>
       </header>
 
       {/* Sidebar overlay for mobile */}
@@ -107,6 +112,9 @@ export default function Layout() {
           <NavLink to="/calendar" className="nav-link">
             Calendar
           </NavLink>
+          <NavLink to="/settings" className="nav-link">
+            Settings
+          </NavLink>
 
           {/* ADMIN */}
           {isAdmin && (
@@ -115,9 +123,16 @@ export default function Layout() {
               <NavLink to="/users" className="nav-link">
                 Users
               </NavLink>
+              <NavLink to="/admin/analytics" className="nav-link">
+                Deep Analytics
+              </NavLink>
             </>
           )}
         </nav>
+
+        <div style={{ padding: '8px 16px 0' }}>
+          <NotificationBell />
+        </div>
 
         <div className="sidebar-footer">
           <div className="user-info">
@@ -142,6 +157,7 @@ export default function Layout() {
       </aside>
 
       <main className="main-content">
+        <ImpersonationBanner />
         <Outlet />
       </main>
     </div>

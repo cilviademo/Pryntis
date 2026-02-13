@@ -475,3 +475,93 @@ CREATE TRIGGER update_tasks_ts      BEFORE UPDATE ON tasks               FOR EAC
 CREATE TRIGGER update_contacts_ts   BEFORE UPDATE ON contacts            FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_comments_ts  BEFORE UPDATE ON activity_comments   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_templates_ts BEFORE UPDATE ON templates           FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================
+-- 23. MEDIA FILES (Upload + Streaming + Versioning)
+-- ============================================
+CREATE TABLE media_files (
+    id                UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    owner_type        VARCHAR(50) NOT NULL,
+    owner_id          UUID NOT NULL,
+    file_name         VARCHAR(255) NOT NULL,
+    mime_type         VARCHAR(100) NOT NULL,
+    size_bytes        BIGINT NOT NULL,
+    storage_key       VARCHAR(500) NOT NULL,
+    storage_provider  VARCHAR(20) NOT NULL DEFAULT 'local',
+    version           INTEGER NOT NULL DEFAULT 1,
+    checksum_sha256   VARCHAR(64),
+    uploaded_by       UUID REFERENCES users(id) ON DELETE SET NULL,
+    is_current        BOOLEAN NOT NULL DEFAULT true,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_media_owner    ON media_files(owner_type, owner_id);
+CREATE INDEX idx_media_uploader ON media_files(uploaded_by);
+CREATE INDEX idx_media_current  ON media_files(owner_type, owner_id, is_current) WHERE is_current = true;
+
+-- ============================================
+-- 24. CALENDAR EVENTS (Scheduling + Booking)
+-- ============================================
+CREATE TABLE calendar_events (
+    id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title         VARCHAR(255) NOT NULL,
+    description   TEXT,
+    event_type    VARCHAR(50) NOT NULL DEFAULT 'meeting',
+    start_at      TIMESTAMPTZ NOT NULL,
+    end_at        TIMESTAMPTZ NOT NULL,
+    timezone      VARCHAR(50) DEFAULT 'UTC',
+    status        VARCHAR(50) NOT NULL DEFAULT 'scheduled',
+    owner_type    VARCHAR(50),
+    owner_id      UUID,
+    assigned_to   UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_by    UUID NOT NULL REFERENCES users(id),
+    updated_by    UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_cal_dates    ON calendar_events(start_at, end_at);
+CREATE INDEX idx_cal_assigned ON calendar_events(assigned_to);
+CREATE INDEX idx_cal_owner    ON calendar_events(owner_type, owner_id);
+CREATE INDEX idx_cal_status   ON calendar_events(status);
+
+-- ============================================
+-- 25. NOTIFICATIONS (In-App)
+-- ============================================
+CREATE TABLE notifications (
+    id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type        VARCHAR(20) NOT NULL DEFAULT 'info',
+    title       VARCHAR(255) NOT NULL,
+    body        TEXT,
+    link_url    VARCHAR(500),
+    is_read     BOOLEAN NOT NULL DEFAULT false,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_notif_user   ON notifications(user_id, is_read);
+CREATE INDEX idx_notif_date   ON notifications(created_at DESC);
+
+-- ============================================
+-- 26. ORGANIZATIONS (Multi-Tenancy Foundation)
+-- ============================================
+CREATE TABLE organizations (
+    id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name        VARCHAR(255) NOT NULL,
+    slug        VARCHAR(100) UNIQUE NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE user_org_memberships (
+    id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    org_id      UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    role        VARCHAR(50) NOT NULL DEFAULT 'member',
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(user_id, org_id)
+);
+CREATE INDEX idx_org_member_user ON user_org_memberships(user_id);
+CREATE INDEX idx_org_member_org  ON user_org_memberships(org_id);
+
+CREATE TRIGGER update_media_ts      BEFORE UPDATE ON media_files      FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_cal_ts        BEFORE UPDATE ON calendar_events  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_orgs_ts       BEFORE UPDATE ON organizations    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

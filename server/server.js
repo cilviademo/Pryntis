@@ -28,6 +28,11 @@ const portAnalyticsRoutes = require('./routes/portAnalyticsRoutes');
 const businessRoutes = require('./routes/businessRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const exportRoutes = require('./routes/exportRoutes');
+const mediaRoutes = require('./routes/mediaRoutes');
+const calendarRoutes = require('./routes/calendarRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const pdfRoutes = require('./routes/pdfRoutes');
+const impersonateRoutes = require('./routes/impersonateRoutes');
 
 const app = express();
 
@@ -97,6 +102,11 @@ app.use('/api/v1/port/analytics', portAnalyticsRoutes);
 app.use('/api/v1/business', businessRoutes);
 app.use('/api/v1/search', searchRoutes);
 app.use('/api/v1/export', exportRoutes);
+app.use('/api/v1/media', mediaRoutes);
+app.use('/api/v1/calendar', calendarRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/pdf', pdfRoutes);
+app.use('/api/v1/admin', impersonateRoutes);
 
 // Health check — verifies DB connectivity
 app.get('/api/health', async (req, res) => {
@@ -120,9 +130,29 @@ if (config.nodeEnv === 'production') {
 // Error handling
 app.use(errorHandler);
 
+// Increase body size limit for file uploads (multipart handled by multer separately)
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+
 if (process.env.NODE_ENV !== 'test') {
   initDb().then(() => {
-    const server = app.listen(config.port, () => {
+    const http = require('http');
+    const httpServer = http.createServer(app);
+
+    // Initialize WebSocket (socket.io) for real-time presence
+    try {
+      const { Server } = require('socket.io');
+      const { initPresence } = require('./realtime/presenceManager');
+      const io = new Server(httpServer, {
+        cors: { origin: origins, credentials: true },
+        transports: ['websocket', 'polling'],
+      });
+      initPresence(io);
+      console.log('[WS] WebSocket server initialized');
+    } catch (err) {
+      console.warn('[WS] WebSocket initialization skipped:', err.message);
+    }
+
+    const server = httpServer.listen(config.port, () => {
       console.log(`Pryntis Panel API running on port ${config.port} [${config.nodeEnv}]`);
     });
 

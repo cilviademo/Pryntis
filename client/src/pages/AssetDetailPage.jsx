@@ -3,6 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import ReactECharts from 'echarts-for-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import PresencePill from '../components/PresencePill';
+import MediaUploader from '../components/MediaUploader';
+import MediaVersionHistory from '../components/MediaVersionHistory';
 
 // Audio file types that should show the player
 const AUDIO_TYPES = ['beat', 'stem', 'mix', 'master', 'sample', 'audio'];
@@ -351,6 +354,7 @@ export default function AssetDetailPage() {
     { key: 'versions', label: 'Versions' },
     { key: 'chain-of-title', label: 'Chain of Title' },
     { key: 'usage', label: 'Usage' },
+    { key: 'files', label: 'Files' },
   ];
 
   // Version status badge helper
@@ -1017,6 +1021,25 @@ export default function AssetDetailPage() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+          </div>
+          {renderCommentsSection()}
+        </div>
+      )}
+
+      {/* Files Tab */}
+      {activeTab === 'files' && (
+        <div>
+          <div className="detail-section">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <h3 style={{ margin: 0 }}>Attached Files</h3>
+              <PresencePill roomId={`asset:${id}`} />
+            </div>
+            <MediaVersionHistory ownerType="asset" ownerId={id} canManage={canEdit} />
+            {canEdit && (
+              <div style={{ marginTop: '16px' }}>
+                <MediaUploader ownerType="asset" ownerId={id} onUploadComplete={() => window.location.reload()} />
               </div>
             )}
           </div>
