@@ -65,6 +65,7 @@ function AppRoutes() {
           }
         />
         <Route path="pass" element={<PassPage />} />
+        <Route path="pass/*" element={<PassPage />} />
         <Route path="port/assets" element={<AssetsPage />} />
         <Route path="port/assets/:id" element={<AssetDetailPage />} />
         <Route path="port/placements" element={<PlacementsPage />} />

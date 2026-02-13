@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import ReactECharts from 'echarts-for-react';
 import api from '../services/api';
 
@@ -152,22 +153,22 @@ export default function AnalyticsPage() {
       </div>
 
       <div className="summary-cards">
-        <div className="summary-card">
+        <Link to="/artists" className="summary-card">
           <div className="summary-card__label">Total Artists</div>
           <div className="summary-card__value">{totalArtists}</div>
-        </div>
-        <div className="summary-card">
+        </Link>
+        <Link to="/projects" className="summary-card">
           <div className="summary-card__label">Total Projects</div>
           <div className="summary-card__value">{totalProjects}</div>
-        </div>
-        <div className="summary-card">
+        </Link>
+        <Link to="/port/assets" className="summary-card">
           <div className="summary-card__label">Total Assets</div>
           <div className="summary-card__value">{totalAssets}</div>
-        </div>
-        <div className="summary-card">
+        </Link>
+        <Link to="/business" className="summary-card">
           <div className="summary-card__label">Gross Revenue</div>
           <div className="summary-card__value">{formatCurrency(grossRevenue)}</div>
-        </div>
+        </Link>
       </div>
 
       <div className="summary-cards mt-16">
@@ -256,7 +257,7 @@ export default function AnalyticsPage() {
                   <thead><tr><th>Artist</th><th>Total Value</th><th>Count</th></tr></thead>
                   <tbody>
                     {pa.placements.top_artists.map((a, i) => (
-                      <tr key={i}>
+                      <tr key={i} className="clickable-row" onClick={() => a.id && (window.location.hash = '', window.location.pathname = `/artists/${a.id}`)}>
                         <td className="font-semibold">{a.stage_name || a.name || a.artist_name}</td>
                         <td>{formatCurrency(a.total_value)}</td>
                         <td>{a.count || a.placement_count}</td>
@@ -364,7 +365,7 @@ export default function AnalyticsPage() {
                   <thead><tr><th>Artist</th><th>Revenue</th></tr></thead>
                   <tbody>
                     {topEarners.map((a, i) => (
-                      <tr key={i}>
+                      <tr key={i} className="clickable-row" onClick={() => a.id && (window.location.hash = '', window.location.pathname = `/artists/${a.id}`)}>
                         <td className="font-semibold">{a.stage_name || a.name || a.artist_name}</td>
                         <td>{formatCurrency(a.total_revenue || a.revenue)}</td>
                       </tr>

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ReactECharts from 'echarts-for-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
 const CHART_COLORS = ['#6c63ff', '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
-const REACTION_ICONS = { thumbs_up: '\u{1F44D}', eyes: '\u{1F440}', check: '\u2705', alert: '\u2757' };
 
 function capitalize(str) {
   return str.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
@@ -25,8 +24,36 @@ const formatCurrency = (val) => {
   return `$${num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 };
 
+/* Health score dimension definitions */
+const HEALTH_DIMENSIONS = [
+  { key: 'subscription', label: 'Subscription', max: 20, missingAction: 'Activate or upgrade subscription tier' },
+  { key: 'assets', label: 'Recent Assets', max: 20, missingAction: 'Upload new assets to catalog' },
+  { key: 'placements', label: 'Placements', max: 20, missingAction: 'Pursue new sync/licensing opportunities' },
+  { key: 'no_overdue_tasks', label: 'No Overdue Tasks', max: 10, missingAction: 'Review and resolve overdue tasks' },
+  { key: 'revenue', label: 'Revenue', max: 15, missingAction: 'Follow up on pending payment collection' },
+  { key: 'ownership', label: 'Ownership', max: 15, missingAction: 'Complete ownership and split sheet documentation' },
+];
+
+function getScoreBarColor(value, max) {
+  if (value === max) return 'var(--color-success)';
+  if (value > 0) return 'var(--color-warning)';
+  return 'var(--color-danger)';
+}
+
+function getActivityLink(item) {
+  if (!item.entity_type || !item.entity_id) return null;
+  switch (item.entity_type) {
+    case 'artist': return `/artists/${item.entity_id}`;
+    case 'project': return `/projects/${item.entity_id}`;
+    case 'asset': return `/port/assets/${item.entity_id}`;
+    case 'placement': return '/port/placements';
+    default: return null;
+  }
+}
+
 export default function DashboardPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const role = user?.role || 'viewer';
   const isElevated = role === 'admin' || role === 'owner' || role === 'manager';
 
@@ -38,6 +65,7 @@ export default function DashboardPage() {
   const [nextActions, setNextActions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedArtist, setSelectedArtist] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -91,7 +119,8 @@ export default function DashboardPage() {
     textStyle: { color: '#e4e6ef' },
   };
 
-  const projectBarOption = {
+  /* ── Projects by Status bar chart ────────────────────────────────── */
+  const projectBarOption = projectStatusArr.length > 0 ? {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', ...chartTooltip },
     grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
@@ -116,8 +145,9 @@ export default function DashboardPage() {
       barWidth: '50%',
       itemStyle: { borderRadius: [4, 4, 0, 0] },
     }],
-  };
+  } : null;
 
+  /* ── Placement Pipeline bar chart ──────────────────────────────── */
   const placementStatusArr = objToArray(placementStatusObj);
   const placementBarOption = placementStatusArr.length > 0 ? {
     backgroundColor: 'transparent',
@@ -146,22 +176,48 @@ export default function DashboardPage() {
     }],
   } : null;
 
-  // Recoup stacked bar (admin/manager only)
-  const recoupStackOption = isElevated ? {
+  /* ── Recoup horizontal bar chart (FIX: was stacked single-category) ── */
+  const recoupData = [
+    { name: 'Recouped', value: parseFloat(kpi.recoupedAmount) || 0, color: '#22c55e' },
+    { name: 'Unrecouped', value: parseFloat(kpi.unrecoupedBalance) || 0, color: '#ef4444' },
+    { name: 'Payable', value: parseFloat(kpi.payableNow) || 0, color: '#3b82f6' },
+  ];
+  const hasRecoupData = recoupData.some((d) => d.value > 0);
+  const recoupOption = isElevated && hasRecoupData ? {
     backgroundColor: 'transparent',
-    tooltip: { trigger: 'axis', ...chartTooltip, formatter: (p) => p.map((s) => `${s.seriesName}: ${formatCurrency(s.value)}`).join('<br/>') },
-    legend: { bottom: 0, textStyle: { color: '#8890a8', fontSize: 12 } },
-    grid: { left: '3%', right: '4%', bottom: '30px', top: '10px', containLabel: true },
-    xAxis: { type: 'category', data: ['Portfolio'], axisLabel: { color: '#8890a8' }, axisLine: { lineStyle: { color: '#2d3143' } } },
-    yAxis: { type: 'value', axisLabel: { color: '#8890a8', formatter: (v) => `$${(v / 1000).toFixed(0)}k` }, splitLine: { lineStyle: { color: '#2d3143' } } },
-    series: [
-      { name: 'Recouped', type: 'bar', stack: 'total', data: [kpi.recoupedAmount || 0], itemStyle: { color: '#22c55e' }, barWidth: '60%' },
-      { name: 'Unrecouped', type: 'bar', stack: 'total', data: [kpi.unrecoupedBalance || 0], itemStyle: { color: '#ef4444' }, barWidth: '60%' },
-      { name: 'Payable', type: 'bar', stack: 'total', data: [kpi.payableNow || 0], itemStyle: { color: '#3b82f6' }, barWidth: '60%' },
-    ],
+    tooltip: {
+      trigger: 'axis',
+      ...chartTooltip,
+      formatter: (params) => params.map((p) => `${p.name}: ${formatCurrency(p.value)}`).join('<br/>'),
+    },
+    grid: { left: 100, right: 40, top: 10, bottom: 10, containLabel: false },
+    xAxis: {
+      type: 'value',
+      axisLabel: { color: '#8890a8', formatter: (v) => `$${(v / 1000).toFixed(0)}k` },
+      splitLine: { lineStyle: { color: '#2d3143' } },
+    },
+    yAxis: {
+      type: 'category',
+      data: recoupData.map((d) => d.name),
+      axisLabel: { color: '#8890a8', fontSize: 13 },
+      axisLine: { lineStyle: { color: '#2d3143' } },
+    },
+    series: [{
+      type: 'bar',
+      data: recoupData.map((d) => ({ value: d.value, itemStyle: { color: d.color } })),
+      barWidth: '50%',
+      itemStyle: { borderRadius: [0, 4, 4, 0] },
+      label: {
+        show: true,
+        position: 'right',
+        formatter: (p) => formatCurrency(p.value),
+        color: '#e4e6ef',
+        fontSize: 12,
+      },
+    }],
   } : null;
 
-  // Project throughput (admin/manager only)
+  /* ── Project Throughput line chart ──────────────────────────────── */
   const throughputData = summary?.projectThroughput || [];
   const throughputOption = throughputData.length > 0 ? {
     backgroundColor: 'transparent',
@@ -189,7 +245,8 @@ export default function DashboardPage() {
     }],
   } : null;
 
-  const artistPieOption = {
+  /* ── Artist Status pie chart ───────────────────────────────────── */
+  const artistPieOption = artistStatusArr.length > 0 ? {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'item', ...chartTooltip },
     legend: { bottom: 0, textStyle: { color: '#8890a8', fontSize: 12 } },
@@ -203,9 +260,10 @@ export default function DashboardPage() {
       emphasis: { label: { show: true, fontSize: 14, fontWeight: 'bold', color: '#e4e6ef' } },
       data: artistStatusArr.map((d, i) => ({ ...d, itemStyle: { color: CHART_COLORS[i % CHART_COLORS.length] } })),
     }],
-  };
+  } : null;
 
-  const subscriptionPieOption = {
+  /* ── Subscription Distribution pie chart ───────────────────────── */
+  const subscriptionPieOption = subscriptionData.length > 0 ? {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'item', ...chartTooltip },
     legend: { bottom: 0, textStyle: { color: '#8890a8', fontSize: 12 } },
@@ -219,6 +277,174 @@ export default function DashboardPage() {
       emphasis: { label: { show: true, fontSize: 14, fontWeight: 'bold', color: '#e4e6ef' } },
       data: subscriptionData.map((d, i) => ({ ...d, itemStyle: { color: CHART_COLORS[i % CHART_COLORS.length] } })),
     }],
+  } : null;
+
+  /* ── Momentum chart option ─────────────────────────────────────── */
+  const momentumOption = momentum.length > 0 ? {
+    backgroundColor: 'transparent',
+    tooltip: { trigger: 'axis', ...chartTooltip },
+    legend: { bottom: 0, textStyle: { color: '#8890a8', fontSize: 11 } },
+    grid: { left: '3%', right: '4%', bottom: '40px', top: '10px', containLabel: true },
+    xAxis: {
+      type: 'category',
+      data: momentum.map((d) => d.month),
+      axisLabel: { color: '#8890a8', fontSize: 11, rotate: 30 },
+      axisLine: { lineStyle: { color: '#2d3143' } },
+    },
+    yAxis: [
+      { type: 'value', name: 'Count', axisLabel: { color: '#8890a8', fontSize: 11 }, splitLine: { lineStyle: { color: '#2d3143' } } },
+      { type: 'value', name: 'Revenue', axisLabel: { color: '#8890a8', fontSize: 11, formatter: (v) => `$${(v / 1000).toFixed(0)}k` }, splitLine: { show: false } },
+    ],
+    series: [
+      { name: 'Assets', type: 'bar', data: momentum.map((d) => d.new_assets || 0), itemStyle: { color: '#6c63ff' }, barWidth: '20%' },
+      { name: 'Placements', type: 'bar', data: momentum.map((d) => d.new_placements || 0), itemStyle: { color: '#3b82f6' }, barWidth: '20%' },
+      { name: 'Projects', type: 'bar', data: momentum.map((d) => d.new_projects || 0), itemStyle: { color: '#22c55e' }, barWidth: '20%' },
+      { name: 'Revenue', type: 'line', yAxisIndex: 1, data: momentum.map((d) => d.revenue || 0), smooth: true, lineStyle: { color: '#f59e0b', width: 2 }, itemStyle: { color: '#f59e0b' } },
+    ],
+  } : null;
+
+  /* ── Momentum bar click handler ────────────────────────────────── */
+  const onMomentumClick = (params) => {
+    if (params.componentType === 'series') {
+      console.log('Momentum chart clicked - month:', momentum[params.dataIndex]?.month);
+    }
+  };
+
+  /* ── Health score drilldown helpers ────────────────────────────── */
+  const renderHealthDrilldown = () => {
+    if (!selectedArtist) return null;
+    const breakdown = selectedArtist.breakdown || {};
+    const scoreColor = selectedArtist.health_score >= 70 ? 'var(--color-success)' : selectedArtist.health_score >= 40 ? 'var(--color-warning)' : 'var(--color-danger)';
+    const scoreLabel = selectedArtist.health_score >= 70 ? 'Healthy' : selectedArtist.health_score >= 40 ? 'Needs Attention' : 'At Risk';
+
+    const drivers = [];
+    const risks = [];
+    const actions = [];
+
+    HEALTH_DIMENSIONS.forEach((dim) => {
+      const val = breakdown[dim.key] || 0;
+      if (val === dim.max) {
+        drivers.push(dim.label + ': Full score (' + val + '/' + dim.max + ')');
+      } else if (val > 0) {
+        risks.push(dim.label + ': Partial score (' + val + '/' + dim.max + ')');
+        actions.push(dim.missingAction);
+      } else {
+        risks.push(dim.label + ': No score (0/' + dim.max + ')');
+        actions.push(dim.missingAction);
+      }
+    });
+
+    return (
+      <div className="modal-overlay" onClick={() => setSelectedArtist(null)}>
+        <div className="modal" style={{ maxWidth: '600px' }} onClick={(e) => e.stopPropagation()}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+            <div>
+              <h3 style={{ marginBottom: '4px' }}>
+                {selectedArtist.stage_name || selectedArtist.name}
+              </h3>
+              {selectedArtist.stage_name && selectedArtist.name !== selectedArtist.stage_name && (
+                <div className="text-sm text-secondary">{selectedArtist.name}</div>
+              )}
+              {selectedArtist.genre && (
+                <div className="text-xs text-muted" style={{ marginTop: '4px' }}>{selectedArtist.genre}</div>
+              )}
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '28px', fontWeight: 700, color: scoreColor }}>
+                {selectedArtist.health_score}
+                <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--color-text-muted)' }}> / 100</span>
+              </div>
+              <div className="text-sm" style={{ color: scoreColor }}>{scoreLabel}</div>
+            </div>
+          </div>
+
+          {/* Score Breakdown Bars */}
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text)', marginBottom: '12px' }}>
+              Score Breakdown
+            </div>
+            {HEALTH_DIMENSIONS.map((dim) => {
+              const val = breakdown[dim.key] || 0;
+              const pct = dim.max > 0 ? (val / dim.max) * 100 : 0;
+              const barColor = getScoreBarColor(val, dim.max);
+              return (
+                <div key={dim.key} style={{ marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{dim.label}</span>
+                    <span className="text-sm font-semibold" style={{ color: barColor }}>
+                      {val} / {dim.max}
+                    </span>
+                  </div>
+                  <div style={{
+                    height: '8px',
+                    background: 'var(--color-surface-2)',
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                  }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${pct}%`,
+                      background: barColor,
+                      borderRadius: '4px',
+                      transition: 'width 0.3s ease',
+                    }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Score Drivers */}
+          {drivers.length > 0 && (
+            <div style={{ marginBottom: '20px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-success)', marginBottom: '8px' }}>
+                Score Drivers
+              </div>
+              <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: '1.8' }}>
+                {drivers.map((d, i) => <li key={i}>{d}</li>)}
+              </ul>
+            </div>
+          )}
+
+          {/* Risk Factors */}
+          {risks.length > 0 && (
+            <div style={{ marginBottom: '20px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-danger)', marginBottom: '8px' }}>
+                Risk Factors
+              </div>
+              <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: '1.8' }}>
+                {risks.map((r, i) => <li key={i}>{r}</li>)}
+              </ul>
+            </div>
+          )}
+
+          {/* Recommended Actions */}
+          {actions.length > 0 && (
+            <div style={{ marginBottom: '8px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-warning)', marginBottom: '8px' }}>
+                Recommended Actions
+              </div>
+              <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: '1.8' }}>
+                {actions.map((a, i) => <li key={i}>{a}</li>)}
+              </ul>
+            </div>
+          )}
+
+          <div className="modal-actions">
+            <button className="btn btn-secondary" onClick={() => setSelectedArtist(null)}>
+              Close
+            </button>
+            <Link
+              to={`/artists/${selectedArtist.id}`}
+              className="btn btn-primary"
+              onClick={() => setSelectedArtist(null)}
+            >
+              View Artist
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -228,27 +454,35 @@ export default function DashboardPage() {
         {role === 'viewer' && <span className="badge badge--active">View Only</span>}
       </div>
 
-      {/* Summary Cards */}
+      {/* Summary Cards -- clickable to relevant pages */}
       <div className="summary-cards">
-        <div className="summary-card">
-          <div className="summary-card__label">Total Artists</div>
-          <div className="summary-card__value">{totalArtists}</div>
-        </div>
-        <div className="summary-card">
-          <div className="summary-card__label">Active Projects</div>
-          <div className="summary-card__value">{activeProjects}</div>
-        </div>
-        <div className="summary-card">
-          <div className="summary-card__label">Total Assets</div>
-          <div className="summary-card__value">{totalAssets}</div>
-        </div>
-        <div className="summary-card">
-          <div className="summary-card__label">Pending Placements</div>
-          <div className="summary-card__value">{pendingPlacements}</div>
-        </div>
+        <Link to="/artists" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div className="summary-card" style={{ cursor: 'pointer' }}>
+            <div className="summary-card__label">Total Artists</div>
+            <div className="summary-card__value">{totalArtists}</div>
+          </div>
+        </Link>
+        <Link to="/projects" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div className="summary-card" style={{ cursor: 'pointer' }}>
+            <div className="summary-card__label">Active Projects</div>
+            <div className="summary-card__value">{activeProjects}</div>
+          </div>
+        </Link>
+        <Link to="/port/assets" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div className="summary-card" style={{ cursor: 'pointer' }}>
+            <div className="summary-card__label">Total Assets</div>
+            <div className="summary-card__value">{totalAssets}</div>
+          </div>
+        </Link>
+        <Link to="/port/placements" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div className="summary-card" style={{ cursor: 'pointer' }}>
+            <div className="summary-card__label">Pending Placements</div>
+            <div className="summary-card__value">{pendingPlacements}</div>
+          </div>
+        </Link>
       </div>
 
-      {/* KPI Cards — manager/admin */}
+      {/* KPI Cards -- manager/admin */}
       {isElevated && (
         <div className="summary-cards mt-16">
           <div className="summary-card">
@@ -278,32 +512,42 @@ export default function DashboardPage() {
       <div className="dashboard-chart-grid">
         <div className="card">
           <h3>Projects by Status</h3>
-          {projectStatusArr.length > 0 ? (
-            <ReactECharts option={projectBarOption} style={{ height: 260 }} />
-          ) : <div className="empty-state">No project data</div>}
+          {projectBarOption ? (
+            <ReactECharts option={projectBarOption} style={{ height: 260, minHeight: 200 }} />
+          ) : (
+            <div className="empty-state" style={{ padding: '40px 24px' }}>No data yet</div>
+          )}
         </div>
 
-        {isElevated && placementBarOption && (
+        {isElevated && (
           <div className="card">
             <h3>Placement Pipeline</h3>
-            <ReactECharts option={placementBarOption} style={{ height: 260 }} />
+            {placementBarOption ? (
+              <ReactECharts option={placementBarOption} style={{ height: 260, minHeight: 200 }} />
+            ) : (
+              <div className="empty-state" style={{ padding: '40px 24px' }}>No data yet</div>
+            )}
           </div>
         )}
 
         {!isElevated && (
           <div className="card">
             <h3>Artists by Status</h3>
-            {artistStatusArr.length > 0 ? (
-              <ReactECharts option={artistPieOption} style={{ height: 260 }} />
-            ) : <div className="empty-state">No artist data</div>}
+            {artistPieOption ? (
+              <ReactECharts option={artistPieOption} style={{ height: 260, minHeight: 200 }} />
+            ) : (
+              <div className="empty-state" style={{ padding: '40px 24px' }}>No data yet</div>
+            )}
           </div>
         )}
 
         <div className="card">
           <h3>Subscription Distribution</h3>
-          {subscriptionData.length > 0 ? (
-            <ReactECharts option={subscriptionPieOption} style={{ height: 260 }} />
-          ) : <div className="empty-state">No subscription data</div>}
+          {subscriptionPieOption ? (
+            <ReactECharts option={subscriptionPieOption} style={{ height: 260, minHeight: 200 }} />
+          ) : (
+            <div className="empty-state" style={{ padding: '40px 24px' }}>No data yet</div>
+          )}
         </div>
       </div>
 
@@ -312,16 +556,20 @@ export default function DashboardPage() {
         <div className="chart-grid mt-24 mb-24">
           <div className="card">
             <h3>Recouped vs Unrecouped vs Payable</h3>
-            {recoupStackOption ? (
-              <ReactECharts option={recoupStackOption} style={{ height: 280 }} />
-            ) : <div className="empty-state">No recoupment data</div>}
+            {recoupOption ? (
+              <ReactECharts option={recoupOption} style={{ height: 280, minHeight: 200 }} />
+            ) : (
+              <div className="empty-state" style={{ padding: '40px 24px' }}>No data yet</div>
+            )}
           </div>
 
           <div className="card">
             <h3>Project Throughput (Monthly)</h3>
             {throughputOption ? (
-              <ReactECharts option={throughputOption} style={{ height: 280 }} />
-            ) : <div className="empty-state">No throughput data</div>}
+              <ReactECharts option={throughputOption} style={{ height: 280, minHeight: 200 }} />
+            ) : (
+              <div className="empty-state" style={{ padding: '40px 24px' }}>No data yet</div>
+            )}
           </div>
         </div>
       )}
@@ -331,7 +579,7 @@ export default function DashboardPage() {
         <div className="detail-section">
           <h3>Recent Activity</h3>
           {activity.length === 0 ? (
-            <div className="empty-state">No recent activity</div>
+            <div className="empty-state" style={{ padding: '40px 24px' }}>No recent activity</div>
           ) : (
             <div className="data-table-wrapper">
               <table className="data-table">
@@ -344,27 +592,34 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {activity.map((item) => (
-                    <tr key={item.id}>
-                      <td>
-                        <span className="badge badge--active">{capitalize(item.event_type || '')}</span>
-                      </td>
-                      <td>{item.summary}</td>
-                      <td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</td>
-                      <td>
-                        <div style={{ display: 'flex', gap: '4px', alignItems: 'center', fontSize: '12px' }}>
-                          {item.reactions && Array.isArray(item.reactions) && item.reactions.map((r, i) => (
-                            <span key={i} className="reaction-pill" title={capitalize(r.reaction)}>
-                              {REACTION_ICONS[r.reaction] || r.reaction} {r.count > 0 ? r.count : ''}
-                            </span>
-                          ))}
-                          {item.comment_count > 0 && (
-                            <span style={{ color: 'var(--color-text-secondary)', marginLeft: '4px' }}>{item.comment_count} replies</span>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {activity.map((item) => {
+                    const activityLink = getActivityLink(item);
+                    return (
+                      <tr
+                        key={item.id}
+                        style={{ cursor: activityLink ? 'pointer' : 'default' }}
+                        onClick={() => activityLink && navigate(activityLink)}
+                      >
+                        <td>
+                          <span className="badge badge--active">{capitalize(item.event_type || '')}</span>
+                        </td>
+                        <td>{item.summary}</td>
+                        <td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</td>
+                        <td>
+                          <div style={{ display: 'flex', gap: '4px', alignItems: 'center', fontSize: '12px' }}>
+                            {item.reactions && Array.isArray(item.reactions) && item.reactions.length > 0 && (
+                              <span className="text-xs text-muted">
+                                {item.reactions.length} reaction{item.reactions.length !== 1 ? 's' : ''}
+                              </span>
+                            )}
+                            {item.comment_count > 0 && (
+                              <span style={{ color: 'var(--color-text-secondary)', marginLeft: '4px' }}>{item.comment_count} replies</span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -374,7 +629,7 @@ export default function DashboardPage() {
         <div className="detail-section">
           <h3>Next Actions</h3>
           {tasks.length === 0 ? (
-            <div className="empty-state">No open tasks</div>
+            <div className="empty-state" style={{ padding: '40px 24px' }}>No open tasks</div>
           ) : (
             <div className="data-table-wrapper">
               <table className="data-table">
@@ -387,7 +642,11 @@ export default function DashboardPage() {
                 </thead>
                 <tbody>
                   {tasks.map((task) => (
-                    <tr key={task.id}>
+                    <tr
+                      key={task.id}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => navigate('/tasks')}
+                    >
                       <td>{task.title}</td>
                       <td>
                         <span className={`badge badge--${task.priority || 'medium'}`}>
@@ -413,7 +672,7 @@ export default function DashboardPage() {
           <div className="detail-section">
             <h3>Artist Health Scores</h3>
             {healthScores.length === 0 ? (
-              <div className="empty-state">No health data available</div>
+              <div className="empty-state" style={{ padding: '40px 24px' }}>No health data available</div>
             ) : (
               <div className="data-table-wrapper">
                 <table className="data-table">
@@ -430,7 +689,11 @@ export default function DashboardPage() {
                       const scoreColor = h.health_score >= 70 ? 'var(--color-success)' : h.health_score >= 40 ? 'var(--color-warning)' : 'var(--color-danger)';
                       const scoreLabel = h.health_score >= 70 ? 'Healthy' : h.health_score >= 40 ? 'Needs Attention' : 'At Risk';
                       return (
-                        <tr key={h.id || h.artist_id}>
+                        <tr
+                          key={h.id || h.artist_id}
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => setSelectedArtist(h)}
+                        >
                           <td>
                             <div className="font-semibold">{h.stage_name || h.name}</div>
                             {h.stage_name && h.name !== h.stage_name && <div className="text-xs text-muted">{h.name}</div>}
@@ -452,33 +715,15 @@ export default function DashboardPage() {
 
           <div className="detail-section">
             <h3>Momentum Trends</h3>
-            {momentum.length > 0 ? (
+            {momentumOption ? (
               <ReactECharts
-                style={{ height: 300 }}
-                option={{
-                  backgroundColor: 'transparent',
-                  tooltip: { trigger: 'axis', ...chartTooltip },
-                  legend: { bottom: 0, textStyle: { color: '#8890a8', fontSize: 11 } },
-                  grid: { left: '3%', right: '4%', bottom: '40px', top: '10px', containLabel: true },
-                  xAxis: {
-                    type: 'category',
-                    data: momentum.map((d) => d.month),
-                    axisLabel: { color: '#8890a8', fontSize: 11, rotate: 30 },
-                    axisLine: { lineStyle: { color: '#2d3143' } },
-                  },
-                  yAxis: [
-                    { type: 'value', name: 'Count', axisLabel: { color: '#8890a8', fontSize: 11 }, splitLine: { lineStyle: { color: '#2d3143' } } },
-                    { type: 'value', name: 'Revenue', axisLabel: { color: '#8890a8', fontSize: 11, formatter: (v) => `$${(v / 1000).toFixed(0)}k` }, splitLine: { show: false } },
-                  ],
-                  series: [
-                    { name: 'Assets', type: 'bar', data: momentum.map((d) => d.new_assets || 0), itemStyle: { color: '#6c63ff' }, barWidth: '20%' },
-                    { name: 'Placements', type: 'bar', data: momentum.map((d) => d.new_placements || 0), itemStyle: { color: '#3b82f6' }, barWidth: '20%' },
-                    { name: 'Projects', type: 'bar', data: momentum.map((d) => d.new_projects || 0), itemStyle: { color: '#22c55e' }, barWidth: '20%' },
-                    { name: 'Revenue', type: 'line', yAxisIndex: 1, data: momentum.map((d) => d.revenue || 0), smooth: true, lineStyle: { color: '#f59e0b', width: 2 }, itemStyle: { color: '#f59e0b' } },
-                  ],
-                }}
+                style={{ height: 300, minHeight: 200 }}
+                option={momentumOption}
+                onEvents={{ click: onMomentumClick }}
               />
-            ) : <div className="empty-state">No momentum data</div>}
+            ) : (
+              <div className="empty-state" style={{ padding: '40px 24px' }}>No data yet</div>
+            )}
           </div>
         </div>
       )}
@@ -519,6 +764,9 @@ export default function DashboardPage() {
           and deep data exploration. See <code>docs/architecture.md</code> for setup instructions.
         </p>
       </div>
+
+      {/* Health Score Drilldown Modal */}
+      {renderHealthDrilldown()}
     </div>
   );
 }

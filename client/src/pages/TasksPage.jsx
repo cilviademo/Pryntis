@@ -10,6 +10,7 @@ export default function TasksPage() {
   const canEdit = user?.role === 'admin' || user?.role === 'owner' || user?.role === 'manager';
 
   const [tasks, setTasks] = useState([]);
+  const [selectedTask, setSelectedTask] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
@@ -174,8 +175,8 @@ export default function TasksPage() {
               </thead>
               <tbody>
                 {tasks.map((task) => (
-                  <tr key={task.id}>
-                    <td style={{ fontWeight: 500 }}>{task.title}</td>
+                  <tr key={task.id} className="clickable-row" onClick={() => setSelectedTask(task)}>
+                    <td className="font-semibold">{task.title}</td>
                     <td>
                       <span className={`badge badge--${task.priority || 'medium'}`}>
                         {task.priority || 'medium'}
@@ -278,6 +279,66 @@ export default function TasksPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {selectedTask && (
+        <div className="drawer-overlay" onClick={() => setSelectedTask(null)}>
+          <div className="drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="drawer-header">
+              <h3 style={{ margin: 0 }}>{selectedTask.title}</h3>
+              <button className="drawer-close" onClick={() => setSelectedTask(null)}>x</button>
+            </div>
+
+            <div className="grid-2 mb-16">
+              <div>
+                <div className="text-xs text-muted mb-4">Priority</div>
+                <span className={`badge badge--${selectedTask.priority || 'medium'}`}>
+                  {(selectedTask.priority || 'medium').replace(/_/g, ' ')}
+                </span>
+              </div>
+              <div>
+                <div className="text-xs text-muted mb-4">Status</div>
+                <span className={`badge badge--${selectedTask.status || 'open'}`}>
+                  {(selectedTask.status || 'open').replace(/_/g, ' ')}
+                </span>
+              </div>
+              <div>
+                <div className="text-xs text-muted mb-4">Due Date</div>
+                <span>{selectedTask.due_date ? new Date(selectedTask.due_date).toLocaleDateString() : 'Not set'}</span>
+              </div>
+              <div>
+                <div className="text-xs text-muted mb-4">Assigned To</div>
+                <span>{selectedTask.assigned_to_name || selectedTask.assigned_to || 'Unassigned'}</span>
+              </div>
+            </div>
+
+            {selectedTask.description && (
+              <div className="mb-16">
+                <div className="text-xs text-muted mb-4">Description</div>
+                <p className="text-sm">{selectedTask.description}</p>
+              </div>
+            )}
+
+            {selectedTask.artist_name && (
+              <div className="mb-16">
+                <div className="text-xs text-muted mb-4">Related Artist</div>
+                <span className="font-semibold">{selectedTask.artist_name}</span>
+              </div>
+            )}
+
+            <div className="text-xs text-muted">
+              Created: {selectedTask.created_at ? new Date(selectedTask.created_at).toLocaleString() : '--'}
+            </div>
+
+            {canEdit && (
+              <div className="modal-actions">
+                <button className="btn btn-secondary" onClick={() => { setSelectedTask(null); openEdit(selectedTask); }}>
+                  Edit Task
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

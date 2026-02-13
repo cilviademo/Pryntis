@@ -1220,6 +1220,403 @@ h1, h2, h3, h4, h5, h6 {
 
 
 /* ============================================================
+   DRAWER / SIDE PANEL
+   ============================================================ */
+
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.drawer {
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  width: 100%;
+  max-width: 560px;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 32px;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.3);
+  animation: slideInRight 0.2s ease;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.drawer-close {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  border-radius: var(--radius-sm);
+}
+
+.drawer-close:hover {
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+}
+
+/* ============================================================
+   HEALTH SCORE BREAKDOWN
+   ============================================================ */
+
+.score-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.score-bar__label {
+  width: 130px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.score-bar__track {
+  flex: 1;
+  height: 8px;
+  background: var(--color-surface-2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.score-bar__fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.score-bar__value {
+  width: 48px;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.score-big {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.score-drivers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.score-driver-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.score-driver-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.score-driver-icon--positive {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.score-driver-icon--negative {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+/* ============================================================
+   FEED ITEMS
+   ============================================================ */
+
+.feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feed-item {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  transition: background 0.15s;
+}
+
+.feed-item:hover {
+  background: var(--color-surface-hover);
+}
+
+.feed-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.feed-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.feed-actor {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.feed-summary {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+.feed-time {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.feed-reactions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.reaction-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.reaction-btn:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+  border-color: var(--color-text-muted);
+}
+
+.reaction-btn--active {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ============================================================
+   SERVICE CARDS (Engineering)
+   ============================================================ */
+
+.service-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.service-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.service-card__name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 6px;
+}
+
+.service-card__desc {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.service-card__meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+}
+
+/* ============================================================
+   PRODUCER LIBRARY CARDS
+   ============================================================ */
+
+.pack-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.pack-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.pack-card__name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.pack-card__creator {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 10px;
+}
+
+.pack-card__tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.pack-card__stats {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* ============================================================
+   CHECKLIST CARDS (Ops)
+   ============================================================ */
+
+.checklist-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.checklist-card:hover {
+  border-color: var(--color-primary);
+}
+
+.checklist-card--expanded {
+  border-color: var(--color-primary);
+}
+
+.checklist-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.checklist-card__name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.checklist-item input[type="checkbox"] {
+  margin-top: 2px;
+  accent-color: var(--color-primary);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.checklist-item--checked {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+/* ============================================================
+   CLICKABLE TABLE ROWS
+   ============================================================ */
+
+.data-table tbody tr.clickable-row {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.data-table tbody tr.clickable-row:hover {
+  background: var(--color-surface-hover);
+}
+
+/* ============================================================
+   LINK CARDS (Summary cards that are clickable)
+   ============================================================ */
+
+a.summary-card {
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+a.summary-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+  color: inherit;
+}
+
+/* ============================================================
    CHART CONTAINERS
    ============================================================ */
 
@@ -1228,6 +1625,15 @@ h1, h2, h3, h4, h5, h6 {
   grid-template-columns: 1fr 1fr;
   gap: 24px;
   margin-bottom: 24px;
+}
+
+.chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: var(--color-text-muted);
+  font-size: 14px;
 }
 
 @media (max-width: 900px) {
@@ -1327,9 +1733,11 @@ h1, h2, h3, h4, h5, h6 {
 .font-semibold { font-weight: 600; }
 .font-bold { font-weight: 700; }
 
+.mt-4 { margin-top: 4px; }
 .mt-8 { margin-top: 8px; }
 .mt-16 { margin-top: 16px; }
 .mt-24 { margin-top: 24px; }
+.mb-4 { margin-bottom: 4px; }
 .mb-8 { margin-bottom: 8px; }
 .mb-16 { margin-bottom: 16px; }
 .mb-24 { margin-bottom: 24px; }
@@ -1689,6 +2097,20 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 12.5px;
   }
 
+  /* Horizontal-scroll tabs on mobile */
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    white-space: nowrap;
+    min-height: 44px;
+    padding: 10px 14px;
+  }
+
   .modal {
     max-width: 100%;
     margin: 16px;
@@ -1698,6 +2120,12 @@ h1, h2, h3, h4, h5, h6 {
   .modal-overlay {
     padding: 0;
     align-items: flex-end;
+  }
+
+  /* Drawer full-width on mobile */
+  .drawer {
+    max-width: 100%;
+    padding: 20px;
   }
 
   .form-row,
@@ -1717,6 +2145,7 @@ h1, h2, h3, h4, h5, h6 {
   .btn {
     padding: 10px 16px;
     font-size: 14px;
+    min-height: 44px;
   }
 
   .btn-sm {
@@ -1731,6 +2160,29 @@ h1, h2, h3, h4, h5, h6 {
 
   .login-card {
     padding: 28px 20px;
+  }
+
+  /* Service and pack cards single-column */
+  .service-card,
+  .pack-card,
+  .checklist-card {
+    padding: 16px;
+  }
+
+  /* Feed items tighter on mobile */
+  .feed-item {
+    padding: 12px;
+  }
+
+  .feed-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Ensure tap targets are 44px minimum */
+  .data-table tbody tr.clickable-row td {
+    padding-top: 12px;
+    padding-bottom: 12px;
   }
 }
 

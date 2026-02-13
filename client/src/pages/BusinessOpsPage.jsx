@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ReactECharts from 'echarts-for-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -16,6 +17,7 @@ function capitalize(str) {
 
 export default function BusinessOpsPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const canView = ['owner', 'admin', 'manager'].includes(user?.role);
 
   const [activeTab, setActiveTab] = useState('ledger');
@@ -196,7 +198,7 @@ export default function BusinessOpsPage() {
               </thead>
               <tbody>
                 {ledger.map((r) => (
-                  <tr key={r.id}>
+                  <tr key={r.id} className="clickable-row" onClick={() => navigate(`/artists/${r.id}`)}>
                     <td>{r.stage_name || r.name}</td>
                     <td className="text-right">{formatCurrency(r.total_revenue)}</td>
                     <td className="text-right">{formatCurrency(r.total_expenses)}</td>

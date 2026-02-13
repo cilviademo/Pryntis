@@ -1181,19 +1181,628 @@ async function seed() {
   console.log(`Contacts: ${contactData.length}`);
 
   // ============================================
-  // 16. TEMPLATES / SOPs (10 industry templates)
+  // 16. TEMPLATES / SOPs (12 industry templates)
   // ============================================
   const templateData = [
-    ['Sync License Agreement — Master Use',        'Sync License',          'SYNC LICENSE AGREEMENT — MASTER USE\n\nThis Sync License Agreement ("Agreement") is entered into as of [DATE] by and between:\n\nLicensor: [ARTIST/LABEL NAME]\nLicensee: [PRODUCTION COMPANY]\n\n1. GRANT OF LICENSE\nLicensor grants Licensee a non-exclusive license to synchronize the Master Recording titled "[TRACK TITLE]" (the "Master") with the audio-visual production titled "[PRODUCTION TITLE]" (the "Production").\n\n2. TERRITORY: [Worldwide / Specific territories]\n3. TERM: [Duration — e.g., 3 years from first broadcast]\n4. MEDIA: [All media / TV / Film / Streaming / Advertising]\n5. FEE: $[AMOUNT] payable upon execution of this Agreement.\n\n6. CREDIT: Licensor shall receive on-screen credit as follows: "[CREDIT LINE]"\n\n7. REPRESENTATIONS & WARRANTIES\nLicensor represents and warrants that they own or control the Master and have full authority to grant this license.\n\n8. GOVERNING LAW: This Agreement shall be governed by the laws of [STATE/COUNTRY].\n\nIN WITNESS WHEREOF, the parties have executed this Agreement.\n\n___________________________\nLicensor Signature / Date\n\n___________________________\nLicensee Signature / Date',                       'https://www.ascap.com/help/music-licensing'],
-    ['Publishing Administration Agreement',         'Publishing',            'PUBLISHING ADMINISTRATION AGREEMENT\n\nThis Agreement is made as of [DATE] between:\n\nWriter/Publisher: [NAME] ("Owner")\nAdministrator: [COMPANY NAME] ("Administrator")\n\n1. APPOINTMENT\nOwner appoints Administrator as the exclusive administrator of the musical compositions listed in Exhibit A (the "Compositions") for the Territory and Term specified herein.\n\n2. TERM: [3 years] from the date of execution, with automatic renewal for successive [1-year] periods unless terminated with [90 days] written notice.\n\n3. TERRITORY: Worldwide\n\n4. ADMINISTRATION FEE: Administrator shall retain [15-20]% of gross receipts as an administration fee.\n\n5. DUTIES OF ADMINISTRATOR:\n   a) Register Compositions with all relevant PROs\n   b) Issue licenses and collect royalties\n   c) Audit licensees as necessary\n   d) Provide quarterly accounting statements\n\n6. RIGHTS RETAINED BY OWNER:\n   Owner retains full ownership of copyright. No rights are assigned or transferred.\n\n7. ACCOUNTING: Administrator shall provide statements and payments quarterly, within [45 days] of each quarter end.\n\nExhibit A: [List of Compositions]',                                          'https://www.songtrust.com/guides/publishing-administration'],
-    ['Digital Distribution Agreement',              'Distribution',          'DIGITAL DISTRIBUTION AGREEMENT\n\nBetween: [LABEL/ARTIST] ("Distributor Client")\nAnd: [DISTRIBUTION COMPANY] ("Distributor")\n\nEffective Date: [DATE]\n\n1. SCOPE\nDistributor shall distribute Distributor Client\'s sound recordings (the "Recordings") to digital service providers ("DSPs") including but not limited to: Spotify, Apple Music, Amazon Music, YouTube Music, Tidal, Deezer.\n\n2. TERM: [2 years] with [90-day] opt-out notice.\n\n3. REVENUE SPLIT:\n   - Distributor Client: [80-85]%\n   - Distributor: [15-20]%\n\n4. DELIVERY REQUIREMENTS:\n   - Audio: WAV 16-bit/44.1kHz or higher\n   - Metadata: ISRC codes, UPC/EAN, complete credits\n   - Artwork: 3000x3000 minimum, RGB, JPG/PNG\n\n5. REPORTING: Monthly statements via distributor portal.\n\n6. TAKEDOWN: Distributor Client may request takedown with [30 days] notice. Distributor shall remove from all DSPs within [5 business days].\n\n7. WARRANTIES: Distributor Client warrants ownership/control of all Recordings.',  'https://www.dittomusic.com/blog/music-distribution-guide'],
-    ['Recording Agreement — Work for Hire',         'Recording Agreement',   'RECORDING AGREEMENT — WORK FOR HIRE\n\nThis Agreement is entered into as of [DATE]:\n\nProducer/Label: [COMPANY NAME] ("Company")\nArtist: [ARTIST NAME] ("Artist")\n\n1. ENGAGEMENT\nCompany engages Artist to render recording services for [NUMBER] master recordings (the "Masters") as a work made for hire under U.S. Copyright law.\n\n2. COMPENSATION:\n   a) Recording Fund: $[AMOUNT] per Master\n   b) Advance: $[AMOUNT] recoupable against royalties\n   c) Royalty Rate: [15-18]% of net receipts after recoupment\n\n3. RECOUPMENT:\n   The following costs are recoupable from Artist royalties:\n   - Recording costs (studio, engineer, musicians)\n   - Advances paid to Artist\n   - 50% of independent promotion costs\n   - Video production costs (50%)\n\n4. OWNERSHIP: Company shall own all Masters and associated copyrights.\n\n5. CREATIVE CONTROL: Artist shall have mutual approval over:\n   - Final mixes\n   - Album artwork\n   - Single selection\n\n6. TERM: Initial period of [1 year], with [3] option periods of [1 year] each at Company\'s election.',  null],
-    ['Cue Sheet Template — Film/TV',                'Cue Sheet',             'CUE SHEET\n\nProduction Title: [SHOW/FILM NAME]\nEpisode: [EPISODE NUMBER AND TITLE]\nNetwork/Platform: [NETWORK]\nAir Date: [DATE]\nDuration: [TOTAL RUNTIME]\n\n+------+--------+------------+----------+-------+--------+----------+-----------+\n| Cue# | Title  | Composer(s)| Publisher| Usage | Timing | Duration | PRO       |\n+------+--------+------------+----------+-------+--------+----------+-----------+\n| 1    | [TITLE]| [NAME]     | [PUB]    | BV    | 00:02  | 00:45    | ASCAP/BMI |\n| 2    | [TITLE]| [NAME]     | [PUB]    | BI    | 05:30  | 01:20    | ASCAP/BMI |\n| 3    | [TITLE]| [NAME]     | [PUB]    | ET    | 42:15  | 00:30    | ASCAP/BMI |\n+------+--------+------------+----------+-------+--------+----------+-----------+\n\nUSAGE CODES:\nBV = Background Vocal  |  BI = Background Instrumental\nVV = Visual Vocal      |  VI = Visual Instrumental\nET = End Title         |  MT = Main Title\nLO = Logo              |  PI = Promo Instrumental\n\nPrepared by: [NAME]\nDate: [DATE]\nContact: [EMAIL]',                                                           'https://www.bmi.com/creators/cue-sheets'],
-    ['Split Sheet Agreement',                        'Split Sheet',           'SPLIT SHEET AGREEMENT\n\nSong Title: [TITLE]\nRecording Date: [DATE]\nStudio/Location: [LOCATION]\n\nThe undersigned contributors agree to the following ownership splits for the above-referenced composition:\n\n+----+------------------+-------+-------+------+--------+\n| #  | Contributor      | Role  | Split | PRO  | IPI #  |\n+----+------------------+-------+-------+------+--------+\n| 1  | [NAME]           | Writer| [XX]% | [PRO]| [IPI]  |\n| 2  | [NAME]           | Writer| [XX]% | [PRO]| [IPI]  |\n| 3  | [NAME]           | Prod  | [XX]% | [PRO]| [IPI]  |\n+----+------------------+-------+-------+------+--------+\nTOTAL:                           100%\n\nAGREED TERMS:\n1. All contributors agree to register this work with their respective PROs within [30 days].\n2. No contributor may license, assign, or transfer their share without written consent of all parties.\n3. Mechanical royalties shall be split in the same percentages as above.\n4. This agreement is binding and may not be modified without unanimous written consent.\n\nSIGNATURES:\n\n___________________________  Date: ________\n[Contributor 1]\n\n___________________________  Date: ________\n[Contributor 2]\n\n___________________________  Date: ________\n[Contributor 3]',                                                             'https://www.tuneregistry.com/blog/split-sheet'],
-    ['Non-Disclosure Agreement — Music Industry',   'NDA',                   'NON-DISCLOSURE AGREEMENT\n\nThis Non-Disclosure Agreement ("NDA") is entered into as of [DATE] by and between:\n\nDisclosing Party: [COMPANY/INDIVIDUAL NAME]\nReceiving Party: [COMPANY/INDIVIDUAL NAME]\n\n1. DEFINITION OF CONFIDENTIAL INFORMATION\nFor purposes of this NDA, "Confidential Information" includes but is not limited to:\n   - Unreleased music, demos, and works-in-progress\n   - Release schedules and marketing strategies\n   - Financial terms of agreements and deals\n   - Artist personal information and contact details\n   - Business strategies and partnership discussions\n   - Sync placement details prior to public announcement\n\n2. OBLIGATIONS\nThe Receiving Party agrees to:\n   a) Hold all Confidential Information in strict confidence\n   b) Not disclose to any third party without prior written consent\n   c) Use Confidential Information solely for the Purpose described herein\n   d) Return or destroy all materials upon termination\n\n3. TERM: This NDA shall remain in effect for [2 years] from the date of execution.\n\n4. PURPOSE: [Describe specific business purpose]\n\n5. REMEDIES: The Disclosing Party shall be entitled to injunctive relief in addition to any other available remedies.\n\n6. GOVERNING LAW: [STATE/COUNTRY]',                                          null],
-    ['Sync Pitch Submission Checklist',              'Other',                 'SYNC PITCH SUBMISSION CHECKLIST\n\nBefore submitting any track for sync consideration, ensure ALL items are complete:\n\nTRACK INFORMATION:\n[ ] Track title confirmed and final\n[ ] ISRC code assigned\n[ ] Genre and mood tags applied\n[ ] BPM documented\n[ ] Key signature documented\n[ ] Lyrics transcribed (if applicable)\n[ ] Explicit content flagged (if applicable)\n\nOWNERSHIP & CLEARANCE:\n[ ] Split sheet signed by ALL contributors\n[ ] All writer IPI numbers verified\n[ ] PRO registrations confirmed (ASCAP/BMI/SESAC)\n[ ] Master ownership documented\n[ ] Publishing ownership documented\n[ ] No unresolved samples or interpolations\n[ ] All contributors have signed sync authorization\n\nDELIVERABLES:\n[ ] Full mix (WAV 24-bit/48kHz)\n[ ] Instrumental version\n[ ] Stems package (drums, bass, vocals, synths, etc.)\n[ ] 30-second and 60-second edits\n[ ] Clean version (if explicit content)\n\nMETADATA:\n[ ] Accurate song credits in file metadata\n[ ] Contact information for clearance\n[ ] One-stop licensing availability noted\n[ ] Pricing tier indicated',                                                 null],
-    ['Artist Onboarding SOP',                        'Other',                 'ARTIST ONBOARDING — STANDARD OPERATING PROCEDURE\n\nWhen signing a new artist to the roster, follow these steps in order:\n\nPHASE 1: LEGAL & ADMIN (Week 1)\n1. Execute artist agreement (recording or distribution)\n2. Collect all legal documents:\n   - Government ID for verification\n   - Tax forms (W-9 for US, W-8BEN for international)\n   - Banking details for royalty payments\n3. Set up artist profile in Pryntis Panel\n4. Assign subscription tier (Basic/Pro/Premium)\n5. Create artist folder in cloud storage\n\nPHASE 2: CATALOGUE INTAKE (Week 2)\n6. Audit existing catalogue:\n   - List all tracks with ownership details\n   - Verify PRO registrations\n   - Check for existing sync licenses or restrictions\n7. Upload assets to Pryntis Port:\n   - Masters (WAV 24-bit/48kHz)\n   - Instrumentals and stems\n   - Artwork and press photos\n8. Create ownership records for all assets\n9. Set up metadata templates\n\nPHASE 3: STRATEGY (Week 3-4)\n10. Schedule onboarding call with artist and management\n11. Create initial project in Pryntis Panel\n12. Assign tasks to team members\n13. Develop 90-day release/placement strategy\n14. Add relevant industry contacts to artist network\n15. Set up streaming and social media monitoring',                            null],
-    ['Royalty Accounting Statement Template',         'Other',                'ROYALTY ACCOUNTING STATEMENT\n\nStatement Period: [Q1/Q2/Q3/Q4] [YEAR]\nArtist: [ARTIST NAME]\nAgreement Date: [DATE]\nStatement Date: [DATE]\n\n1. REVENUE SUMMARY\n+-------------------------+-------------+\n| Source                  | Amount      |\n+-------------------------+-------------+\n| Streaming Revenue       | $[AMOUNT]   |\n| Sync License Fees       | $[AMOUNT]   |\n| Mechanical Royalties    | $[AMOUNT]   |\n| Performance Royalties   | $[AMOUNT]   |\n| Other Income            | $[AMOUNT]   |\n+-------------------------+-------------+\n| GROSS REVENUE           | $[TOTAL]    |\n+-------------------------+-------------+\n\n2. DEDUCTIONS\n+-------------------------+-------------+\n| Distribution Fees ([X]%)| $[AMOUNT]   |\n| Administration Fee ([X])| $[AMOUNT]   |\n+-------------------------+-------------+\n| NET REVENUE             | $[TOTAL]    |\n+-------------------------+-------------+\n\n3. RECOUPMENT STATUS\n+-------------------------+-------------+\n| Total Recoupable Balance| $[AMOUNT]   |\n| Applied This Period     | $[AMOUNT]   |\n| Remaining Balance       | $[AMOUNT]   |\n+-------------------------+-------------+\n\n4. AMOUNT DUE TO ARTIST\n+-------------------------+-------------+\n| Artist Share ([X]%)     | $[AMOUNT]   |\n| Less: Recoupment Applied| $[AMOUNT]   |\n| NET PAYABLE             | $[AMOUNT]   |\n+-------------------------+-------------+\n\nPayment Method: [ACH/Wire/Check]\nPayment Date: [DATE]',                                                        null],
+    ['Split Sheet Agreement', 'Split Sheet',
+`SPLIT SHEET AGREEMENT
+
+Song Title: ________________________________________
+Working Title (if different): ______________________
+Recording Date: ____/____/________
+Studio / Location: _________________________________
+ISRC (if assigned): ________________________________
+
+The undersigned contributors hereby agree to the following ownership
+splits for the above-referenced musical composition:
+
+WRITER / CONTRIBUTOR TABLE
++----+---------------------+-----------+--------+-------+-----------------+
+| #  | Name                | Role      | Share  | PRO   | IPI / CAE #     |
++----+---------------------+-----------+--------+-------+-----------------+
+| 1  | ________________    | Topliner  | _____%  | ASCAP | _______________ |
+| 2  | ________________    | Lyricist  | _____%  | BMI   | _______________ |
+| 3  | ________________    | Producer  | _____%  | SESAC | _______________ |
+| 4  | ________________    | Composer  | _____%  | PRS   | _______________ |
++----+---------------------+-----------+--------+-------+-----------------+
+TOTAL:                                   100.00%
+
+PUBLISHER INFORMATION
+Writer 1 Publisher: ____________________  Share: _____%
+Writer 2 Publisher: ____________________  Share: _____%
+Writer 3 Publisher: ____________________  Share: _____%
+Writer 4 Publisher: ____________________  Share: _____%
+
+AGREED TERMS
+1. Each contributor shall register this work with their respective PRO
+   within 30 calendar days of execution.
+2. No contributor may license, assign, or transfer their share without
+   prior written consent of all parties.
+3. Mechanical royalties shall be split in the same percentages listed above.
+4. Sync licensing requires unanimous written approval of all contributors.
+5. This agreement is binding and may not be modified except by unanimous
+   written consent of all parties.
+
+SIGNATURES
+
+___________________________  Date: ____/____/________
+Print Name: _______________
+
+___________________________  Date: ____/____/________
+Print Name: _______________
+
+___________________________  Date: ____/____/________
+Print Name: _______________
+
+___________________________  Date: ____/____/________
+Print Name: _______________`, null],
+
+    ['Producer Agreement Checklist', 'Other',
+`PRODUCER AGREEMENT CHECKLIST
+
+Use this checklist when negotiating or reviewing any producer agreement
+to ensure all key deal points are addressed before execution.
+
+RECOUPMENT TERMS
+[ ] Advance amount clearly stated (e.g., $2,000 - $10,000 per master)
+[ ] Recoupment limited to artist royalties only (not label share)
+[ ] Recording costs listed as recoupable or non-recoupable
+[ ] Recoupment cross-collateralization clause reviewed
+[ ] Cap on recoupable expenses defined
+
+PRODUCER ROYALTY POINTS
+[ ] Points specified as percentage of suggested retail or net receipts
+[ ] Typical range: 3-5 points for major-label deals
+[ ] Pro-rata calculation method defined for multi-producer albums
+[ ] Escalations tied to sales thresholds (e.g., 4pts after 500K units)
+[ ] Points calculated before or after packaging deductions
+
+MOST FAVORED NATIONS (MFN) CLAUSE
+[ ] MFN clause present or intentionally excluded
+[ ] MFN applies to: advance, points, credit (specify which)
+[ ] MFN reference group defined (all producers on project)
+
+CREDIT LANGUAGE
+[ ] Credit format specified: "Produced by [NAME]"
+[ ] Placement requirements: liner notes, streaming metadata, video
+[ ] Credit on all configurations (digital, physical, promotional)
+[ ] Remedies for credit omission (cure period, not grounds for termination)
+
+DELIVERY SPECIFICATIONS
+[ ] File format: WAV 24-bit / 48 kHz minimum
+[ ] Stems required: drums, bass, vocals, synths, FX (separate tracks)
+[ ] Instrumental version required
+[ ] TV-clean version required (if applicable)
+[ ] Delivery deadline with cure period for late delivery
+[ ] Metadata requirements: BPM, key, ISRC embedded in file headers`, null],
+
+    ['Cue Sheet Template -- Film/TV', 'Cue Sheet',
+`CUE SHEET -- FILM / TELEVISION
+
+Production Title: _________________________________
+Episode Number: _________  Episode Title: _________
+Network / Platform: _______________________________
+Air Date / Release Date: ____/____/________
+Total Runtime: ____:____:____
+Production Company: _______________________________
+Music Supervisor: _________________________________
+
+CUE LOG
++------+------------------------------+-------------------+-------------------+-------+----------+----------+-----------+------------------+
+| Cue# | Music Title                  | Composer(s)       | Publisher(s)      | PRO   | Usage    | Timing   | Duration  | ISRC             |
++------+------------------------------+-------------------+-------------------+-------+----------+----------+-----------+------------------+
+| 001  | ________________________     | ________________  | ________________  | ASCAP | BV       | 00:01:15 | 00:00:45  | ________________ |
+| 002  | ________________________     | ________________  | ________________  | BMI   | BI       | 00:05:30 | 00:01:20  | ________________ |
+| 003  | ________________________     | ________________  | ________________  | SESAC | VV       | 00:12:44 | 00:02:10  | ________________ |
+| 004  | ________________________     | ________________  | ________________  | ASCAP | MT       | 00:00:00 | 00:00:30  | ________________ |
+| 005  | ________________________     | ________________  | ________________  | BMI   | ET       | 00:42:15 | 00:00:30  | ________________ |
++------+------------------------------+-------------------+-------------------+-------+----------+----------+-----------+------------------+
+
+USAGE TYPE CODES
+BV = Background Vocal       BI = Background Instrumental
+VV = Visual Vocal           VI = Visual Instrumental
+MT = Main Title / Theme     ET = End Title
+LO = Logo                   PI = Promotional Instrumental
+FT = Feature Performance    AD = Ad / Bumper
+
+NOTES
+- All publishers must be listed with their respective PRO affiliations.
+- If a cue contains multiple works, list each on a separate row.
+- Attach signed sync and master-use licenses for each cue.
+
+Prepared by: ___________________  Date: ____/____/________
+Contact Email: _________________  Phone: _________________`, null],
+
+    ['ISRC/UPC Assignment SOP', 'Other',
+`ISRC / UPC ASSIGNMENT -- STANDARD OPERATING PROCEDURE
+
+PURPOSE
+Ensure every released recording has a unique, valid ISRC and every
+release (single, EP, album) has a valid UPC/EAN barcode before
+distribution.
+
+ISRC ASSIGNMENT (International Standard Recording Code)
+Format: CC-XXX-YY-NNNNN  (Country-Registrant-Year-Designation)
+
+Step 1: Obtain a registrant code from your national ISRC agency
+        (US: RIAA, UK: PPL, etc.) or through your distributor.
+Step 2: Maintain a sequential log of all assigned designation numbers.
+Step 3: Assign one unique ISRC per unique recording.
+        - New ISRC required for: remixes, remastered versions, edits.
+        - Same ISRC retained for: re-releases on different platforms,
+          inclusion on compilations, format changes (WAV to MP3).
+Step 4: Embed the ISRC in the WAV file header (BWF chunk) before delivery.
+Step 5: Record the ISRC in your asset management system and metadata sheet.
+
+COMMON ISRC MISTAKES TO AVOID
+- Do NOT reuse an ISRC for a different recording.
+- Do NOT assign a new ISRC when re-distributing the same master.
+- Do NOT use placeholder codes; always assign final ISRCs before delivery.
+- Ensure the year portion matches the year of first commercial release.
+
+UPC/EAN ASSIGNMENT (Universal Product Code)
+Step 1: Purchase a GS1 company prefix or obtain UPCs from your distributor.
+Step 2: Assign one UPC per release (single, EP, album, deluxe edition).
+Step 3: Each unique configuration (standard vs. deluxe) needs its own UPC.
+Step 4: Enter the UPC into your distributor portal during release setup.
+
+VALIDATION RULES
+- ISRC must be exactly 12 alphanumeric characters (no hyphens in systems).
+- UPC must be exactly 12 digits (UPC-A) or 13 digits (EAN-13).
+- Run check-digit validation before submission.
+- Cross-reference against existing catalogue to prevent duplicates.`, null],
+
+    ['Metadata QC Checklist', 'Other',
+`METADATA QUALITY CONTROL CHECKLIST
+
+Run this checklist before submitting any release to distribution.
+Every field marked [REQUIRED] must be present and validated.
+
+TRACK-LEVEL METADATA
+[REQUIRED] Track title -- no ALL CAPS unless stylized; check spelling
+[REQUIRED] Primary artist name -- must match existing DSP profiles
+[REQUIRED] ISRC code -- 12 characters, validated format
+[REQUIRED] Genre (primary) -- use DDEX standard genre taxonomy
+[REQUIRED] Language of lyrics -- ISO 639-1 code (e.g., "en", "es")
+[REQUIRED] Explicit content flag -- "Explicit" or "Clean" or "Not Applicable"
+[OPTIONAL] Featured artist(s) -- format: "feat. [Name]"
+[OPTIONAL] Remixer / version info -- "(Remix)" or "(Acoustic Version)"
+[REQUIRED] Composer(s) -- full legal names, comma-separated
+[REQUIRED] Producer(s) -- full legal names
+[REQUIRED] Publisher(s) -- registered entity names
+
+RELEASE-LEVEL METADATA
+[REQUIRED] Release title -- consistent with track naming conventions
+[REQUIRED] UPC/EAN -- 12 or 13 digits, check-digit validated
+[REQUIRED] Release date -- YYYY-MM-DD, must be a future Friday (industry standard)
+[REQUIRED] Label name -- registered with distributor
+[REQUIRED] Cover art -- 3000x3000 px minimum, RGB, JPG or PNG, no bleed
+[REQUIRED] Copyright line (P) -- year + master owner
+[REQUIRED] Copyright line (C) -- year + composition owner
+
+COMMON ERRORS TO WATCH FOR
+- Mismatched artist names across DSPs (e.g., "J. Cole" vs "J Cole")
+- Missing featured artist credits in both title and artist fields
+- Wrong ISRC format (hyphens where systems expect none)
+- Release date set on a non-Friday
+- Artwork with text too small to read at thumbnail size
+- Genre mismatch between metadata and actual audio content
+
+SIGN-OFF
+QC performed by: ___________________  Date: ____/____/________
+Approved for distribution: [ ] Yes  [ ] No
+Notes: ____________________________________________________________`, null],
+
+    ['Royalty Statement Template', 'Other',
+`ROYALTY ACCOUNTING STATEMENT
+
+Statement Period: Q__ / 20____
+Artist / Payee: ___________________________________
+Agreement Date: ____/____/________
+Statement Issue Date: ____/____/________
+Account Number: ___________________________________
+
+1. REVENUE BY SOURCE
++-------------------------------+-----------+-----------+
+| Source                        | Units     | Gross ($) |
++-------------------------------+-----------+-----------+
+| Streaming -- Spotify          |           |           |
+| Streaming -- Apple Music      |           |           |
+| Streaming -- Amazon / Other   |           |           |
+| Download Sales                |           |           |
+| Sync License Fees             |           |           |
+| Mechanical Royalties          |           |           |
+| Performance Royalties (PRO)   |           |           |
+| Physical Sales                |           |           |
+| Neighboring Rights            |           |           |
+| Other Income                  |           |           |
++-------------------------------+-----------+-----------+
+| GROSS REVENUE                 |           |           |
++-------------------------------+-----------+-----------+
+
+2. DEDUCTIONS
++-------------------------------+-----------+
+| Distribution Fee (___%)       |           |
+| Administration Fee (___%)     |           |
+| Withholding Tax (___%)        |           |
++-------------------------------+-----------+
+| TOTAL DEDUCTIONS              |           |
++-------------------------------+-----------+
+
+3. NET REVENUE AFTER DEDUCTIONS:  $__________
+
+4. RECOUPMENT STATUS
++-------------------------------+-----------+
+| Opening Unrecouped Balance    |           |
+| Applied This Period           |           |
+| Closing Unrecouped Balance    |           |
++-------------------------------+-----------+
+
+5. NET PAYABLE TO ARTIST
++-------------------------------+-----------+
+| Artist Share (___%)           |           |
+| Less: Recoupment Applied      |           |
+| Less: Reserves Held (___%)    |           |
+| NET PAYMENT THIS PERIOD       |           |
++-------------------------------+-----------+
+
+Payment Method: [ ] ACH  [ ] Wire  [ ] Check
+Payment Date: ____/____/________
+Notes: ____________________________________________________________`, null],
+
+    ['Sync Pitch Email Template', 'Sync License',
+`SYNC PITCH EMAIL TEMPLATE
+
+Use this template when pitching tracks to music supervisors, ad agencies,
+or sync licensing representatives.
+
+SUBJECT LINE OPTIONS (choose or adapt one):
+- "[Artist] -- Fresh tracks for [Show/Brand] consideration"
+- "One-stop clearance catalog: [Genre] tracks for [Project Type]"
+- "New releases available for sync: [Artist] ([Genre])"
+
+---
+
+EMAIL BODY
+
+Hi [First Name],
+
+I hope this message finds you well. I wanted to share some tracks from
+[Artist Name / Catalog Name] that I believe could be a strong fit for
+[specific project, show, or brand if known; otherwise use "your upcoming
+projects"].
+
+Attached / linked below are [3-5] selections:
+
+1. "[Track Title]" -- [Genre], [BPM] BPM, [Mood descriptors]
+   Duration: [X:XX] | One-stop: [Yes/No]
+   Link: [streaming or private link]
+
+2. "[Track Title]" -- [Genre], [BPM] BPM, [Mood descriptors]
+   Duration: [X:XX] | One-stop: [Yes/No]
+   Link: [streaming or private link]
+
+3. "[Track Title]" -- [Genre], [BPM] BPM, [Mood descriptors]
+   Duration: [X:XX] | One-stop: [Yes/No]
+   Link: [streaming or private link]
+
+All tracks are fully cleared for sync with master and publishing
+controlled by [Entity]. Instrumentals, stems, and alternate edits
+(30s / 60s) are available upon request.
+
+Happy to send additional material or discuss licensing terms. Looking
+forward to hearing from you.
+
+Best regards,
+[Your Name]
+[Title / Company]
+[Phone] | [Email]
+
+---
+
+ATTACHMENTS CHECKLIST
+[ ] One-sheet (PDF) with track list, credits, and clearance status
+[ ] Private streaming links (not public URLs)
+[ ] Contact card or signature with direct phone number
+
+FOLLOW-UP SCHEDULE
+- Day 3: Brief follow-up email if no response
+- Day 10: Second follow-up with one additional track suggestion
+- Day 21: Final check-in; offer to remove from pitch list if not relevant`, null],
+
+    ['Engineer Mix Notes', 'Other',
+`ENGINEER MIX NOTES -- REVISION LOG
+
+Project: ___________________________________
+Artist: ___________________________________
+Engineer: ___________________________________
+Session Date: ____/____/________
+DAW / Session File: ___________________________________
+
+REFERENCE TRACKS
+List 2-3 commercial reference tracks for sonic direction:
+1. "[Title]" by [Artist] -- Reference for: [low end / vocal tone / width]
+2. "[Title]" by [Artist] -- Reference for: [dynamics / overall balance]
+3. "[Title]" by [Artist] -- Reference for: [FX treatment / spatial depth]
+
+MIX TARGETS
+- Loudness: -14 LUFS integrated (streaming-optimized)
+- True Peak: -1.0 dBTP maximum
+- Dynamic Range: 8-12 LU minimum
+- Low-end roll-off: HPF at 30 Hz on master bus
+- Stereo width: Mono-compatible below 200 Hz
+
+REVISION LOG
++-----+------------+-----------------------------------------------------+
+| Rev | Date       | Notes                                               |
++-----+------------+-----------------------------------------------------+
+| v1  | __________ | Initial mix delivered. Awaiting client feedback.     |
+| v2  | __________ | ____________________________________________        |
+| v3  | __________ | ____________________________________________        |
+| v4  | __________ | ____________________________________________        |
++-----+------------+-----------------------------------------------------+
+
+DELIVERY SPECIFICATIONS
+- Mix format: WAV 24-bit / 48 kHz (or match session sample rate)
+- Instrumental: Separate file, same processing chain minus vocal bus
+- A-cappella: Vocals only, with reverb/delay printed and dry version
+- TV mix: Remove explicit lyrics; preserve all instrumentation
+- Stems: Drums, Bass, Synths/Keys, Guitars, Vocals, FX/Perc (6-8 stems)
+- File naming: [Artist]_[Title]_[Version]_[Date].[ext]
+  Example: LunaRey_Midnight_MixV2_20250115.wav
+
+SIGN-OFF
+Mix approved by: ___________________  Date: ____/____/________
+Notes: ____________________________________________________________`, null],
+
+    ['Master Delivery Checklist', 'Other',
+`MASTER DELIVERY CHECKLIST
+
+Complete this checklist before delivering final masters to distribution,
+licensing partners, or archive storage.
+
+FORMAT REQUIREMENTS
+[ ] WAV 16-bit / 44.1 kHz -- CD-quality master (required for physical)
+[ ] WAV 24-bit / 48 kHz -- High-resolution master (required for DSPs)
+[ ] WAV 24-bit / 96 kHz -- Archival master (if available)
+[ ] MP3 320 kbps CBR -- Promotional / reference copy
+[ ] FLAC -- Lossless compressed (for platforms that accept it)
+
+LOUDNESS TARGETS (per platform standards)
+[ ] Integrated loudness: -14 LUFS (Spotify, YouTube, Tidal)
+[ ] True peak: -1.0 dBTP maximum
+[ ] Loudness range (LRA): 5-12 LU recommended
+[ ] Verify with loudness meter (e.g., Youlean, iZotope Insight)
+
+STEMS PACKAGE
+[ ] Drums / Percussion (stereo or multi-mono)
+[ ] Bass (DI + processed)
+[ ] Vocals (lead + backgrounds, dry + wet versions)
+[ ] Synths / Keys
+[ ] Guitars
+[ ] FX / Ambience
+[ ] All stems sum to match the full mix within 0.5 dB
+
+ALTERNATE VERSIONS
+[ ] Instrumental (full mix minus all vocals)
+[ ] A-cappella (vocals only, with and without effects)
+[ ] TV / Clean edit (explicit content removed)
+[ ] 30-second edit
+[ ] 60-second edit
+[ ] Radio edit (if different from album version)
+
+FILE NAMING CONVENTION
+[Artist]_[Title]_[Version]_[BitDepth]-[SampleRate].[ext]
+Example: BreeWave_Glow_Master_24-48.wav
+Example: BreeWave_Glow_Instrumental_24-48.wav
+
+METADATA EMBEDDED IN FILES
+[ ] ISRC code in BWF header
+[ ] Artist name, track title, album title
+[ ] Year of release
+[ ] Copyright notice
+
+FINAL SIGN-OFF
+Mastering engineer: ___________________  Date: ____/____/________
+A&R / Label approval: _________________  Date: ____/____/________`, null],
+
+    ['Sample Clearance Request', 'Other',
+`SAMPLE CLEARANCE REQUEST
+
+Use this template to initiate clearance for any sampled or interpolated
+material in a new recording.
+
+REQUESTING PARTY
+Artist / Producer: ___________________________________
+Label / Company: ___________________________________
+Contact Name: ___________________________________
+Email: ___________________________________
+Phone: ___________________________________
+
+ORIGINAL WORK BEING SAMPLED
+Song Title: ___________________________________
+Original Artist: ___________________________________
+Writer(s): ___________________________________
+Publisher(s): ___________________________________
+Record Label (Master Owner): ___________________________________
+Year of Release: __________
+ISRC (if known): ___________________________________
+
+SAMPLE DETAILS
+Type: [ ] Sound Recording Sample  [ ] Interpolation  [ ] Replay
+Portion Used: ___________________________________
+Duration of Sample: ____:____ (MM:SS)
+Location in New Song: ____:____ to ____:____
+Is the sample recognizable? [ ] Yes  [ ] No
+Modifications made: ___________________________________
+
+NEW WORK
+New Song Title: ___________________________________
+New Artist: ___________________________________
+Expected Release Date: ____/____/________
+Distribution Scope: [ ] Worldwide  [ ] Territory-specific: __________
+Intended Use: [ ] Commercial Release  [ ] Sync  [ ] Mixtape / Promo
+
+FEE STRUCTURE
+Typical clearance models (for reference):
+- Flat fee: $500 - $50,000+ depending on prominence and commercial scope
+- Rollover advance: Flat fee + royalty after sales threshold
+- Co-publishing: Ownership share of new composition (often 25-50%)
+- Royalty only: Per-unit or percentage of revenue, no upfront fee
+
+Proposed offer: ___________________________________
+
+TRACKING
++-----+---------------------+-----------+----------------------------------+
+| #   | Date                | Contact   | Status / Notes                   |
++-----+---------------------+-----------+----------------------------------+
+| 1   | ____/____/________  | ________  | Initial outreach sent            |
+| 2   | ____/____/________  | ________  | ________________________________ |
+| 3   | ____/____/________  | ________  | ________________________________ |
++-----+---------------------+-----------+----------------------------------+
+
+Master clearance obtained: [ ] Yes  [ ] No  Date: ____/____/________
+Publishing clearance obtained: [ ] Yes  [ ] No  Date: ____/____/________`, null],
+
+    ['Project Kickoff Brief', 'Other',
+`PROJECT KICKOFF BRIEF
+
+PROJECT OVERVIEW
+Project Name: ___________________________________
+Project Type: [ ] Album  [ ] EP  [ ] Single  [ ] Sync Campaign  [ ] Other
+Artist / Client: ___________________________________
+Project Lead: ___________________________________
+Start Date: ____/____/________
+Target Completion: ____/____/________
+
+GOALS AND OBJECTIVES
+Primary goal: ___________________________________
+Success metrics:
+  - ___________________________________
+  - ___________________________________
+  - ___________________________________
+
+SCOPE AND DELIVERABLES
++-----+------------------------------------+----------------+
+| #   | Deliverable                        | Due Date       |
++-----+------------------------------------+----------------+
+| 1   | __________________________________ | ______________ |
+| 2   | __________________________________ | ______________ |
+| 3   | __________________________________ | ______________ |
+| 4   | __________________________________ | ______________ |
+| 5   | __________________________________ | ______________ |
++-----+------------------------------------+----------------+
+
+TEAM ROLES AND RESPONSIBILITIES
++-----------------------------+-------------------+------------------+
+| Role                        | Name              | Contact          |
++-----------------------------+-------------------+------------------+
+| Project Manager             | ________________  | ________________ |
+| A&R / Creative Director     | ________________  | ________________ |
+| Engineer / Producer         | ________________  | ________________ |
+| Marketing / PR              | ________________  | ________________ |
+| Legal / Business Affairs    | ________________  | ________________ |
+| Distribution Contact        | ________________  | ________________ |
++-----------------------------+-------------------+------------------+
+
+BUDGET
+Total Budget: $__________
++-----------------------------+-----------+
+| Category                    | Allocated |
++-----------------------------+-----------+
+| Recording / Production      |           |
+| Mixing / Mastering          |           |
+| Marketing / Promotion       |           |
+| Music Videos / Visual       |           |
+| Legal / Licensing           |           |
+| Contingency (10%)           |           |
++-----------------------------+-----------+
+
+MILESTONES
++-----+------------------------------------+----------------+-----------+
+| #   | Milestone                          | Target Date    | Status    |
++-----+------------------------------------+----------------+-----------+
+| 1   | Project kickoff meeting            | ______________ | _________ |
+| 2   | Recording complete                 | ______________ | _________ |
+| 3   | Mixing and mastering complete      | ______________ | _________ |
+| 4   | Marketing assets finalized         | ______________ | _________ |
+| 5   | Distribution submission            | ______________ | _________ |
+| 6   | Release date                       | ______________ | _________ |
++-----+------------------------------------+----------------+-----------+
+
+NOTES / SPECIAL CONSIDERATIONS
+___________________________________________________________________
+___________________________________________________________________`, null],
+
+    ['Dispute/Claim Intake Form', 'Other',
+`DISPUTE / CLAIM INTAKE FORM
+
+Complete this form for any ownership dispute, royalty claim, or
+takedown request. All fields are required unless marked optional.
+
+CLAIM REFERENCE NUMBER: _____________________ (assigned by admin)
+Date Filed: ____/____/________
+
+CLAIMANT INFORMATION
+Name / Entity: ___________________________________
+Role: [ ] Writer  [ ] Publisher  [ ] Producer  [ ] Label  [ ] Other: ______
+Email: ___________________________________
+Phone: ___________________________________
+Legal Representative (optional): ___________________________________
+
+CLAIM TYPE
+[ ] Ownership / Split Dispute -- Disagreement over composition shares
+[ ] Royalty Underpayment -- Alleged incorrect or missing royalty payment
+[ ] Unauthorized Use -- Work used without permission or license
+[ ] Credit Omission -- Missing or incorrect credit on released work
+[ ] Takedown Request -- Request to remove content from DSPs
+[ ] Counter-Notification -- Response to a previous claim or takedown
+[ ] Other: ___________________________________
+
+WORK(S) IN QUESTION
+Song Title: ___________________________________
+ISRC: ___________________________________
+UPC (if release-level): ___________________________________
+Release Date: ____/____/________
+Platform(s) affected: ___________________________________
+
+DESCRIPTION OF CLAIM
+Provide a detailed summary of the dispute, including relevant dates,
+parties involved, and the specific issue:
+___________________________________________________________________
+___________________________________________________________________
+___________________________________________________________________
+
+EVIDENCE PROVIDED
+[ ] Signed split sheet or agreement
+[ ] PRO registration confirmation
+[ ] Correspondence (emails, messages) supporting claim
+[ ] Royalty statements showing discrepancy
+[ ] Screenshots of incorrect credits or usage
+[ ] Copyright registration certificate
+[ ] Other: ___________________________________
+
+TIMELINE OF EVENTS
++-----+--------------------+----------------------------------------------+
+| #   | Date               | Event                                        |
++-----+--------------------+----------------------------------------------+
+| 1   | __________________ | ____________________________________________ |
+| 2   | __________________ | ____________________________________________ |
+| 3   | __________________ | ____________________________________________ |
++-----+--------------------+----------------------------------------------+
+
+REQUESTED RESOLUTION
+[ ] Correction of ownership splits to: ___________________________________
+[ ] Payment of outstanding royalties: $__________
+[ ] Removal of content from platforms
+[ ] Credit correction on all platforms and metadata
+[ ] Other: ___________________________________
+
+INTERNAL USE ONLY
+Assigned to: ___________________  Priority: [ ] Low  [ ] Medium  [ ] High
+Status: [ ] Open  [ ] Under Review  [ ] Resolved  [ ] Escalated
+Resolution date: ____/____/________
+Resolution summary: ________________________________________________`, null],
   ];
 
   for (const [title, category, body, sourceUrl] of templateData) {

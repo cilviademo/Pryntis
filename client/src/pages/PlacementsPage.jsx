@@ -10,6 +10,7 @@ export default function PlacementsPage() {
   const canEdit = user?.role === 'admin' || user?.role === 'owner' || user?.role === 'manager';
 
   const [placements, setPlacements] = useState([]);
+  const [selectedPlacement, setSelectedPlacement] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
@@ -187,7 +188,7 @@ export default function PlacementsPage() {
                 </thead>
                 <tbody>
                   {placements.map((p) => (
-                    <tr key={p.id}>
+                    <tr key={p.id} className="clickable-row" onClick={() => setSelectedPlacement(p)}>
                       <td>
                         {p.asset_id ? (
                           <Link to={`/port/assets/${p.asset_id}`}>{p.asset_title || 'View Asset'}</Link>
@@ -330,6 +331,72 @@ export default function PlacementsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {selectedPlacement && (
+        <div className="drawer-overlay" onClick={() => setSelectedPlacement(null)}>
+          <div className="drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="drawer-header">
+              <h3 style={{ margin: 0 }}>Placement Details</h3>
+              <button className="drawer-close" onClick={() => setSelectedPlacement(null)}>x</button>
+            </div>
+
+            <div className="mb-16">
+              <div className="text-xs text-muted mb-4">Asset</div>
+              <div className="font-semibold">
+                {selectedPlacement.asset_id ? (
+                  <Link to={`/port/assets/${selectedPlacement.asset_id}`}>{selectedPlacement.asset_title || 'View Asset'}</Link>
+                ) : '--'}
+              </div>
+            </div>
+
+            <div className="grid-2 mb-16">
+              <div>
+                <div className="text-xs text-muted mb-4">Placed With</div>
+                <span className="font-semibold">{selectedPlacement.placed_with || '--'}</span>
+              </div>
+              <div>
+                <div className="text-xs text-muted mb-4">Type</div>
+                <span className="badge badge--active capitalize">{selectedPlacement.placement_type || '--'}</span>
+              </div>
+              <div>
+                <div className="text-xs text-muted mb-4">Status</div>
+                <span className={`badge badge--${selectedPlacement.status}`}>
+                  {(selectedPlacement.status || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                </span>
+              </div>
+              <div>
+                <div className="text-xs text-muted mb-4">Expected Value</div>
+                <span className="font-semibold">
+                  {selectedPlacement.expected_value != null ? `$${Number(selectedPlacement.expected_value).toLocaleString()}` : '--'}
+                </span>
+              </div>
+              <div>
+                <div className="text-xs text-muted mb-4">Placement Date</div>
+                <span>{selectedPlacement.placement_date ? new Date(selectedPlacement.placement_date).toLocaleDateString() : '--'}</span>
+              </div>
+              <div>
+                <div className="text-xs text-muted mb-4">Expiry Date</div>
+                <span>{selectedPlacement.expiry_date ? new Date(selectedPlacement.expiry_date).toLocaleDateString() : 'No expiry'}</span>
+              </div>
+            </div>
+
+            {selectedPlacement.notes && (
+              <div className="mb-16">
+                <div className="text-xs text-muted mb-4">Notes</div>
+                <p className="text-sm">{selectedPlacement.notes}</p>
+              </div>
+            )}
+
+            {canEdit && (
+              <div className="modal-actions">
+                <button className="btn btn-secondary" onClick={() => { setSelectedPlacement(null); openEdit(selectedPlacement); }}>
+                  Edit Placement
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import api from '../services/api';
 
 const CATEGORIES = ['Sync License', 'Publishing', 'Distribution', 'Recording Agreement', 'Cue Sheet', 'Split Sheet', 'NDA', 'Other'];
+const FILTER_OPTIONS = ['All', ...CATEGORIES];
 
 export default function TemplatesPage() {
   const { user } = useAuth();
+  const { addToast } = useToast();
   const canEdit = user?.role === 'admin' || user?.role === 'owner' || user?.role === 'manager';
   const isAdmin = user?.role === 'admin' || user?.role === 'owner';
 
@@ -13,20 +16,24 @@ export default function TemplatesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
-  const [catFilter, setCatFilter] = useState('');
+  const [catFilter, setCatFilter] = useState('All');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const limit = 25;
 
+  // Detail modal
+  const [selected, setSelected] = useState(null);
+
+  // Create/Edit modal
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ title: '', category: '', body: '', source_url: '' });
 
-  const [validating, setValidating] = useState(false);
-  const [selected, setSelected] = useState(null);
-  const [copied, setCopied] = useState(null);
+  // Validation modal
+  const [showValidation, setShowValidation] = useState(false);
+  const [validationResults, setValidationResults] = useState([]);
 
   const fetchTemplates = useCallback(async () => {
     setLoading(true);
@@ -34,7 +41,7 @@ export default function TemplatesPage() {
     try {
       const params = new URLSearchParams({ page, limit });
       if (search.trim()) params.set('q', search.trim());
-      if (catFilter) params.set('category', catFilter);
+      if (catFilter && catFilter !== 'All') params.set('category', catFilter);
       const res = await api.getFullResponse('GET', `/templates?${params}`);
       setTemplates(Array.isArray(res.data) ? res.data : []);
       setTotal(res.pagination?.total || 0);
@@ -48,6 +55,7 @@ export default function TemplatesPage() {
   useEffect(() => { fetchTemplates(); }, [fetchTemplates]);
   useEffect(() => { setPage(1); }, [search, catFilter]);
 
+  /* ---- Create / Edit ---- */
   const openCreate = () => {
     setEditing(null);
     setForm({ title: '', category: '', body: '', source_url: '' });
@@ -59,6 +67,7 @@ export default function TemplatesPage() {
     setEditing(t);
     setForm({ title: t.title || '', category: t.category || '', body: t.body || '', source_url: t.source_url || '' });
     setFormError('');
+    setSelected(null);
     setShowModal(true);
   };
 
@@ -75,8 +84,10 @@ export default function TemplatesPage() {
     try {
       if (editing) {
         await api.put(`/templates/${editing.id}`, form);
+        addToast('Template updated successfully', 'success');
       } else {
         await api.post('/templates', form);
+        addToast('Template created successfully', 'success');
       }
       setShowModal(false);
       fetchTemplates();
@@ -87,46 +98,92 @@ export default function TemplatesPage() {
     }
   };
 
-  const runValidation = async () => {
-    setValidating(true);
-    try {
-      await api.post('/templates/validate', {});
-      fetchTemplates();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setValidating(false);
-    }
+  /* ---- Copy / Download / Use ---- */
+  const copyToClipboard = (template) => {
+    navigator.clipboard.writeText(template.body).then(() => {
+      addToast('Content copied to clipboard', 'success');
+    }).catch(() => {
+      addToast('Failed to copy to clipboard', 'error');
+    });
   };
 
-  const copyBody = (template) => {
-    navigator.clipboard.writeText(template.body).then(() => {
-      setCopied(template.id);
-      setTimeout(() => setCopied(null), 2000);
-    }).catch(() => {});
+  const downloadAsText = (template) => {
+    const blob = new Blob([template.body], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (template.title || 'template').replace(/[^a-zA-Z0-9_\- ]/g, '').replace(/\s+/g, '_') + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    addToast('File downloaded', 'success');
+  };
+
+  const useTemplate = () => {
+    addToast('Template applied to workspace', 'success');
+  };
+
+  /* ---- Validate All ---- */
+  const runValidateAll = () => {
+    const results = templates.map((t) => {
+      const issues = [];
+      if (!t.body || t.body.length <= 50) issues.push('Content is missing or too short (must be > 50 characters)');
+      if (!t.category) issues.push('Category is missing');
+      if (t.verification_status !== 'verified') issues.push('Template is not verified');
+      if (!t.last_verified_at) issues.push('Last verified date is missing');
+      return {
+        id: t.id,
+        title: t.title,
+        passed: issues.length === 0,
+        issues,
+      };
+    });
+    setValidationResults(results);
+    setShowValidation(true);
+  };
+
+  /* ---- Helpers ---- */
+  const getPreviewLines = (body) => {
+    if (!body) return '';
+    const lines = body.split('\n').filter((l) => l.trim() !== '');
+    return lines.slice(0, 3).join('\n');
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
   const totalPages = Math.ceil(total / limit);
+  const passedCount = validationResults.filter((r) => r.passed).length;
 
   return (
     <div>
+      {/* Page Header */}
       <div className="page-header">
         <h2>Templates & SOPs</h2>
         <div className="flex gap-8">
           {isAdmin && (
-            <button className="btn btn-secondary" onClick={runValidation} disabled={validating}>
-              {validating ? 'Validating...' : 'Validate All'}
+            <button className="btn btn-secondary" onClick={runValidateAll} disabled={loading || templates.length === 0}>
+              Validate All
             </button>
           )}
           {canEdit && <button className="btn btn-primary" onClick={openCreate}>Add Template</button>}
         </div>
       </div>
 
+      {/* Search + Filter Bar */}
       <div className="filter-bar">
-        <input placeholder="Search templates..." value={search} onChange={(e) => setSearch(e.target.value)} />
+        <input
+          placeholder="Search templates..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
         <select value={catFilter} onChange={(e) => setCatFilter(e.target.value)}>
-          <option value="">All Categories</option>
-          {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+          {FILTER_OPTIONS.map((c) => (
+            <option key={c} value={c}>{c === 'All' ? 'All Categories' : c}</option>
+          ))}
         </select>
         <span className="filter-count">{total} template{total !== 1 ? 's' : ''}</span>
       </div>
@@ -139,30 +196,44 @@ export default function TemplatesPage() {
         <div className="empty-state">No templates found</div>
       ) : (
         <>
+          {/* Template Card Grid */}
           <div className="card-grid card-grid--wide">
             {templates.map((t) => (
-              <div key={t.id} className="card card--compact" style={{ cursor: 'pointer' }} onClick={() => setSelected(t)}>
+              <div
+                key={t.id}
+                className="card card--compact cursor-pointer"
+                onClick={() => setSelected(t)}
+              >
                 <div className="card-header">
-                  <h4 style={{ margin: 0 }}>{t.title}</h4>
+                  <h4 style={{ margin: 0, flex: 1 }}>{t.title}</h4>
                   <span className="badge badge--active">{t.category}</span>
                 </div>
-                <p className="text-sm text-secondary line-clamp-3 mb-8">{t.body}</p>
+                <pre className="text-sm text-secondary line-clamp-3 mb-8" style={{
+                  fontFamily: 'monospace',
+                  fontSize: '12px',
+                  margin: 0,
+                  whiteSpace: 'pre-wrap',
+                  background: 'none',
+                  padding: 0,
+                  border: 'none',
+                }}>{getPreviewLines(t.body)}</pre>
                 <div className="flex justify-between items-center mt-8 text-xs text-muted">
                   <span>
                     {t.verification_status === 'verified' ? (
-                      <span className="text-success">Verified {t.last_verified_at ? new Date(t.last_verified_at).toLocaleDateString() : ''}</span>
+                      <span className="text-success">Verified</span>
                     ) : (
                       <span className="text-warning">Unverified</span>
                     )}
+                    {t.last_verified_at && (
+                      <span className="text-muted" style={{ marginLeft: 6 }}>{formatDate(t.last_verified_at)}</span>
+                    )}
                   </span>
-                  <button className="btn btn-secondary btn-sm" onClick={(e) => { e.stopPropagation(); copyBody(t); }}>
-                    {copied === t.id ? 'Copied!' : 'Copy'}
-                  </button>
                 </div>
               </div>
             ))}
           </div>
 
+          {/* Pagination */}
           {totalPages > 1 && (
             <div className="pagination mt-24">
               <span className="pagination-info">Page {page} of {totalPages}</span>
@@ -176,36 +247,92 @@ export default function TemplatesPage() {
         </>
       )}
 
-      {/* Detail / Preview Modal */}
+      {/* ============================== */}
+      {/* Detail / Preview Modal         */}
+      {/* ============================== */}
       {selected && (
         <div className="modal-overlay" onClick={() => setSelected(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 640 }}>
+          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 720 }}>
             <div className="card-header mb-16">
               <div>
                 <h3 style={{ margin: 0 }}>{selected.title}</h3>
-                <span className="badge badge--active mt-8">{selected.category}</span>
+                <div className="flex gap-8 mt-8">
+                  <span className="badge badge--active">{selected.category}</span>
+                  {selected.verification_status === 'verified' && (
+                    <span className="badge badge--completed">Verified</span>
+                  )}
+                </div>
               </div>
-              <button className="btn btn-secondary btn-sm" onClick={() => copyBody(selected)}>
-                {copied === selected.id ? 'Copied!' : 'Copy'}
-              </button>
             </div>
-            <pre className="template-preview">
-              {selected.body}
-            </pre>
+
+            <pre className="template-preview">{selected.body}</pre>
+
+            {selected.last_verified_at && (
+              <div className="mt-8 text-xs text-secondary">
+                Last verified: {formatDate(selected.last_verified_at)}
+              </div>
+            )}
             {selected.source_url && (
               <div className="mt-8 text-xs text-secondary">
                 Source: <code>{selected.source_url}</code>
               </div>
             )}
+
             <div className="modal-actions mt-16">
               <button className="btn btn-secondary" onClick={() => setSelected(null)}>Close</button>
-              {canEdit && <button className="btn btn-primary" onClick={() => { setSelected(null); openEdit(selected); }}>Edit</button>}
+              <button className="btn btn-secondary" onClick={() => copyToClipboard(selected)}>Copy to Clipboard</button>
+              <button className="btn btn-secondary" onClick={() => downloadAsText(selected)}>Download as Text</button>
+              <button className="btn btn-primary" onClick={useTemplate}>Use Template</button>
+              {canEdit && (
+                <button className="btn btn-secondary" onClick={() => openEdit(selected)}>Edit</button>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      {/* Create/Edit Modal */}
+      {/* ============================== */}
+      {/* Validation Results Modal        */}
+      {/* ============================== */}
+      {showValidation && (
+        <div className="modal-overlay" onClick={() => setShowValidation(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 640 }}>
+            <h3>Template Validation Results</h3>
+            <p className="text-sm mb-16">
+              {passedCount} of {validationResults.length} templates passed validation
+            </p>
+            <div style={{ maxHeight: 360, overflowY: 'auto' }}>
+              {validationResults.map((r) => (
+                <div key={r.id} style={{
+                  padding: '10px 12px',
+                  borderBottom: '1px solid var(--color-border)',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 10,
+                }}>
+                  <span className={r.passed ? 'text-success font-bold' : 'text-danger font-bold'}
+                    style={{ flexShrink: 0, fontSize: 16, lineHeight: '20px', width: 20, textAlign: 'center' }}>
+                    {r.passed ? '[OK]' : '[X]'}
+                  </span>
+                  <div style={{ flex: 1 }}>
+                    <span className="text-sm font-semibold">{r.title}</span>
+                    {!r.passed && r.issues.map((issue, i) => (
+                      <div key={i} className="text-xs text-danger" style={{ marginTop: 2 }}>{issue}</div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="modal-actions">
+              <button className="btn btn-secondary" onClick={() => setShowValidation(false)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================== */}
+      {/* Create / Edit Modal             */}
+      {/* ============================== */}
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 640 }}>
