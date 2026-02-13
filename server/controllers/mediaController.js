@@ -7,6 +7,7 @@ const db = require('../config/db');
 const { AppError } = require('../middleware/errorHandler');
 const { success, created } = require('../utils/response');
 const { getStorageProvider } = require('../services/storage');
+const { safeMediaFile } = require('../utils/serializers');
 
 /**
  * Allowed owner types for media files.
@@ -79,7 +80,7 @@ const mediaController = {
         ]
       );
 
-      created(res, rows[0], 'File uploaded successfully');
+      created(res, safeMediaFile(rows[0]), 'File uploaded successfully');
     } catch (err) {
       next(err);
     }
@@ -186,7 +187,7 @@ const mediaController = {
         params
       );
 
-      success(res, rows, 'Media files retrieved');
+      success(res, rows.map(safeMediaFile), 'Media files retrieved');
     } catch (err) {
       next(err);
     }
@@ -270,7 +271,7 @@ const mediaController = {
 
       await client.query('COMMIT');
 
-      created(res, newRows[0], 'New version uploaded successfully');
+      created(res, safeMediaFile(newRows[0]), 'New version uploaded successfully');
     } catch (err) {
       await client.query('ROLLBACK').catch(() => {});
       next(err);
@@ -317,7 +318,7 @@ const mediaController = {
 
       await client.query('COMMIT');
 
-      success(res, updated[0], 'Current version updated successfully');
+      success(res, safeMediaFile(updated[0]), 'Current version updated successfully');
     } catch (err) {
       await client.query('ROLLBACK').catch(() => {});
       next(err);

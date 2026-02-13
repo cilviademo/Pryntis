@@ -34,7 +34,6 @@ function initPresence(io) {
 
       socket.user = {
         id: rows[0].id,
-        email: rows[0].email,
         role: rows[0].role,
         name: `${rows[0].first_name} ${rows[0].last_name}`,
       };
@@ -45,7 +44,10 @@ function initPresence(io) {
   });
 
   io.on('connection', (socket) => {
-    console.log(`[WS] Connected: ${socket.user.name} (${socket.user.id})`);
+    // Log connection without exposing PII
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[WS] Connected: user ${socket.user.id}`);
+    }
 
     // Join a room
     socket.on('join_room', (data) => {

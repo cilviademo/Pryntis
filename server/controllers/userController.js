@@ -1,6 +1,7 @@
 const db = require('../config/db');
 const { AppError } = require('../middleware/errorHandler');
 const { success } = require('../utils/response');
+const { safeUser } = require('../utils/serializers');
 
 const userController = {
   // GET /api/v1/users — admin only
@@ -33,7 +34,7 @@ const userController = {
         totalPages: Math.ceil(total / parsedLimit),
       };
 
-      success(res, rows, 'Users retrieved', 200, pagination);
+      success(res, rows.map(safeUser), 'Users retrieved', 200, pagination);
     } catch (err) {
       next(err);
     }
@@ -52,7 +53,7 @@ const userController = {
         throw new AppError('User not found', 404, 'NOT_FOUND');
       }
 
-      success(res, rows[0], 'User retrieved');
+      success(res, safeUser(rows[0]), 'User retrieved');
     } catch (err) {
       next(err);
     }
@@ -93,7 +94,7 @@ const userController = {
         throw new AppError('User not found', 404, 'NOT_FOUND');
       }
 
-      success(res, rows[0], 'User updated successfully');
+      success(res, safeUser(rows[0]), 'User updated successfully');
     } catch (err) {
       next(err);
     }
@@ -118,7 +119,7 @@ const userController = {
         throw new AppError('User not found', 404, 'NOT_FOUND');
       }
 
-      success(res, rows[0], 'User deactivated successfully');
+      success(res, safeUser(rows[0]), 'User deactivated successfully');
     } catch (err) {
       next(err);
     }

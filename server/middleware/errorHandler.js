@@ -32,15 +32,25 @@ function errorHandler(err, req, res, _next) {
   const statusCode = err.statusCode || 500;
   const code = err.code || 'INTERNAL_ERROR';
 
-  if (process.env.NODE_ENV === 'development') {
-    console.error(err);
+  // Log server-side only — redact sensitive data
+  if (statusCode >= 500) {
+    const safeUrl = (req.originalUrl || '').split('?')[0];
+    console.error(`[ERROR] ${req.method} ${safeUrl} — ${err.message}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.error(err.stack);
+    }
   }
+
+  // Never expose internal details or stack traces to the client
+  const clientMessage = statusCode >= 500
+    ? 'An unexpected error occurred'
+    : (err.message || 'An unexpected error occurred');
 
   res.status(statusCode).json({
     success: false,
     error: {
       code,
-      message: err.message || 'An unexpected error occurred',
+      message: clientMessage,
       details: err.details || [],
     },
   });

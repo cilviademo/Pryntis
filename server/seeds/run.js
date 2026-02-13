@@ -2463,14 +2463,8 @@ Next audit scheduled: ____/____/________`, null],
   }
 
   console.log('\n========================================');
-  console.log('TEST ACCOUNT CREDENTIALS:');
-  console.log('========================================');
-  console.log('  owner@pryntis.io       / owner123        (owner)');
-  console.log('  admin@pryntis.io       / admin123        (admin)');
-  console.log('  manager@pryntis.io     / manager123      (manager)');
-  console.log('  engineer@pryntis.io    / engineer123     (audio_engineer)');
-  console.log('  contributor@pryntis.io / contributor123  (contributor)');
-  console.log('  viewer@pryntis.io      / viewer123       (viewer)');
+  console.log('DEMO SEED DATA LOADED');
+  console.log('See .env.example for test account setup');
   console.log('========================================\n');
 
 }

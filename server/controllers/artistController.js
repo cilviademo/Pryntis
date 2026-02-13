@@ -1,6 +1,9 @@
 const db = require('../config/db');
 const { AppError } = require('../middleware/errorHandler');
 const { success, created } = require('../utils/response');
+const { safeArtist } = require('../utils/serializers');
+
+const PII_ROLES = ['owner', 'admin', 'manager'];
 
 const artistController = {
   // GET /api/v1/artists
@@ -67,7 +70,8 @@ const artistController = {
         totalPages: Math.ceil(total / parsedLimit),
       };
 
-      success(res, rows, 'Artists retrieved', 200, pagination);
+      const includePII = PII_ROLES.includes(req.user.role);
+      success(res, rows.map((r) => safeArtist(r, { includePII })), 'Artists retrieved', 200, pagination);
     } catch (err) {
       next(err);
     }
@@ -85,7 +89,8 @@ const artistController = {
         throw new AppError('Artist not found', 404, 'NOT_FOUND');
       }
 
-      success(res, rows[0], 'Artist retrieved');
+      const includePII = PII_ROLES.includes(req.user.role);
+      success(res, safeArtist(rows[0], { includePII }), 'Artist retrieved');
     } catch (err) {
       next(err);
     }
@@ -103,7 +108,7 @@ const artistController = {
         [name, stage_name || null, email || null, phone || null, bio || null, genre || null, status || 'active', notes || null, req.user.id]
       );
 
-      created(res, rows[0], 'Artist created successfully');
+      created(res, safeArtist(rows[0], { includePII: true }), 'Artist created successfully');
     } catch (err) {
       next(err);
     }
@@ -144,7 +149,7 @@ const artistController = {
         throw new AppError('Artist not found', 404, 'NOT_FOUND');
       }
 
-      success(res, rows[0], 'Artist updated successfully');
+      success(res, safeArtist(rows[0], { includePII: true }), 'Artist updated successfully');
     } catch (err) {
       next(err);
     }
@@ -164,7 +169,7 @@ const artistController = {
         throw new AppError('Artist not found', 404, 'NOT_FOUND');
       }
 
-      success(res, rows[0], 'Artist archived successfully');
+      success(res, safeArtist(rows[0], { includePII: true }), 'Artist archived successfully');
     } catch (err) {
       next(err);
     }
@@ -188,7 +193,7 @@ const artistController = {
         throw new AppError('Deleted artist not found', 404, 'NOT_FOUND');
       }
 
-      success(res, rows[0], 'Artist restored successfully');
+      success(res, safeArtist(rows[0], { includePII: true }), 'Artist restored successfully');
     } catch (err) {
       next(err);
     }

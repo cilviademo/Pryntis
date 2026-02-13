@@ -8,23 +8,33 @@ const authorize = require('../middleware/rbac');
 
 const router = express.Router();
 
+const { AppError } = require('../middleware/errorHandler');
+
 // ── Multer configuration ─────────────────────────────────────────────
 // Use memory storage so the buffer is available on req.file.buffer for
 // checksum computation and storage-provider upload.
+const MAX_UPLOAD_BYTES = parseInt(process.env.MAX_UPLOAD_MB || '100', 10) * 1024 * 1024;
+
+const ALLOWED_MIME_TYPES = [
+  'audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/aac', 'audio/ogg', 'audio/flac',
+  'audio/x-wav', 'audio/x-m4a', 'audio/webm',
+  'video/mp4', 'video/webm', 'video/quicktime',
+  'application/pdf',
+];
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 100 * 1024 * 1024, // 100 MB
+    fileSize: MAX_UPLOAD_BYTES,
   },
   fileFilter(_req, file, cb) {
-    const allowedPrefixes = ['audio/', 'video/', 'application/pdf'];
-    const allowed = allowedPrefixes.some((prefix) =>
-      file.mimetype.startsWith(prefix)
-    );
-
-    if (!allowed) {
+    if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
       return cb(
-        new Error('Only audio, video, and PDF files are accepted'),
+        new AppError(
+          `File type ${file.mimetype} is not allowed. Accepted: audio, video, PDF.`,
+          400,
+          'INVALID_FILE_TYPE'
+        ),
         false
       );
     }

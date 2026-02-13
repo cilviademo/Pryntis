@@ -40,7 +40,7 @@ const authController = {
       const { email, password } = req.body;
 
       const { rows } = await db.query(
-        'SELECT * FROM users WHERE email = $1',
+        'SELECT id, email, first_name, last_name, role, is_active, password_hash, token_version FROM users WHERE email = $1',
         [email]
       );
       const user = rows[0];
