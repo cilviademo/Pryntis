@@ -94,6 +94,9 @@ export default function Layout() {
           <NavLink to="/analytics" className="nav-link">
             Analytics
           </NavLink>
+          <NavLink to="/business" className="nav-link">
+            Business Ops
+          </NavLink>
 
           {/* ADMIN */}
           {isAdmin && (

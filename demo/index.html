@@ -233,6 +233,7 @@ h1,h2,h3,h4,h5,h6 { line-height: 1.3; font-weight: 600; }
       <div class="nav-section-label">Ops</div>
       <button class="nav-link" onclick="showPage('tasks')">Tasks</button>
       <button class="nav-link" onclick="showPage('analytics')">Analytics</button>
+      <button class="nav-link" onclick="showPage('business')">Business Ops</button>
 
       <div class="nav-section-label">Admin</div>
       <button class="nav-link" onclick="showPage('users')">Users</button>
@@ -536,6 +537,29 @@ h1,h2,h3,h4,h5,h6 { line-height: 1.3; font-weight: 600; }
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- ====== BUSINESS OPS ====== -->
+    <div id="page-business" class="page-section">
+      <div class="page-header"><h2>Business Operations</h2></div>
+      <div class="summary-cards">
+        <div class="summary-card"><div class="summary-card__label">Total Revenue</div><div class="summary-card__value">$198,200</div></div>
+        <div class="summary-card"><div class="summary-card__label">Total Expenses</div><div class="summary-card__value">$61,500</div></div>
+        <div class="summary-card"><div class="summary-card__label">Net Position</div><div class="summary-card__value" style="color:var(--color-success)">$136,700</div></div>
+        <div class="summary-card"><div class="summary-card__label">Unrecouped Artists</div><div class="summary-card__value">1</div></div>
+      </div>
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead><tr><th>Artist</th><th style="text-align:right">Revenue</th><th style="text-align:right">Expenses</th><th style="text-align:right">Net</th><th style="text-align:center">Status</th></tr></thead>
+          <tbody>
+            <tr><td>Luna Rey</td><td style="text-align:right">$73,000</td><td style="text-align:right">$0</td><td style="text-align:right;color:var(--color-success)">$73,000</td><td style="text-align:center"><span class="badge badge--active">No Expenses</span></td></tr>
+            <tr><td>MVRK</td><td style="text-align:right">$28,000</td><td style="text-align:right">$61,500</td><td style="text-align:right;color:var(--color-danger)">-$33,500</td><td style="text-align:center"><span class="badge badge--urgent">Unrecouped</span></td></tr>
+            <tr><td>Bree Wave</td><td style="text-align:right">$26,500</td><td style="text-align:right">$0</td><td style="text-align:right;color:var(--color-success)">$26,500</td><td style="text-align:center"><span class="badge badge--active">No Expenses</span></td></tr>
+            <tr><td>Crux</td><td style="text-align:right">$17,700</td><td style="text-align:right">$0</td><td style="text-align:right;color:var(--color-success)">$17,700</td><td style="text-align:center"><span class="badge badge--active">No Expenses</span></td></tr>
+            <tr><td>Sable</td><td style="text-align:right">$12,200</td><td style="text-align:right">$0</td><td style="text-align:right;color:var(--color-success)">$12,200</td><td style="text-align:center"><span class="badge badge--active">No Expenses</span></td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 

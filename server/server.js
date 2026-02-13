@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
+const rateLimit = require('express-rate-limit');
 const config = require('./config');
 const db = require('./config/db');
 const initDb = require('./initDb');
@@ -22,6 +23,9 @@ const kpiRoutes = require('./routes/kpiRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const templateRoutes = require('./routes/templateRoutes');
 const activityRoutes = require('./routes/activityRoutes');
+const panelRoutes = require('./routes/panelRoutes');
+const portAnalyticsRoutes = require('./routes/portAnalyticsRoutes');
+const businessRoutes = require('./routes/businessRoutes');
 
 const app = express();
 
@@ -56,9 +60,22 @@ app.use(helmet({
 // ── Compression ─────────────────────────────────────────────────
 app.use(compression());
 
+// ── Global API rate limiter ──────────────────────────────────────
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: { code: 'RATE_LIMITED', message: 'Too many requests, slow down' },
+  },
+});
+app.use('/api/', apiLimiter);
+
 // ── Global middleware ───────────────────────────────────────────
 app.use(responseTime);
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 
 // API routes
 app.use('/api/v1/auth', authRoutes);
@@ -73,6 +90,9 @@ app.use('/api/v1/kpi', kpiRoutes);
 app.use('/api/v1/contacts', contactRoutes);
 app.use('/api/v1/templates', templateRoutes);
 app.use('/api/v1/activity', activityRoutes);
+app.use('/api/v1/panel', panelRoutes);
+app.use('/api/v1/port/analytics', portAnalyticsRoutes);
+app.use('/api/v1/business', businessRoutes);
 
 // Health check — verifies DB connectivity
 app.get('/api/health', async (req, res) => {

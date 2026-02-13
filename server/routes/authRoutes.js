@@ -29,7 +29,7 @@ router.post(
     body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
     body('first_name').notEmpty().withMessage('First name required'),
     body('last_name').notEmpty().withMessage('Last name required'),
-    body('role').isIn(['admin', 'manager', 'viewer']).withMessage('Invalid role'),
+    body('role').isIn(['admin', 'manager', 'audio_engineer', 'contributor', 'viewer']).withMessage('Invalid role'),
   ],
   validate,
   authController.register

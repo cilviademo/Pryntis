@@ -19,6 +19,7 @@ import TasksPage from './pages/TasksPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import ContactsPage from './pages/ContactsPage';
 import TemplatesPage from './pages/TemplatesPage';
+import BusinessOpsPage from './pages/BusinessOpsPage';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -71,6 +72,7 @@ function AppRoutes() {
         <Route path="port/templates" element={<TemplatesPage />} />
         <Route path="tasks" element={<TasksPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
+        <Route path="business" element={<BusinessOpsPage />} />
       </Route>
     </Routes>
   );

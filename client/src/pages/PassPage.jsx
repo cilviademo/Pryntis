@@ -178,6 +178,21 @@ export default function PassPage() {
     return true;
   });
 
+  // Creator stats: derive asset count and placement count per artist from subscription data
+  const creatorStatsMap = {};
+  subscriptions.forEach((s) => {
+    const artistKey = s.artist_id;
+    if (!creatorStatsMap[artistKey]) {
+      creatorStatsMap[artistKey] = {
+        assetCount: s.asset_count != null ? Number(s.asset_count) : 0,
+        placementCount: s.placement_count != null ? Number(s.placement_count) : 0,
+      };
+    } else {
+      if (s.asset_count != null) creatorStatsMap[artistKey].assetCount = Number(s.asset_count);
+      if (s.placement_count != null) creatorStatsMap[artistKey].placementCount = Number(s.placement_count);
+    }
+  });
+
   // Summary stats
   const activeSubs = subscriptions.filter((s) => s.status === 'active').length;
   const tierDistribution = {};
@@ -193,6 +208,7 @@ export default function PassPage() {
     { key: 'overview', label: 'Overview' },
     { key: 'subscriptions', label: 'Subscriptions' },
     { key: 'features', label: 'Feature Matrix' },
+    { key: 'roadmap', label: 'Roadmap' },
   ];
   if (isAdmin) tabs.push({ key: 'audit', label: 'Audit Log' });
 
@@ -331,6 +347,7 @@ export default function PassPage() {
                     <th>Tier</th>
                     <th>Level</th>
                     <th>Status</th>
+                    <th>Creator Stats</th>
                     <th>Start Date</th>
                     <th>End Date</th>
                     {canEdit && <th>Actions</th>}
@@ -358,6 +375,14 @@ export default function PassPage() {
                           {isExpired && sub.status === 'active' && (
                             <span className="text-xs text-danger" style={{ display: 'block' }}>Past End Date</span>
                           )}
+                        </td>
+                        <td className="nowrap">
+                          <div className="text-xs text-secondary">
+                            Assets: <span className="font-semibold">{creatorStatsMap[sub.artist_id]?.assetCount || 0}</span>
+                          </div>
+                          <div className="text-xs text-secondary">
+                            Placements: <span className="font-semibold">{creatorStatsMap[sub.artist_id]?.placementCount || 0}</span>
+                          </div>
                         </td>
                         <td>{sub.start_date ? new Date(sub.start_date).toLocaleDateString() : '--'}</td>
                         <td>{sub.end_date ? new Date(sub.end_date).toLocaleDateString() : '--'}</td>
@@ -422,6 +447,144 @@ export default function PassPage() {
               </table>
             </div>
           )}
+        </div>
+      )}
+
+      {activeTab === 'roadmap' && (
+        <div className="detail-section">
+          <h3>Analog Modeling Roadmap</h3>
+          <p className="text-sm text-secondary mb-16">
+            Planned feature releases for the Pryntis analog modeling suite. Each phase introduces new capabilities
+            aligned with subscription tier availability.
+          </p>
+          <div className="card-grid">
+            <div className="card card--compact card--border-top" style={{ borderTopColor: 'var(--color-success)' }}>
+              <div className="card-header">
+                <h4 className="card-title">Phase 1 -- Current</h4>
+                <span className="badge badge--active">Live</span>
+              </div>
+              <p className="text-sm text-secondary mb-8">
+                Foundation layer available across all tiers. Core digital infrastructure
+                for managing music assets and rights.
+              </p>
+              <div className="card-limits">
+                <div className="card-limits__title">Included Capabilities</div>
+                <div>Digital asset management and cataloging</div>
+                <div>Sync licensing workflow automation</div>
+                <div>Ownership tracking and chain-of-title records</div>
+              </div>
+              <div className="mt-8">
+                <span className="text-xs text-muted">Available: All Tiers</span>
+              </div>
+            </div>
+
+            <div className="card card--compact card--border-top" style={{ borderTopColor: 'var(--color-info)' }}>
+              <div className="card-header">
+                <h4 className="card-title">Phase 2 -- Q2 2026</h4>
+                <span className="badge badge--in_progress">In Development</span>
+              </div>
+              <p className="text-sm text-secondary mb-8">
+                Introduction of analog sound modeling tools. Authentic vintage
+                hardware emulation for modern production workflows.
+              </p>
+              <div className="card-limits">
+                <div className="card-limits__title">Planned Capabilities</div>
+                <div>Analog tape emulation presets (reel-to-reel, cassette, 8-track)</div>
+                <div>Vintage EQ modeling (Pultec, Neve, API style curves)</div>
+              </div>
+              <div className="mt-8">
+                <span className="text-xs text-muted">Available: Pro and Enterprise Tiers</span>
+              </div>
+            </div>
+
+            <div className="card card--compact card--border-top" style={{ borderTopColor: 'var(--color-warning)' }}>
+              <div className="card-header">
+                <h4 className="card-title">Phase 3 -- Q3 2026</h4>
+                <span className="badge badge--pending">Planned</span>
+              </div>
+              <p className="text-sm text-secondary mb-8">
+                Developer and integration tools for third-party hardware connectivity
+                and real-time audio processing pipelines.
+              </p>
+              <div className="card-limits">
+                <div className="card-limits__title">Planned Capabilities</div>
+                <div>Hardware integration SDK for outboard gear connectivity</div>
+                <div>Real-time processing API with sub-5ms latency target</div>
+              </div>
+              <div className="mt-8">
+                <span className="text-xs text-muted">Available: Enterprise Tier</span>
+              </div>
+            </div>
+
+            <div className="card card--compact card--border-top" style={{ borderTopColor: 'var(--color-primary)' }}>
+              <div className="card-header">
+                <h4 className="card-title">Phase 4 -- Q4 2026</h4>
+                <span className="badge badge--draft">Roadmap</span>
+              </div>
+              <p className="text-sm text-secondary mb-8">
+                Complete analog modeling suite with native DAW integration.
+                Full production-grade toolchain for professional studios.
+              </p>
+              <div className="card-limits">
+                <div className="card-limits__title">Planned Capabilities</div>
+                <div>Full analog modeling suite (compressors, preamps, saturators)</div>
+                <div>DAW plugins (VST3, AU, AAX) with preset management</div>
+              </div>
+              <div className="mt-8">
+                <span className="text-xs text-muted">Available: Enterprise Tier</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="card card--compact mt-24">
+            <h4>Tier Availability Matrix</h4>
+            <p className="text-sm text-secondary mb-16">
+              Feature availability by subscription tier as each phase is released.
+            </p>
+            <div className="data-table-wrapper">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Phase</th>
+                    <th className="text-center">Free</th>
+                    <th className="text-center">Basic</th>
+                    <th className="text-center">Pro</th>
+                    <th className="text-center">Enterprise</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="font-semibold">Phase 1: Digital Asset Management</td>
+                    <td className="text-center text-success">Yes</td>
+                    <td className="text-center text-success">Yes</td>
+                    <td className="text-center text-success">Yes</td>
+                    <td className="text-center text-success">Yes</td>
+                  </tr>
+                  <tr>
+                    <td className="font-semibold">Phase 2: Analog Tape and EQ Modeling</td>
+                    <td className="text-center text-muted">--</td>
+                    <td className="text-center text-muted">--</td>
+                    <td className="text-center text-success">Yes</td>
+                    <td className="text-center text-success">Yes</td>
+                  </tr>
+                  <tr>
+                    <td className="font-semibold">Phase 3: Hardware SDK and Processing API</td>
+                    <td className="text-center text-muted">--</td>
+                    <td className="text-center text-muted">--</td>
+                    <td className="text-center text-muted">--</td>
+                    <td className="text-center text-success">Yes</td>
+                  </tr>
+                  <tr>
+                    <td className="font-semibold">Phase 4: Full Modeling Suite and DAW Plugins</td>
+                    <td className="text-center text-muted">--</td>
+                    <td className="text-center text-muted">--</td>
+                    <td className="text-center text-muted">--</td>
+                    <td className="text-center text-success">Yes</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       )}
 

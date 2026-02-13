@@ -676,6 +676,79 @@ async function seed() {
   console.log(`Ownership records: ${ownershipData.length}`);
 
   // ============================================
+  // 9b. ASSET TAGS — realistic music-industry descriptors
+  // ============================================
+  const tagData = [
+    // MVRK assets (0-5)
+    [0,  ['dark', '808', 'cinematic', 'hip-hop']],
+    [1,  ['dark', 'trap', 'orchestral', 'gritty']],
+    [2,  ['atmospheric', 'synth', 'bass-heavy', 'dark', 'cinematic']],
+    [3,  ['melodic', 'chill', 'radio-ready', 'hip-hop']],
+    [4,  ['ambient', 'synth', 'electronic', 'atmospheric', 'instrumental']],
+    [5,  ['bass-heavy', '808', 'gritty', 'hip-hop']],
+
+    // Luna Rey assets (6-10)
+    [6,  ['vocal', 'smooth', 'melodic', 'r&b']],
+    [7,  ['vocal', 'latin', 'smooth', 'radio-ready']],
+    [8,  ['vocal', 'atmospheric', 'chill', 'r&b']],
+    [9,  ['melodic', 'instrumental', 'smooth', 'r&b']],
+    [10, ['vocal', 'radio-ready', 'summer', 'melodic', 'sync-ready']],
+
+    // Sable assets (11-15)
+    [11, ['ambient', 'cinematic', 'atmospheric', 'sync-ready', 'strings']],
+    [12, ['synth', 'upbeat', 'electronic', 'sync-ready']],
+    [13, ['ambient', 'cinematic', 'atmospheric', 'instrumental', 'sync-ready']],
+    [14, ['ambient', 'synth', 'electronic', 'instrumental']],
+    [15, ['lo-fi', 'atmospheric', 'synth', 'electronic']],
+
+    // JO Beats assets (16-22)
+    [16, ['bass-heavy', 'trap', 'club', '808']],
+    [17, ['chopped-screwed', 'dark', 'gritty', 'lo-fi']],
+    [18, ['808', 'trap', 'radio-ready', 'hip-hop', 'bass-heavy']],
+    [19, ['bass-heavy', 'gritty', 'hip-hop', 'club']],
+    [20, ['chopped-screwed', 'dark', 'atmospheric']],
+    [21, ['upbeat', 'trap', '808', 'hip-hop']],
+    [22, ['bass-heavy', '808', 'gritty', 'club', 'trap']],
+
+    // Mayavision assets (23-27)
+    [23, ['live-drums', 'piano', 'smooth', 'instrumental']],
+    [24, ['live-drums', 'instrumental', 'cinematic', 'orchestral', 'sync-ready']],
+    [25, ['piano', 'strings', 'smooth', 'atmospheric']],
+    [26, ['live-drums', 'strings', 'instrumental', 'ambient']],
+    [27, ['guitar', 'live-drums', 'chill', 'smooth', 'instrumental']],
+
+    // Crux assets (28-31)
+    [28, ['latin', 'club', 'bass-heavy', 'radio-ready', 'summer']],
+    [29, ['latin', 'trap', 'gritty', 'club']],
+    [30, ['latin', 'upbeat', 'club', 'summer']],
+    [31, ['latin', 'dark', 'atmospheric', 'trap']],
+
+    // Bree Wave assets (32-35)
+    [32, ['vocal', 'lo-fi', 'chill', 'sync-ready', 'smooth']],
+    [33, ['vocal', 'lo-fi', 'chill', 'melodic']],
+    [34, ['lo-fi', 'atmospheric', 'chill', 'r&b']],
+    [35, ['lo-fi', 'instrumental', 'chill', 'smooth']],
+
+    // Roster assets (36-39)
+    [36, ['vocal', 'upbeat', 'radio-ready', 'summer', 'synth']],
+    [37, ['boom-bap', 'gritty', 'instrumental', 'hip-hop']],
+    [38, ['cinematic', 'orchestral', 'strings', 'sync-ready', 'atmospheric']],
+    [39, ['synth', 'afrobeats', 'upbeat', 'club', 'melodic']],
+  ];
+
+  let tagCount = 0;
+  for (const [assetIdx, tags] of tagData) {
+    for (const tag of tags) {
+      await db.query(
+        `INSERT INTO asset_tags (asset_id, tag) VALUES ($1, $2) RETURNING id`,
+        [assetRows[assetIdx].id, tag]
+      );
+      tagCount++;
+    }
+  }
+  console.log(`Asset tags: ${tagCount}`);
+
+  // ============================================
   // 10. USAGE RECORDS (200)
   // ============================================
   const platforms = ['Spotify', 'Apple Music', 'YouTube', 'Amazon Music', 'Tidal'];
@@ -871,6 +944,27 @@ async function seed() {
     [6, 33, null, 4200.00, 0, 'Spotify streaming H2 2025',             'Paper Cranes — Lo-Fi Love Letters single',              '2025-12-31'],
     [6, 33, null, 1800.00, 0, 'Apple Music streaming 2025',            'Paper Cranes — Apple Music',                            '2025-12-31'],
     [6, 32, null, 2500.00, 0, 'Spotify streaming post-sync 2025',      'Tidal Serenade — post-placement streaming boost',       '2025-12-31'],
+
+    // Roster artists with placements — Liv G, Tone Russo, Ray K, Priya Sharma
+    // Liv G (artist index 10) — asset 36, placement 16 (NBC sync, confirmed $15k)
+    [10, 36, 16,  15000.00, 0, 'NBC sync fee — This Is Us Revival',     'Skyline Drive — TV sync placement fee',                 '2026-02-01'],
+    [10, 36, null, 3200.00, 0, 'Spotify streaming H2 2025',             'Skyline Drive — pop single streaming revenue',          '2025-12-31'],
+    [10, 36, null, 1400.00, 0, 'Apple Music streaming 2025',            'Skyline Drive — Apple Music annual payout',             '2025-12-31'],
+
+    // Tone Russo (artist index 15) — asset 37, placement 18 (Heard Well, pending $4k)
+    [15, 37, null, 2800.00, 0, 'Spotify streaming H2 2025',             'Smoke Signals — boom-bap beat tape streams',            '2025-12-31'],
+    [15, 37, null, 1100.00, 0, 'Apple Music streaming 2025',            'Smoke Signals — Apple Music annual payout',             '2025-12-31'],
+    [15, 37, null,  600.00, 0, 'YouTube ad revenue 2025',               'Smoke Signals — YouTube Content ID revenue',            '2025-12-31'],
+
+    // Ray K (artist index 20) — asset 38, placement 17 (John Wick 5, completed $22k)
+    [20, 38, 17,  22000.00, 0, 'Lionsgate sync fee — John Wick 5',      'Cinema Noir — cinematic underscore sync deal',          '2025-09-01'],
+    [20, 38, null, 1800.00, 0, 'Spotify streaming post-sync 2025',      'Cinema Noir — post-placement streaming boost',          '2025-12-31'],
+    [20, 38, null,  900.00, 0, 'Apple Music streaming 2025',            'Cinema Noir — Apple Music annual payout',               '2025-12-31'],
+
+    // Priya Sharma (artist index 24) — asset 39, placement 19 (Disney+ Nat Geo, confirmed $9k)
+    [24, 39, 19,   9000.00, 0, 'Disney+ sync fee — Nat Geo Series',     'Dharma Rising — world music documentary cue',           '2026-01-25'],
+    [24, 39, null,  2100.00, 0, 'Spotify streaming H2 2025',            'Dharma Rising — Bollywood-house fusion streams',        '2025-12-31'],
+    [24, 39, null,   800.00, 0, 'Apple Music streaming 2025',           'Dharma Rising — Apple Music annual payout',             '2025-12-31'],
   ];
 
   for (const [artIdx, assetIdx, placeIdx, amount, recoup, source, desc, date] of revenueData) {
@@ -899,6 +993,18 @@ async function seed() {
     [0, 'recording',    2500.00,  'Studio time — Neon Nights EP sessions',              '2025-11-15'],
     [0, 'distribution', 1200.00,  'Distribution fees — all platforms 2025',             '2025-12-31'],
     [0, 'legal',        800.00,   'Contract review — Nike sync placement',              '2026-01-05'],
+
+    // Luna Rey (index 1) — recording and marketing expenses
+    [1, 'recording',    3500.00,  'Studio time — Luna Rising album sessions (5 days)',    '2025-11-10'],
+    [1, 'marketing',    2000.00,  'Social media campaign — Velvet Singles pre-release',   '2025-08-20'],
+
+    // Sable (index 2) — recording and marketing expenses
+    [2, 'recording',    2800.00,  'Studio time — Ambient Trap Sessions mixing (3 days)',  '2026-01-08'],
+    [2, 'marketing',    1500.00,  'Sync reel production — Sync Library Vol. 1 promo',    '2025-10-15'],
+
+    // Bree Wave (index 6) — recording and marketing expenses
+    [6, 'recording',    2200.00,  'Studio time — Wave II vocal tracking sessions',        '2026-01-20'],
+    [6, 'marketing',    3000.00,  'Music video production — Paper Cranes visual',         '2025-09-10'],
   ];
 
   for (const [artIdx, cat, amount, desc, date] of expenseData) {

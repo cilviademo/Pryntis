@@ -1371,9 +1371,11 @@ h1, h2, h3, h4, h5, h6 {
 .capitalize { text-transform: capitalize; }
 .flex-wrap { flex-wrap: wrap; }
 
+.mr-4 { margin-right: 4px; }
 .mx-8 { margin-left: 8px; margin-right: 8px; }
 .mx-12 { margin-left: 12px; margin-right: 12px; }
 .ml-auto { margin-left: auto; }
+.cursor-pointer { cursor: pointer; }
 
 .truncate {
   overflow: hidden;

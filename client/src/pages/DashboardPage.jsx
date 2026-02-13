@@ -33,20 +33,29 @@ export default function DashboardPage() {
   const [summary, setSummary] = useState(null);
   const [activity, setActivity] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [healthScores, setHealthScores] = useState([]);
+  const [momentum, setMomentum] = useState([]);
+  const [nextActions, setNextActions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     async function load() {
       try {
-        const [sum, act, tsk] = await Promise.all([
+        const [sum, act, tsk, health, mom, actions] = await Promise.all([
           api.get('/dashboard/summary'),
           api.get('/dashboard/recent-activity').catch(() => []),
           api.get('/tasks?status=open&limit=5').catch(() => []),
+          api.get('/panel/health').catch(() => []),
+          api.get('/panel/momentum').catch(() => []),
+          api.get('/panel/actions').catch(() => []),
         ]);
         setSummary(sum);
         setActivity(Array.isArray(act) ? act : []);
         setTasks(Array.isArray(tsk) ? tsk : []);
+        setHealthScores(Array.isArray(health) ? health : []);
+        setMomentum(Array.isArray(mom) ? mom : []);
+        setNextActions(Array.isArray(actions) ? actions : []);
       } catch (err) {
         console.error('Failed to load dashboard:', err);
         setError('Failed to load dashboard data');
@@ -398,9 +407,114 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Health Scores + Momentum */}
+      {isElevated && (
+        <div className="dashboard-bottom-grid">
+          <div className="detail-section">
+            <h3>Artist Health Scores</h3>
+            {healthScores.length === 0 ? (
+              <div className="empty-state">No health data available</div>
+            ) : (
+              <div className="data-table-wrapper">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Artist</th>
+                      <th>Genre</th>
+                      <th>Score</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {healthScores.slice(0, 15).map((h) => {
+                      const scoreColor = h.health_score >= 70 ? 'var(--color-success)' : h.health_score >= 40 ? 'var(--color-warning)' : 'var(--color-danger)';
+                      const scoreLabel = h.health_score >= 70 ? 'Healthy' : h.health_score >= 40 ? 'Needs Attention' : 'At Risk';
+                      return (
+                        <tr key={h.id || h.artist_id}>
+                          <td>
+                            <div className="font-semibold">{h.stage_name || h.name}</div>
+                            {h.stage_name && h.name !== h.stage_name && <div className="text-xs text-muted">{h.name}</div>}
+                          </td>
+                          <td className="text-sm">{h.genre || '--'}</td>
+                          <td>
+                            <span className="font-semibold" style={{ color: scoreColor }}>{h.health_score}</span>
+                            <span className="text-xs text-muted"> / 100</span>
+                          </td>
+                          <td><span className="text-xs" style={{ color: scoreColor }}>{scoreLabel}</span></td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          <div className="detail-section">
+            <h3>Momentum Trends</h3>
+            {momentum.length > 0 ? (
+              <ReactECharts
+                style={{ height: 300 }}
+                option={{
+                  backgroundColor: 'transparent',
+                  tooltip: { trigger: 'axis', ...chartTooltip },
+                  legend: { bottom: 0, textStyle: { color: '#8890a8', fontSize: 11 } },
+                  grid: { left: '3%', right: '4%', bottom: '40px', top: '10px', containLabel: true },
+                  xAxis: {
+                    type: 'category',
+                    data: momentum.map((d) => d.month),
+                    axisLabel: { color: '#8890a8', fontSize: 11, rotate: 30 },
+                    axisLine: { lineStyle: { color: '#2d3143' } },
+                  },
+                  yAxis: [
+                    { type: 'value', name: 'Count', axisLabel: { color: '#8890a8', fontSize: 11 }, splitLine: { lineStyle: { color: '#2d3143' } } },
+                    { type: 'value', name: 'Revenue', axisLabel: { color: '#8890a8', fontSize: 11, formatter: (v) => `$${(v / 1000).toFixed(0)}k` }, splitLine: { show: false } },
+                  ],
+                  series: [
+                    { name: 'Assets', type: 'bar', data: momentum.map((d) => d.new_assets || 0), itemStyle: { color: '#6c63ff' }, barWidth: '20%' },
+                    { name: 'Placements', type: 'bar', data: momentum.map((d) => d.new_placements || 0), itemStyle: { color: '#3b82f6' }, barWidth: '20%' },
+                    { name: 'Projects', type: 'bar', data: momentum.map((d) => d.new_projects || 0), itemStyle: { color: '#22c55e' }, barWidth: '20%' },
+                    { name: 'Revenue', type: 'line', yAxisIndex: 1, data: momentum.map((d) => d.revenue || 0), smooth: true, lineStyle: { color: '#f59e0b', width: 2 }, itemStyle: { color: '#f59e0b' } },
+                  ],
+                }}
+              />
+            ) : <div className="empty-state">No momentum data</div>}
+          </div>
+        </div>
+      )}
+
+      {/* Next Actions from Panel */}
+      {isElevated && nextActions.length > 0 && (
+        <div className="detail-section">
+          <h3>Priority Actions</h3>
+          <div className="data-table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Priority</th>
+                  <th>Type</th>
+                  <th>Title</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                {nextActions.slice(0, 10).map((action, i) => (
+                  <tr key={i}>
+                    <td><span className={`badge badge--${action.priority}`}>{capitalize(action.priority)}</span></td>
+                    <td><span className="badge badge--active">{capitalize(action.type)}</span></td>
+                    <td className="font-semibold">{action.title}</td>
+                    <td className="text-sm text-secondary">{action.description}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       <div className="detail-section">
         <h3>Advanced Analytics</h3>
-        <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px', lineHeight: '1.6' }}>
+        <p className="text-sm text-secondary" style={{ lineHeight: '1.6' }}>
           Apache Superset integration is available for advanced analytics, custom dashboards,
           and deep data exploration. See <code>docs/architecture.md</code> for setup instructions.
         </p>

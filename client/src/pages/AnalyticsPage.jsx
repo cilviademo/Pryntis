@@ -30,14 +30,23 @@ const formatCurrency = (val) => {
 
 export default function AnalyticsPage() {
   const [summary, setSummary] = useState(null);
+  const [portAnalytics, setPortAnalytics] = useState(null);
+  const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     async function load() {
       try {
-        const data = await api.get('/dashboard/summary');
+        const [data, placements, assets, revenue, deliveries] = await Promise.all([
+          api.get('/dashboard/summary'),
+          api.get('/port/analytics/placements').catch(() => null),
+          api.get('/port/analytics/assets').catch(() => null),
+          api.get('/port/analytics/revenue').catch(() => null),
+          api.get('/port/analytics/deliveries').catch(() => null),
+        ]);
         setSummary(data);
+        setPortAnalytics({ placements, assets, revenue, deliveries });
       } catch (err) {
         setError('Failed to load analytics data');
         console.error(err);
@@ -66,35 +75,7 @@ export default function AnalyticsPage() {
   const artistStatusData = objToArray(summary.artists?.byStatus);
   const placementStatusData = objToArray(summary.placements?.byStatus);
 
-  const projectBarOption = projectStatusData.length > 0 ? {
-    backgroundColor: 'transparent',
-    tooltip: { trigger: 'axis', ...chartTooltip },
-    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-    xAxis: {
-      type: 'category',
-      data: projectStatusData.map((d) => d.name),
-      axisLabel: { color: '#8890a8', fontSize: 12 },
-      axisLine: { lineStyle: { color: '#2d3143' } },
-      axisTick: { show: false },
-    },
-    yAxis: {
-      type: 'value',
-      minInterval: 1,
-      splitLine: { lineStyle: { color: '#1c2030' } },
-      axisLabel: { color: '#8890a8', fontSize: 12 },
-    },
-    series: [{
-      type: 'bar',
-      data: projectStatusData.map((d, i) => ({
-        value: d.value,
-        itemStyle: { color: COLORS[i % COLORS.length] },
-      })),
-      barWidth: '50%',
-      itemStyle: { borderRadius: [4, 4, 0, 0] },
-    }],
-  } : null;
-
-  const artistPieOption = artistStatusData.length > 0 ? {
+  const makePieOption = (data) => ({
     backgroundColor: 'transparent',
     tooltip: { trigger: 'item', ...chartTooltip },
     legend: { bottom: 0, textStyle: { color: '#8890a8', fontSize: 12 } },
@@ -105,66 +86,64 @@ export default function AnalyticsPage() {
       avoidLabelOverlap: true,
       itemStyle: { borderRadius: 6, borderColor: '#151820', borderWidth: 2 },
       label: { show: false },
-      emphasis: {
-        label: { show: true, fontSize: 14, fontWeight: 'bold', color: '#e8eaf0' },
-      },
-      data: artistStatusData.map((d, i) => ({
-        ...d,
-        itemStyle: { color: COLORS[i % COLORS.length] },
-      })),
+      emphasis: { label: { show: true, fontSize: 14, fontWeight: 'bold', color: '#e8eaf0' } },
+      data: data.map((d, i) => ({ ...d, itemStyle: { color: COLORS[i % COLORS.length] } })),
     }],
-  } : null;
+  });
 
-  const placementBarOption = placementStatusData.length > 0 ? {
+  const makeBarOption = (data) => ({
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', ...chartTooltip },
     grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
     xAxis: {
       type: 'category',
-      data: placementStatusData.map((d) => d.name),
+      data: data.map((d) => d.name),
       axisLabel: { color: '#8890a8', fontSize: 12 },
       axisLine: { lineStyle: { color: '#2d3143' } },
+      axisTick: { show: false },
     },
-    yAxis: {
-      type: 'value',
-      minInterval: 1,
-      splitLine: { lineStyle: { color: '#1c2030' } },
-      axisLabel: { color: '#8890a8', fontSize: 12 },
-    },
+    yAxis: { type: 'value', minInterval: 1, splitLine: { lineStyle: { color: '#1c2030' } }, axisLabel: { color: '#8890a8', fontSize: 12 } },
     series: [{
       type: 'bar',
-      data: placementStatusData.map((d, i) => ({
-        value: d.value,
-        itemStyle: { color: COLORS[i % COLORS.length] },
-      })),
+      data: data.map((d, i) => ({ value: d.value, itemStyle: { color: COLORS[i % COLORS.length] } })),
       barWidth: '50%',
       itemStyle: { borderRadius: [4, 4, 0, 0] },
     }],
-  } : null;
+  });
 
   const subscriptionData = (summary.subscriptionDistribution || []).map((s) => ({
     name: s.tier_name || 'Unknown',
     value: s.subscriber_count || 0,
   }));
-  const subscriptionPieOption = subscriptionData.length > 0 ? {
-    backgroundColor: 'transparent',
-    tooltip: { trigger: 'item', ...chartTooltip },
-    legend: { bottom: 0, textStyle: { color: '#8890a8', fontSize: 12 } },
-    series: [{
-      type: 'pie',
-      radius: ['40%', '70%'],
-      center: ['50%', '45%'],
-      itemStyle: { borderRadius: 6, borderColor: '#12141c', borderWidth: 2 },
-      label: { show: false },
-      emphasis: {
-        label: { show: true, fontSize: 14, fontWeight: 'bold', color: '#e4e6ef' },
-      },
-      data: subscriptionData.map((d, i) => ({
-        ...d,
-        itemStyle: { color: COLORS[i % COLORS.length] },
-      })),
-    }],
-  } : null;
+
+  // Port analytics data
+  const pa = portAnalytics || {};
+  const placementsByType = pa.placements?.by_type ? objToArray(
+    (Array.isArray(pa.placements.by_type) ? pa.placements.by_type : []).reduce(
+      (acc, r) => { acc[r.placement_type || r.type] = r.count; return acc; }, {}
+    )
+  ) : [];
+  const assetsByType = pa.assets?.by_file_type ? objToArray(
+    (Array.isArray(pa.assets.by_file_type) ? pa.assets.by_file_type : []).reduce(
+      (acc, r) => { acc[r.file_type || r.type] = r.count; return acc; }, {}
+    )
+  ) : [];
+  const assetsByGenre = pa.assets?.by_genre ? objToArray(
+    (Array.isArray(pa.assets.by_genre) ? pa.assets.by_genre : []).reduce(
+      (acc, r) => { acc[r.genre] = r.count; return acc; }, {}
+    )
+  ) : [];
+  const monthlyRevenue = pa.revenue?.monthly || [];
+  const topEarners = pa.revenue?.top_artists || [];
+  const deliveries = pa.deliveries || {};
+
+  const tabs = [
+    { key: 'overview', label: 'Overview' },
+    { key: 'placements', label: 'Placements' },
+    { key: 'assets', label: 'Assets' },
+    { key: 'revenue', label: 'Revenue' },
+    { key: 'delivery', label: 'Delivery' },
+  ];
 
   return (
     <div>
@@ -191,14 +170,14 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      <div className="summary-cards" style={{ marginTop: '16px' }}>
-        <div className="summary-card">
-          <div className="summary-card__label">Recoupable Balance</div>
-          <div className="summary-card__value">{formatCurrency(recoupableBalance)}</div>
-        </div>
+      <div className="summary-cards mt-16">
         <div className="summary-card">
           <div className="summary-card__label">Pipeline Value</div>
           <div className="summary-card__value">{formatCurrency(pipelineValue)}</div>
+        </div>
+        <div className="summary-card">
+          <div className="summary-card__label">Recoupable Balance</div>
+          <div className="summary-card__value">{formatCurrency(recoupableBalance)}</div>
         </div>
         <div className="summary-card">
           <div className="summary-card__label">At-Risk Revenue</div>
@@ -212,44 +191,239 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      <div className="chart-grid" style={{ margin: '24px 0' }}>
-        <div className="card">
-          <h3 style={{ marginBottom: '16px' }}>Projects by Status</h3>
-          {projectBarOption ? (
-            <ReactECharts option={projectBarOption} style={{ height: 300 }} />
-          ) : (
-            <div className="empty-state">No project data</div>
-          )}
-        </div>
-        <div className="card">
-          <h3 style={{ marginBottom: '16px' }}>Artists by Status</h3>
-          {artistPieOption ? (
-            <ReactECharts option={artistPieOption} style={{ height: 300 }} />
-          ) : (
-            <div className="empty-state">No artist data</div>
-          )}
-        </div>
-        <div className="card">
-          <h3 style={{ marginBottom: '16px' }}>Placements by Status</h3>
-          {placementBarOption ? (
-            <ReactECharts option={placementBarOption} style={{ height: 300 }} />
-          ) : (
-            <div className="empty-state">No placement data</div>
-          )}
-        </div>
-        <div className="card">
-          <h3 style={{ marginBottom: '16px' }}>Subscription Distribution</h3>
-          {subscriptionPieOption ? (
-            <ReactECharts option={subscriptionPieOption} style={{ height: 300 }} />
-          ) : (
-            <div className="empty-state">No subscription data</div>
-          )}
-        </div>
+      <div className="tabs mt-24">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`tab${activeTab === tab.key ? ' active' : ''}`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      <div className="detail-section">
+      {activeTab === 'overview' && (
+        <div className="chart-grid mt-16">
+          <div className="card">
+            <h3>Projects by Status</h3>
+            {projectStatusData.length > 0 ? <ReactECharts option={makeBarOption(projectStatusData)} style={{ height: 300 }} /> : <div className="empty-state">No project data</div>}
+          </div>
+          <div className="card">
+            <h3>Artists by Status</h3>
+            {artistStatusData.length > 0 ? <ReactECharts option={makePieOption(artistStatusData)} style={{ height: 300 }} /> : <div className="empty-state">No artist data</div>}
+          </div>
+          <div className="card">
+            <h3>Placements by Status</h3>
+            {placementStatusData.length > 0 ? <ReactECharts option={makeBarOption(placementStatusData)} style={{ height: 300 }} /> : <div className="empty-state">No placement data</div>}
+          </div>
+          <div className="card">
+            <h3>Subscription Distribution</h3>
+            {subscriptionData.length > 0 ? <ReactECharts option={makePieOption(subscriptionData)} style={{ height: 300 }} /> : <div className="empty-state">No subscription data</div>}
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'placements' && (
+        <div className="mt-16">
+          <div className="summary-cards">
+            <div className="summary-card text-center">
+              <div className="summary-card__value text-primary">{pa.placements?.total || 0}</div>
+              <div className="summary-card__label">Total Placements</div>
+            </div>
+            <div className="summary-card text-center">
+              <div className="summary-card__value text-success">{formatCurrency(pa.placements?.total_value || 0)}</div>
+              <div className="summary-card__label">Total Value</div>
+            </div>
+          </div>
+
+          <div className="chart-grid mt-16">
+            <div className="card">
+              <h3>By Type</h3>
+              {placementsByType.length > 0 ? <ReactECharts option={makePieOption(placementsByType)} style={{ height: 280 }} /> : <div className="empty-state">No data</div>}
+            </div>
+            <div className="card">
+              <h3>By Status</h3>
+              {placementStatusData.length > 0 ? <ReactECharts option={makeBarOption(placementStatusData)} style={{ height: 280 }} /> : <div className="empty-state">No data</div>}
+            </div>
+          </div>
+
+          {pa.placements?.top_artists && pa.placements.top_artists.length > 0 && (
+            <div className="detail-section mt-16">
+              <h3>Top Artists by Placement Value</h3>
+              <div className="data-table-wrapper">
+                <table className="data-table">
+                  <thead><tr><th>Artist</th><th>Total Value</th><th>Count</th></tr></thead>
+                  <tbody>
+                    {pa.placements.top_artists.map((a, i) => (
+                      <tr key={i}>
+                        <td className="font-semibold">{a.stage_name || a.name || a.artist_name}</td>
+                        <td>{formatCurrency(a.total_value)}</td>
+                        <td>{a.count || a.placement_count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'assets' && (
+        <div className="mt-16">
+          <div className="summary-cards">
+            <div className="summary-card text-center">
+              <div className="summary-card__value text-primary">{pa.assets?.total || totalAssets}</div>
+              <div className="summary-card__label">Total Assets</div>
+            </div>
+          </div>
+
+          <div className="chart-grid mt-16">
+            <div className="card">
+              <h3>By File Type</h3>
+              {assetsByType.length > 0 ? <ReactECharts option={makePieOption(assetsByType)} style={{ height: 280 }} /> : <div className="empty-state">No data</div>}
+            </div>
+            <div className="card">
+              <h3>By Genre</h3>
+              {assetsByGenre.length > 0 ? <ReactECharts option={makeBarOption(assetsByGenre)} style={{ height: 280 }} /> : <div className="empty-state">No data</div>}
+            </div>
+          </div>
+
+          {pa.assets?.most_placed && pa.assets.most_placed.length > 0 && (
+            <div className="detail-section mt-16">
+              <h3>Most Placed Assets</h3>
+              <div className="data-table-wrapper">
+                <table className="data-table">
+                  <thead><tr><th>Asset</th><th>Type</th><th>Genre</th><th>Placements</th></tr></thead>
+                  <tbody>
+                    {pa.assets.most_placed.map((a, i) => (
+                      <tr key={i}>
+                        <td className="font-semibold">{a.title}</td>
+                        <td><span className="badge badge--active">{a.file_type}</span></td>
+                        <td>{a.genre || '--'}</td>
+                        <td>{a.placement_count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'revenue' && (
+        <div className="mt-16">
+          <div className="summary-cards">
+            <div className="summary-card text-center">
+              <div className="summary-card__value text-success">{formatCurrency(pa.revenue?.total || grossRevenue)}</div>
+              <div className="summary-card__label">Total Revenue</div>
+            </div>
+            <div className="summary-card text-center">
+              <div className="summary-card__value text-danger">{formatCurrency(pa.revenue?.total_expenses || 0)}</div>
+              <div className="summary-card__label">Total Expenses</div>
+            </div>
+          </div>
+
+          {monthlyRevenue.length > 0 && (
+            <div className="card mt-16">
+              <h3>Monthly Revenue</h3>
+              <ReactECharts
+                style={{ height: 300 }}
+                option={{
+                  backgroundColor: 'transparent',
+                  tooltip: { trigger: 'axis', ...chartTooltip, formatter: (p) => p.map((s) => `${s.seriesName}: ${formatCurrency(s.value)}`).join('<br/>') },
+                  grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+                  xAxis: {
+                    type: 'category',
+                    data: monthlyRevenue.map((d) => d.month),
+                    axisLabel: { color: '#8890a8', fontSize: 11, rotate: 30 },
+                    axisLine: { lineStyle: { color: '#2d3143' } },
+                  },
+                  yAxis: { type: 'value', axisLabel: { color: '#8890a8', formatter: (v) => `$${(v / 1000).toFixed(0)}k` }, splitLine: { lineStyle: { color: '#2d3143' } } },
+                  series: [{
+                    name: 'Revenue',
+                    type: 'line',
+                    data: monthlyRevenue.map((d) => d.amount || d.revenue || 0),
+                    smooth: true,
+                    lineStyle: { color: '#22c55e', width: 2 },
+                    itemStyle: { color: '#22c55e' },
+                    areaStyle: { color: 'rgba(34, 197, 94, 0.1)' },
+                  }],
+                }}
+              />
+            </div>
+          )}
+
+          {topEarners.length > 0 && (
+            <div className="detail-section mt-16">
+              <h3>Top Earning Artists</h3>
+              <div className="data-table-wrapper">
+                <table className="data-table">
+                  <thead><tr><th>Artist</th><th>Revenue</th></tr></thead>
+                  <tbody>
+                    {topEarners.map((a, i) => (
+                      <tr key={i}>
+                        <td className="font-semibold">{a.stage_name || a.name || a.artist_name}</td>
+                        <td>{formatCurrency(a.total_revenue || a.revenue)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'delivery' && (
+        <div className="mt-16">
+          <div className="summary-cards">
+            <div className="summary-card text-center">
+              <div className="summary-card__value text-primary">{deliveries.total_projects || totalProjects}</div>
+              <div className="summary-card__label">Total Projects</div>
+            </div>
+            <div className="summary-card text-center">
+              <div className="summary-card__value text-warning">{deliveries.overdue_tasks || 0}</div>
+              <div className="summary-card__label">Overdue Tasks</div>
+            </div>
+            <div className="summary-card text-center">
+              <div className="summary-card__value text-secondary">
+                {deliveries.avg_project_duration ? `${Math.round(deliveries.avg_project_duration)} days` : '--'}
+              </div>
+              <div className="summary-card__label">Avg. Project Duration</div>
+            </div>
+          </div>
+
+          <div className="chart-grid mt-16">
+            {deliveries.projects_by_status && (
+              <div className="card">
+                <h3>Projects by Status</h3>
+                <ReactECharts option={makeBarOption(objToArray(
+                  (Array.isArray(deliveries.projects_by_status) ? deliveries.projects_by_status : []).reduce(
+                    (acc, r) => { acc[r.status] = r.count; return acc; }, {}
+                  )
+                ))} style={{ height: 280 }} />
+              </div>
+            )}
+            {deliveries.tasks_by_status && (
+              <div className="card">
+                <h3>Tasks by Status</h3>
+                <ReactECharts option={makePieOption(objToArray(
+                  (Array.isArray(deliveries.tasks_by_status) ? deliveries.tasks_by_status : []).reduce(
+                    (acc, r) => { acc[r.status] = r.count; return acc; }, {}
+                  )
+                ))} style={{ height: 280 }} />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="detail-section mt-24">
         <h3>Advanced Analytics</h3>
-        <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px', lineHeight: '1.6' }}>
+        <p className="text-sm text-secondary" style={{ lineHeight: '1.6' }}>
           Apache Superset integration is available for advanced analytics, custom dashboards,
           and deep data exploration. See <code>docs/architecture.md</code> for setup instructions.
         </p>
