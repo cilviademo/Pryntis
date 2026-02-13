@@ -4,6 +4,33 @@ const TOKEN_KEY = 'pryntis_token';
 // Token store — persisted in sessionStorage so page refresh keeps you logged in
 let authToken = sessionStorage.getItem(TOKEN_KEY);
 
+// Warmup — detect cold start and provide status
+let _warmupChecked = false;
+let _warmupResolve = null;
+const warmupPromise = new Promise((resolve) => { _warmupResolve = resolve; });
+
+async function checkWarmup() {
+  if (_warmupChecked) return;
+  const maxRetries = 4;
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const res = await fetch('/api/health', { signal: AbortSignal.timeout(8000) });
+      if (res.ok) { _warmupChecked = true; _warmupResolve(true); return; }
+    } catch { /* retry */ }
+    // Show banner
+    const banner = document.getElementById('warmup-banner');
+    if (banner) banner.style.display = 'block';
+    await new Promise((r) => setTimeout(r, 2000 * (i + 1)));
+  }
+  _warmupChecked = true;
+  _warmupResolve(true);
+  const banner = document.getElementById('warmup-banner');
+  if (banner) banner.style.display = 'none';
+}
+
+// Start warmup check immediately
+checkWarmup();
+
 const api = {
   setToken(token) {
     authToken = token;

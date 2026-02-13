@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ReactECharts from 'echarts-for-react';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
 const CHART_COLORS = ['#6c63ff', '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+const REACTION_ICONS = { thumbs_up: '\u{1F44D}', eyes: '\u{1F440}', check: '\u2705', alert: '\u2757' };
 
 function capitalize(str) {
   return str.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
@@ -18,7 +20,16 @@ function objToArray(obj) {
   }));
 }
 
+const formatCurrency = (val) => {
+  const num = typeof val === 'number' ? val : parseFloat(val) || 0;
+  return `$${num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+};
+
 export default function DashboardPage() {
+  const { user } = useAuth();
+  const role = user?.role || 'viewer';
+  const isElevated = role === 'admin' || role === 'manager';
+
   const [summary, setSummary] = useState(null);
   const [activity, setActivity] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -51,17 +62,14 @@ export default function DashboardPage() {
 
   const totalArtists = summary?.artists?.total || 0;
   const totalAssets = summary?.assets?.total || 0;
+  const kpi = summary?.kpiSnapshot || {};
 
   const projectStatusArr = objToArray(summary?.projects?.byStatus);
   const artistStatusArr = objToArray(summary?.artists?.byStatus);
   const placementStatusObj = summary?.placements?.byStatus || {};
 
-  const activeProjects = typeof placementStatusObj === 'object'
-    ? (summary?.projects?.byStatus?.in_progress || 0)
-    : 0;
-  const pendingPlacements = typeof placementStatusObj === 'object'
-    ? (placementStatusObj.pending || 0)
-    : 0;
+  const activeProjects = summary?.projects?.byStatus?.in_progress || 0;
+  const pendingPlacements = placementStatusObj.pending || 0;
 
   const subscriptionData = (summary?.subscriptionDistribution || []).map((s) => ({
     name: s.tier_name || 'Unknown',
@@ -101,6 +109,77 @@ export default function DashboardPage() {
     }],
   };
 
+  const placementStatusArr = objToArray(placementStatusObj);
+  const placementBarOption = placementStatusArr.length > 0 ? {
+    backgroundColor: 'transparent',
+    tooltip: { trigger: 'axis', ...chartTooltip },
+    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    xAxis: {
+      type: 'category',
+      data: placementStatusArr.map((d) => d.name),
+      axisLabel: { color: '#8890a8', fontSize: 12 },
+      axisLine: { lineStyle: { color: '#2d3143' } },
+    },
+    yAxis: {
+      type: 'value',
+      minInterval: 1,
+      axisLabel: { color: '#8890a8', fontSize: 12 },
+      splitLine: { lineStyle: { color: '#2d3143' } },
+    },
+    series: [{
+      type: 'bar',
+      data: placementStatusArr.map((d, i) => ({
+        value: d.value,
+        itemStyle: { color: CHART_COLORS[i % CHART_COLORS.length] },
+      })),
+      barWidth: '50%',
+      itemStyle: { borderRadius: [4, 4, 0, 0] },
+    }],
+  } : null;
+
+  // Recoup stacked bar (admin/manager only)
+  const recoupStackOption = isElevated ? {
+    backgroundColor: 'transparent',
+    tooltip: { trigger: 'axis', ...chartTooltip, formatter: (p) => p.map((s) => `${s.seriesName}: ${formatCurrency(s.value)}`).join('<br/>') },
+    legend: { bottom: 0, textStyle: { color: '#8890a8', fontSize: 12 } },
+    grid: { left: '3%', right: '4%', bottom: '30px', top: '10px', containLabel: true },
+    xAxis: { type: 'category', data: ['Portfolio'], axisLabel: { color: '#8890a8' }, axisLine: { lineStyle: { color: '#2d3143' } } },
+    yAxis: { type: 'value', axisLabel: { color: '#8890a8', formatter: (v) => `$${(v / 1000).toFixed(0)}k` }, splitLine: { lineStyle: { color: '#2d3143' } } },
+    series: [
+      { name: 'Recouped', type: 'bar', stack: 'total', data: [kpi.recoupedAmount || 0], itemStyle: { color: '#22c55e' }, barWidth: '60%' },
+      { name: 'Unrecouped', type: 'bar', stack: 'total', data: [kpi.unrecoupedBalance || 0], itemStyle: { color: '#ef4444' }, barWidth: '60%' },
+      { name: 'Payable', type: 'bar', stack: 'total', data: [kpi.payableNow || 0], itemStyle: { color: '#3b82f6' }, barWidth: '60%' },
+    ],
+  } : null;
+
+  // Project throughput (admin/manager only)
+  const throughputData = summary?.projectThroughput || [];
+  const throughputOption = throughputData.length > 0 ? {
+    backgroundColor: 'transparent',
+    tooltip: { trigger: 'axis', ...chartTooltip },
+    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    xAxis: {
+      type: 'category',
+      data: throughputData.map((d) => d.month),
+      axisLabel: { color: '#8890a8', fontSize: 11, rotate: 45 },
+      axisLine: { lineStyle: { color: '#2d3143' } },
+    },
+    yAxis: {
+      type: 'value',
+      minInterval: 1,
+      axisLabel: { color: '#8890a8', fontSize: 12 },
+      splitLine: { lineStyle: { color: '#2d3143' } },
+    },
+    series: [{
+      type: 'line',
+      data: throughputData.map((d) => d.count),
+      smooth: true,
+      lineStyle: { color: '#6c63ff', width: 2 },
+      itemStyle: { color: '#6c63ff' },
+      areaStyle: { color: 'rgba(108, 99, 255, 0.1)' },
+    }],
+  } : null;
+
   const artistPieOption = {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'item', ...chartTooltip },
@@ -112,13 +191,8 @@ export default function DashboardPage() {
       avoidLabelOverlap: true,
       itemStyle: { borderRadius: 6, borderColor: '#12141c', borderWidth: 2 },
       label: { show: false },
-      emphasis: {
-        label: { show: true, fontSize: 14, fontWeight: 'bold', color: '#e4e6ef' },
-      },
-      data: artistStatusArr.map((d, i) => ({
-        ...d,
-        itemStyle: { color: CHART_COLORS[i % CHART_COLORS.length] },
-      })),
+      emphasis: { label: { show: true, fontSize: 14, fontWeight: 'bold', color: '#e4e6ef' } },
+      data: artistStatusArr.map((d, i) => ({ ...d, itemStyle: { color: CHART_COLORS[i % CHART_COLORS.length] } })),
     }],
   };
 
@@ -133,13 +207,8 @@ export default function DashboardPage() {
       avoidLabelOverlap: true,
       itemStyle: { borderRadius: 6, borderColor: '#12141c', borderWidth: 2 },
       label: { show: false },
-      emphasis: {
-        label: { show: true, fontSize: 14, fontWeight: 'bold', color: '#e4e6ef' },
-      },
-      data: subscriptionData.map((d, i) => ({
-        ...d,
-        itemStyle: { color: CHART_COLORS[i % CHART_COLORS.length] },
-      })),
+      emphasis: { label: { show: true, fontSize: 14, fontWeight: 'bold', color: '#e4e6ef' } },
+      data: subscriptionData.map((d, i) => ({ ...d, itemStyle: { color: CHART_COLORS[i % CHART_COLORS.length] } })),
     }],
   };
 
@@ -147,8 +216,10 @@ export default function DashboardPage() {
     <div>
       <div className="page-header">
         <h2>Dashboard</h2>
+        {role === 'viewer' && <span className="badge badge--active">View Only</span>}
       </div>
 
+      {/* Summary Cards */}
       <div className="summary-cards">
         <div className="summary-card">
           <div className="summary-card__label">Total Artists</div>
@@ -168,33 +239,85 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* KPI Cards — manager/admin */}
+      {isElevated && (
+        <div className="summary-cards" style={{ marginTop: '16px' }}>
+          <div className="summary-card">
+            <div className="summary-card__label">Gross Revenue</div>
+            <div className="summary-card__value">{formatCurrency(kpi.grossRevenue)}</div>
+          </div>
+          <div className="summary-card">
+            <div className="summary-card__label">Pipeline Value</div>
+            <div className="summary-card__value">{formatCurrency(kpi.pipelineValue)}</div>
+          </div>
+          <div className="summary-card">
+            <div className="summary-card__label">Payable Now</div>
+            <div className="summary-card__value" style={{ color: kpi.payableNow > 0 ? '#22c55e' : 'inherit' }}>
+              {formatCurrency(kpi.payableNow)}
+            </div>
+          </div>
+          <div className="summary-card">
+            <div className="summary-card__label">At-Risk</div>
+            <div className="summary-card__value" style={{ color: kpi.atRiskRevenue > 0 ? '#ef4444' : 'inherit' }}>
+              {formatCurrency(kpi.atRiskRevenue)}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Charts */}
       <div className="dashboard-chart-grid">
         <div className="card">
           <h3 style={{ marginBottom: '16px' }}>Projects by Status</h3>
           {projectStatusArr.length > 0 ? (
             <ReactECharts option={projectBarOption} style={{ height: 260 }} />
-          ) : (
-            <div className="empty-state">No project data</div>
-          )}
+          ) : <div className="empty-state">No project data</div>}
         </div>
-        <div className="card">
-          <h3 style={{ marginBottom: '16px' }}>Artists by Status</h3>
-          {artistStatusArr.length > 0 ? (
-            <ReactECharts option={artistPieOption} style={{ height: 260 }} />
-          ) : (
-            <div className="empty-state">No artist data</div>
-          )}
-        </div>
+
+        {isElevated && placementBarOption && (
+          <div className="card">
+            <h3 style={{ marginBottom: '16px' }}>Placement Pipeline</h3>
+            <ReactECharts option={placementBarOption} style={{ height: 260 }} />
+          </div>
+        )}
+
+        {!isElevated && (
+          <div className="card">
+            <h3 style={{ marginBottom: '16px' }}>Artists by Status</h3>
+            {artistStatusArr.length > 0 ? (
+              <ReactECharts option={artistPieOption} style={{ height: 260 }} />
+            ) : <div className="empty-state">No artist data</div>}
+          </div>
+        )}
+
         <div className="card">
           <h3 style={{ marginBottom: '16px' }}>Subscription Distribution</h3>
           {subscriptionData.length > 0 ? (
             <ReactECharts option={subscriptionPieOption} style={{ height: 260 }} />
-          ) : (
-            <div className="empty-state">No subscription data</div>
-          )}
+          ) : <div className="empty-state">No subscription data</div>}
         </div>
       </div>
 
+      {/* Admin/Manager extra charts */}
+      {isElevated && (
+        <div className="chart-grid" style={{ margin: '24px 0' }}>
+          <div className="card">
+            <h3 style={{ marginBottom: '16px' }}>Recouped vs Unrecouped vs Payable</h3>
+            {recoupStackOption ? (
+              <ReactECharts option={recoupStackOption} style={{ height: 280 }} />
+            ) : <div className="empty-state">No recoupment data</div>}
+          </div>
+
+          <div className="card">
+            <h3 style={{ marginBottom: '16px' }}>Project Throughput (Monthly)</h3>
+            {throughputOption ? (
+              <ReactECharts option={throughputOption} style={{ height: 280 }} />
+            ) : <div className="empty-state">No throughput data</div>}
+          </div>
+        </div>
+      )}
+
+      {/* Activity Feed + Tasks */}
       <div className="dashboard-bottom-grid">
         <div className="detail-section">
           <h3>Recent Activity</h3>
@@ -208,18 +331,29 @@ export default function DashboardPage() {
                     <th>Event</th>
                     <th>Summary</th>
                     <th>When</th>
+                    <th>Reactions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {activity.map((item) => (
                     <tr key={item.id}>
                       <td>
-                        <span className="badge badge--active">
-                          {capitalize(item.event_type || '')}
-                        </span>
+                        <span className="badge badge--active">{capitalize(item.event_type || '')}</span>
                       </td>
                       <td>{item.summary}</td>
                       <td>{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '4px', alignItems: 'center', fontSize: '12px' }}>
+                          {item.reactions && Array.isArray(item.reactions) && item.reactions.map((r, i) => (
+                            <span key={i} className="reaction-pill" title={capitalize(r.reaction)}>
+                              {REACTION_ICONS[r.reaction] || r.reaction} {r.count > 0 ? r.count : ''}
+                            </span>
+                          ))}
+                          {item.comment_count > 0 && (
+                            <span style={{ color: 'var(--color-text-secondary)', marginLeft: '4px' }}>{item.comment_count} replies</span>
+                          )}
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

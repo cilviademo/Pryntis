@@ -17,6 +17,8 @@ import AssetDetailPage from './pages/AssetDetailPage';
 import PlacementsPage from './pages/PlacementsPage';
 import TasksPage from './pages/TasksPage';
 import AnalyticsPage from './pages/AnalyticsPage';
+import ContactsPage from './pages/ContactsPage';
+import TemplatesPage from './pages/TemplatesPage';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -65,6 +67,8 @@ function AppRoutes() {
         <Route path="port/assets" element={<AssetsPage />} />
         <Route path="port/assets/:id" element={<AssetDetailPage />} />
         <Route path="port/placements" element={<PlacementsPage />} />
+        <Route path="port/contacts" element={<ContactsPage />} />
+        <Route path="port/templates" element={<TemplatesPage />} />
         <Route path="tasks" element={<TasksPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
       </Route>

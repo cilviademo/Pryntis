@@ -552,6 +552,19 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.2px;
 }
 
+.reaction-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 6px;
+  border-radius: 12px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  font-size: 12px;
+  cursor: default;
+  white-space: nowrap;
+}
+
 /* Aliases for old class names */
 .status-badge { composes: badge; }
 

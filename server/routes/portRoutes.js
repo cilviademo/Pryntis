@@ -4,6 +4,7 @@ const portController = require('../controllers/portController');
 const authenticate = require('../middleware/auth');
 const authorize = require('../middleware/rbac');
 const validate = require('../middleware/validate');
+const { requireTier } = require('../middleware/tierGate');
 
 const router = express.Router();
 
@@ -18,6 +19,7 @@ router.get('/assets/:id', portController.getAsset);
 router.post(
   '/assets',
   authorize('admin', 'manager'),
+  requireTier(1),
   portController.createAsset
 );
 
@@ -43,12 +45,13 @@ router.delete(
   portController.removeTag
 );
 
-// Placements
+// Placements — require at least Basic tier (level 2)
 router.get('/placements', portController.listPlacements);
 
 router.post(
   '/placements',
   authorize('admin', 'manager'),
+  requireTier(2),
   portController.createPlacement
 );
 

@@ -6,6 +6,8 @@ const dashboardController = {
   // GET /api/v1/dashboard/summary
   async summary(req, res, next) {
     try {
+      const role = req.user ? req.user.role : 'viewer';
+
       const [
         artistCountResult,
         artistsByStatusResult,
@@ -18,20 +20,15 @@ const dashboardController = {
         recoupableBalanceResult,
         pipelineValueResult,
         atRiskResult,
+        payableResult,
+        projectThroughputResult,
       ] = await Promise.all([
-        // Total active artists
         db.query("SELECT COUNT(*) AS total FROM artists WHERE is_deleted = false"),
-        // Artists by status
         db.query("SELECT status, COUNT(*) AS count FROM artists WHERE is_deleted = false GROUP BY status"),
-        // Total active projects
         db.query("SELECT COUNT(*) AS total FROM projects WHERE is_deleted = false"),
-        // Projects by status
         db.query("SELECT status::text, COUNT(*) AS count FROM projects WHERE is_deleted = false GROUP BY status"),
-        // Total active assets
         db.query("SELECT COUNT(*) AS total FROM assets WHERE is_deleted = false"),
-        // Placements by status
         db.query("SELECT status::text, COUNT(*) AS count FROM placements WHERE is_deleted = false GROUP BY status"),
-        // Subscription distribution
         db.query(`
           SELECT st.name AS tier_name, st.access_level, COUNT(asub.id) AS subscriber_count
           FROM subscription_tiers st
@@ -40,16 +37,13 @@ const dashboardController = {
           GROUP BY st.id, st.name, st.access_level
           ORDER BY st.access_level
         `),
-        // Gross revenue
         db.query("SELECT COALESCE(SUM(amount), 0) AS gross_revenue FROM revenue_events"),
-        // Recoupable balance
         db.query(`
           SELECT
             COALESCE((SELECT SUM(amount) FROM recoupable_expenses), 0)
             - COALESCE((SELECT SUM(amount_applied_to_recoupment) FROM revenue_events), 0)
             AS recoupable_balance
         `),
-        // Pipeline value (weighted)
         db.query(`
           SELECT COALESCE(SUM(
             CASE status::text
@@ -62,15 +56,36 @@ const dashboardController = {
           FROM placements
           WHERE is_deleted = false AND status IN ('pending', 'confirmed', 'completed')
         `),
-        // At-risk revenue (pending placements)
         db.query(`
           SELECT COALESCE(SUM(expected_value * 0.25), 0) AS at_risk_revenue
           FROM placements
           WHERE is_deleted = false AND status = 'pending'
         `),
+        // Payable = sum of (applied_to_recoupment - expenses) per fully-recouped artist, clamped >= 0
+        db.query(`
+          SELECT COALESCE(SUM(GREATEST(applied - expenses, 0)), 0) AS payable_now
+          FROM (
+            SELECT
+              a.id,
+              COALESCE((SELECT SUM(amount_applied_to_recoupment) FROM revenue_events WHERE artist_id = a.id), 0) AS applied,
+              COALESCE((SELECT SUM(amount) FROM recoupable_expenses WHERE artist_id = a.id), 0) AS expenses
+            FROM artists a WHERE a.is_deleted = false
+          ) sub
+          WHERE applied > expenses
+        `),
+        // Project throughput — completed per month (last 12 months)
+        db.query(`
+          SELECT TO_CHAR(DATE_TRUNC('month', p.updated_at), 'YYYY-MM') AS month,
+                 COUNT(*) AS count
+          FROM projects p
+          WHERE p.status = 'completed'
+            AND p.is_deleted = false
+            AND p.updated_at >= NOW() - INTERVAL '12 months'
+          GROUP BY DATE_TRUNC('month', p.updated_at)
+          ORDER BY month
+        `),
       ]);
 
-      // Build status maps
       const artistsByStatus = {};
       for (const row of artistsByStatusResult.rows) {
         artistsByStatus[row.status] = parseInt(row.count, 10);
@@ -96,8 +111,11 @@ const dashboardController = {
       const recoupableBalance = parseFloat(recoupableBalanceResult.rows[0].recoupable_balance);
       const pipelineValue = parseFloat(pipelineValueResult.rows[0].pipeline_value);
       const atRiskRevenue = parseFloat(atRiskResult.rows[0].at_risk_revenue);
+      const payableNow = parseFloat(payableResult.rows[0].payable_now);
+      const unrecoupedBalance = Math.max(0, recoupableBalance);
+      const recoupedAmount = Math.max(0, -recoupableBalance);
 
-      success(res, {
+      const base = {
         artists: {
           total: parseInt(artistCountResult.rows[0].total, 10),
           byStatus: artistsByStatus,
@@ -116,11 +134,25 @@ const dashboardController = {
         kpiSnapshot: {
           grossRevenue,
           recoupableBalance,
+          recoupedAmount,
+          unrecoupedBalance,
           recouped: recoupableBalance <= 0,
           pipelineValue,
           atRiskRevenue,
+          payableNow,
         },
-      }, 'Dashboard summary retrieved');
+        role,
+      };
+
+      // Manager/admin get additional data
+      if (role === 'admin' || role === 'manager') {
+        base.projectThroughput = projectThroughputResult.rows.map((r) => ({
+          month: r.month,
+          count: parseInt(r.count, 10),
+        }));
+      }
+
+      success(res, base, 'Dashboard summary retrieved');
     } catch (err) {
       next(err);
     }
@@ -132,7 +164,14 @@ const dashboardController = {
       const { rows } = await db.query(`
         SELECT af.id, af.event_type, af.actor_user_id, af.entity_type, af.entity_id,
                af.summary, af.metadata, af.created_at,
-               u.first_name AS actor_first_name, u.last_name AS actor_last_name
+               u.first_name AS actor_first_name, u.last_name AS actor_last_name,
+               (SELECT json_agg(json_build_object(
+                  'reaction', ar.reaction, 'count',
+                  (SELECT COUNT(*) FROM activity_reactions ar2 WHERE ar2.activity_id = af.id AND ar2.reaction = ar.reaction)
+               ))
+               FROM (SELECT DISTINCT reaction FROM activity_reactions WHERE activity_id = af.id) ar
+               ) AS reactions,
+               (SELECT COUNT(*) FROM activity_comments WHERE activity_id = af.id) AS comment_count
         FROM activity_feed af
         LEFT JOIN users u ON u.id = af.actor_user_id
         ORDER BY af.created_at DESC

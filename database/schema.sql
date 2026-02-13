@@ -354,6 +354,67 @@ CREATE TABLE contacts (
 CREATE INDEX idx_contacts_org ON contacts(organization);
 
 -- ============================================
+-- 17. ACTIVITY REACTIONS (Panel — activity feed)
+-- ============================================
+CREATE TYPE reaction_type AS ENUM ('thumbs_up', 'eyes', 'check', 'alert');
+
+CREATE TABLE activity_reactions (
+    id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    activity_id   UUID NOT NULL REFERENCES activity_feed(id) ON DELETE CASCADE,
+    user_id       UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    reaction      reaction_type NOT NULL,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(activity_id, user_id, reaction)
+);
+CREATE INDEX idx_reactions_activity ON activity_reactions(activity_id);
+
+-- ============================================
+-- 18. ACTIVITY COMMENTS (Panel — threading)
+-- ============================================
+CREATE TABLE activity_comments (
+    id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    activity_id   UUID NOT NULL REFERENCES activity_feed(id) ON DELETE CASCADE,
+    user_id       UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    body          TEXT NOT NULL,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_comments_activity ON activity_comments(activity_id);
+
+-- ============================================
+-- 19. AUDIT LOG (Pass — tier changes)
+-- ============================================
+CREATE TABLE audit_log (
+    id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id       UUID REFERENCES users(id) ON DELETE SET NULL,
+    action        VARCHAR(100) NOT NULL,
+    entity_type   VARCHAR(50) NOT NULL,
+    entity_id     UUID,
+    details       JSONB DEFAULT '{}'::jsonb,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_audit_entity ON audit_log(entity_type, entity_id);
+CREATE INDEX idx_audit_user   ON audit_log(user_id);
+CREATE INDEX idx_audit_date   ON audit_log(created_at DESC);
+
+-- ============================================
+-- 20. TEMPLATES (Port — SOP library)
+-- ============================================
+CREATE TABLE templates (
+    id                UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title             VARCHAR(255) NOT NULL,
+    category          VARCHAR(100) NOT NULL,
+    body              TEXT NOT NULL,
+    source_url        VARCHAR(1000),
+    last_verified_at  TIMESTAMPTZ,
+    verification_status VARCHAR(50) DEFAULT 'unverified',
+    created_by        UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_templates_category ON templates(category);
+
+-- ============================================
 -- UPDATED_AT TRIGGERS
 -- ============================================
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -376,3 +437,5 @@ CREATE TRIGGER update_own_ts        BEFORE UPDATE ON ownership_records   FOR EAC
 CREATE TRIGGER update_usage_ts      BEFORE UPDATE ON usage_records       FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_tasks_ts      BEFORE UPDATE ON tasks               FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_contacts_ts   BEFORE UPDATE ON contacts            FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_comments_ts  BEFORE UPDATE ON activity_comments   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_templates_ts BEFORE UPDATE ON templates           FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

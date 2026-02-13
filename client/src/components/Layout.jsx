@@ -79,6 +79,12 @@ export default function Layout() {
           <NavLink to="/port/placements" className="nav-link">
             Placements
           </NavLink>
+          <NavLink to="/port/contacts" className="nav-link">
+            Contacts
+          </NavLink>
+          <NavLink to="/port/templates" className="nav-link">
+            Templates
+          </NavLink>
 
           {/* OPS */}
           <div className="nav-section-label">Ops</div>

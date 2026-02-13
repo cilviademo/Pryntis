@@ -50,4 +50,11 @@ router.put(
   passController.updateSubscription
 );
 
+// Tier Limits & Feature Matrix
+router.get('/feature-matrix', passController.featureMatrix);
+router.get('/limits/:artistId', passController.getArtistLimits);
+
+// Audit Log (admin only)
+router.get('/audit', authorize('admin'), passController.listAuditLog);
+
 module.exports = router;
