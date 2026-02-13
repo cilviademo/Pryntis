@@ -276,6 +276,8 @@ export default function PassPage() {
   const [libTypeFilter, setLibTypeFilter] = useState('All');
   const [libSearch, setLibSearch] = useState('');
   const [selectedPack, setSelectedPack] = useState(null);
+  const [favorites, setFavorites] = useState(new Set());
+  const [libFilters, setLibFilters] = useState({ genre: '', bpmMin: '', bpmMax: '', key: '', showSaved: false });
 
   /* ------ Ops Toolkit state ------ */
   const [expandedChecklist, setExpandedChecklist] = useState(null);
@@ -476,6 +478,37 @@ export default function PassPage() {
     }
     return true;
   });
+
+  const filteredPacks = producerLibrary.filter((p) => {
+    // Parse midpoint BPM from string ranges like "140-160"
+    const bpmStr = p.bpm || '';
+    const bpmParts = bpmStr.match(/(\d+)/g);
+    const packBpm = bpmParts ? Math.round(bpmParts.reduce((a, b) => a + parseInt(b), 0) / bpmParts.length) : 0;
+
+    if (libFilters.genre && p.genre !== libFilters.genre) return false;
+    if (libFilters.bpmMin && packBpm < parseInt(libFilters.bpmMin)) return false;
+    if (libFilters.bpmMax && packBpm > parseInt(libFilters.bpmMax)) return false;
+    if (libFilters.key && p.key !== libFilters.key) return false;
+    if (libFilters.showSaved && !favorites.has(p.id)) return false;
+    // Also respect the existing search
+    if (libSearch) {
+      const q = libSearch.toLowerCase();
+      if (!p.name.toLowerCase().includes(q) && !p.creator.toLowerCase().includes(q)) return false;
+    }
+    return true;
+  });
+
+  const toggleFavorite = (packId) => {
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      if (next.has(packId)) {
+        next.delete(packId);
+      } else {
+        next.add(packId);
+      }
+      return next;
+    });
+  };
 
   /* ============================================================
      Checklist toggle
@@ -749,75 +782,177 @@ export default function PassPage() {
             </div>
           </div>
 
-          <div className="filter-bar">
+          <div className="filter-bar" style={{ marginBottom: '16px' }}>
             <input
               placeholder="Search packs or creators..."
               value={libSearch}
               onChange={(e) => setLibSearch(e.target.value)}
             />
-            <select value={libGenreFilter} onChange={(e) => setLibGenreFilter(e.target.value)}>
-              {libraryGenres.map((g) => (
-                <option key={g} value={g}>{g === 'All' ? 'All Genres' : g}</option>
-              ))}
-            </select>
-            <select value={libTypeFilter} onChange={(e) => setLibTypeFilter(e.target.value)}>
-              {libraryTypes.map((t) => (
-                <option key={t} value={t}>{t === 'All' ? 'All Types' : t}</option>
-              ))}
-            </select>
-            <span className="filter-count">{filteredLibrary.length} pack{filteredLibrary.length !== 1 ? 's' : ''}</span>
+            <span className="filter-count">{filteredPacks.length} pack{filteredPacks.length !== 1 ? 's' : ''}</span>
           </div>
 
-          {filteredLibrary.length === 0 ? (
-            <div className="empty-state">No packs match your filters</div>
-          ) : (
-            <div className="card-grid">
-              {filteredLibrary.map((pack) => (
-                <div
-                  key={pack.id}
-                  className="card card--compact cursor-pointer"
-                  onClick={() => setSelectedPack(pack)}
-                  style={{ transition: 'border-color 0.15s' }}
-                >
-                  <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-8">
-                      <IconPackage />
-                      <span className="font-semibold text-sm">{pack.name}</span>
-                    </div>
-                  </div>
-                  <div className="text-xs text-secondary mb-8">by {pack.creator}</div>
-                  <div className="flex items-center gap-8 flex-wrap">
-                    <span className="badge badge--in_progress">{pack.genre}</span>
-                    <span className="badge badge--pending">{pack.type}</span>
-                    <span className="text-xs text-muted ml-auto">{pack.samples} samples</span>
-                  </div>
-                  <div className="flex items-center gap-8 mt-8">
-                    <span className={`badge ${pack.license === 'Royalty-Free' ? 'badge--active' : 'badge--draft'}`}>
-                      {pack.license}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: '16px' }}>
+            {/* Left filters sidebar */}
+            <div style={{ background: 'var(--color-surface-2)', padding: '16px', borderRadius: 'var(--radius)', border: '1px solid var(--color-border)', height: 'fit-content' }}>
+              <h4 style={{ fontSize: '13px', marginBottom: '12px' }}>Filters</h4>
 
-          <div className="card card--compact mt-24">
-            <h4>License Terms</h4>
-            <div style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.7 }}>
-              <p className="mb-8">
-                <strong style={{ color: 'var(--color-text)' }}>Royalty-Free:</strong> Once downloaded, you may use the samples
-                in unlimited commercial and non-commercial productions. No additional royalties or clearance required.
-                Credit is appreciated but not mandatory.
-              </p>
-              <p className="mb-8">
-                <strong style={{ color: 'var(--color-text)' }}>Sync-Ready:</strong> Pre-cleared for synchronization licensing.
-                Suitable for film, TV, advertising, and gaming placements. Chain of title documentation included.
-                Contact rights management for specific sync deal terms.
-              </p>
-              <p>
-                All packs remain the intellectual property of the original creator. Redistribution of raw samples is
-                prohibited. Derivative works using these samples are fully owned by the licensee.
-              </p>
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '4px' }}>Genre</label>
+                <select
+                  value={libFilters.genre}
+                  onChange={(e) => setLibFilters((prev) => ({ ...prev, genre: e.target.value }))}
+                  style={{ width: '100%' }}
+                >
+                  <option value="">All Genres</option>
+                  {libraryGenres.filter((g) => g !== 'All').map((g) => (
+                    <option key={g} value={g}>{g}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '4px' }}>BPM Range</label>
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={libFilters.bpmMin}
+                    onChange={(e) => setLibFilters((prev) => ({ ...prev, bpmMin: e.target.value }))}
+                    style={{ width: '100%' }}
+                  />
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>-</span>
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={libFilters.bpmMax}
+                    onChange={(e) => setLibFilters((prev) => ({ ...prev, bpmMax: e.target.value }))}
+                    style={{ width: '100%' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '4px' }}>Key</label>
+                <select
+                  value={libFilters.key}
+                  onChange={(e) => setLibFilters((prev) => ({ ...prev, key: e.target.value }))}
+                  style={{ width: '100%' }}
+                >
+                  <option value="">All Keys</option>
+                  <option value="C Major">C Major</option>
+                  <option value="D Minor">D Minor</option>
+                  <option value="E Minor">E Minor</option>
+                  <option value="F Major">F Major</option>
+                  <option value="G Major">G Major</option>
+                  <option value="A Minor">A Minor</option>
+                  <option value="B Minor">B Minor</option>
+                  <option value="Various">Various</option>
+                </select>
+              </div>
+
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '4px' }}>Tags</label>
+                <select
+                  value={libTypeFilter}
+                  onChange={(e) => setLibTypeFilter(e.target.value)}
+                  style={{ width: '100%' }}
+                >
+                  {libraryTypes.map((t) => (
+                    <option key={t} value={t}>{t === 'All' ? 'All Types' : t}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ marginBottom: '12px' }}>
+                <label
+                  style={{ fontSize: '12px', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={libFilters.showSaved}
+                    onChange={(e) => setLibFilters((prev) => ({ ...prev, showSaved: e.target.checked }))}
+                    style={{ accentColor: 'var(--color-primary)' }}
+                  />
+                  Saved Only ({favorites.size})
+                </label>
+              </div>
+
+              <button
+                className="btn btn-secondary btn-sm"
+                style={{ width: '100%', marginTop: '12px' }}
+                onClick={() => setLibFilters({ genre: '', bpmMin: '', bpmMax: '', key: '', showSaved: false })}
+              >
+                Clear Filters
+              </button>
+            </div>
+
+            {/* Right: pack grid */}
+            <div>
+              {filteredPacks.length === 0 ? (
+                <div className="empty-state">No packs match your filters</div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
+                  {filteredPacks.map((pack) => (
+                    <div
+                      key={pack.id}
+                      className="card card--compact cursor-pointer"
+                      onClick={() => setSelectedPack(pack)}
+                      style={{ transition: 'border-color 0.15s', position: 'relative' }}
+                    >
+                      {/* Mini waveform */}
+                      <div className="audio-player__waveform" style={{ height: '32px', marginBottom: '8px', display: 'flex', alignItems: 'flex-end', gap: '2px' }}>
+                        {Array.from({ length: 20 }, (_, i) => (
+                          <div
+                            key={i}
+                            className="audio-player__bar"
+                            style={{
+                              height: `${20 + Math.random() * 80}%`,
+                              flex: 1,
+                              background: 'var(--color-primary)',
+                              opacity: 0.6,
+                              borderRadius: '1px',
+                            }}
+                          />
+                        ))}
+                      </div>
+
+                      {/* Pack info */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-8" style={{ minWidth: 0, flex: 1 }}>
+                          <IconPackage />
+                          <span className="font-semibold text-sm" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pack.name}</span>
+                        </div>
+                        {/* Favorite button */}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); toggleFavorite(pack.id); }}
+                          style={{
+                            background: 'none', border: 'none', cursor: 'pointer', padding: '2px',
+                            color: favorites.has(pack.id) ? 'var(--color-warning)' : 'var(--color-text-muted)',
+                          }}
+                          title={favorites.has(pack.id) ? 'Remove from favorites' : 'Save to favorites'}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill={favorites.has(pack.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                          </svg>
+                        </button>
+                      </div>
+                      <div className="text-xs text-secondary mb-8">by {pack.creator}</div>
+                      <div className="flex items-center gap-8 flex-wrap">
+                        <span className="badge badge--in_progress">{pack.genre}</span>
+                        <span className="badge badge--pending">{pack.type}</span>
+                        <span className="text-xs text-muted ml-auto">{pack.samples} samples</span>
+                      </div>
+                      <div className="flex items-center gap-8 mt-8">
+                        <span className="text-xs text-muted">{pack.bpm} BPM</span>
+                        <span className="text-xs text-muted">{pack.key}</span>
+                        <span className={`badge ${pack.license === 'Royalty-Free' ? 'badge--active' : 'badge--draft'}`} style={{ marginLeft: 'auto' }}>
+                          {pack.license}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1459,7 +1594,7 @@ export default function PassPage() {
       {/* Producer Library Pack Detail Modal */}
       {selectedPack && (
         <div className="modal-overlay" onClick={() => setSelectedPack(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal" style={{ maxWidth: '560px' }} onClick={(e) => e.stopPropagation()}>
             <h3>{selectedPack.name}</h3>
             <div className="flex items-center gap-8 mb-16">
               <span className="badge badge--in_progress">{selectedPack.genre}</span>
@@ -1468,6 +1603,24 @@ export default function PassPage() {
                 {selectedPack.license}
               </span>
             </div>
+
+            {/* Waveform visualization */}
+            <div className="audio-player__waveform" style={{ height: '48px', marginBottom: '16px', display: 'flex', alignItems: 'flex-end', gap: '2px', background: 'var(--color-surface-2)', borderRadius: 'var(--radius-sm)', padding: '8px' }}>
+              {Array.from({ length: 40 }, (_, i) => (
+                <div
+                  key={i}
+                  className="audio-player__bar"
+                  style={{
+                    height: `${15 + Math.random() * 85}%`,
+                    flex: 1,
+                    background: 'var(--color-primary)',
+                    opacity: 0.7,
+                    borderRadius: '1px',
+                  }}
+                />
+              ))}
+            </div>
+
             <div className="detail-grid mb-16">
               <div className="detail-field">
                 <span className="detail-field__label">Creator</span>
@@ -1486,18 +1639,33 @@ export default function PassPage() {
                 <span className="detail-field__value">{selectedPack.samples}</span>
               </div>
             </div>
-            <div className="card-limits mb-16">
-              <div className="card-limits__title">License</div>
-              <div style={{ fontSize: 12, lineHeight: 1.6 }}>
-                {selectedPack.license === 'Royalty-Free'
-                  ? 'This pack is royalty-free. Use in unlimited productions without additional clearance. Redistribution of raw samples is prohibited.'
-                  : 'This pack is sync-ready. Pre-cleared for synchronization licensing including film, TV, advertising, and gaming. Chain of title documentation included.'}
-              </div>
+
+            {/* License Terms */}
+            <div style={{ marginTop: '16px', padding: '12px', background: 'var(--color-surface-2)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
+              <h4 style={{ fontSize: '13px', marginBottom: '8px' }}>License Terms</h4>
+              <ul style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: '1.8', paddingLeft: '16px' }}>
+                <li>Non-exclusive license for commercial use</li>
+                <li>Credit required: Producer name in liner notes</li>
+                <li>No redistribution of raw stems/samples</li>
+                <li>Unlimited streams/downloads for finished works</li>
+                <li>Sync/placement use requires separate license</li>
+              </ul>
             </div>
+
+            {/* Add to Project button */}
+            <button className="btn btn-primary btn-sm" style={{ marginTop: '12px' }}>
+              Add to Project
+            </button>
+
             <div className="modal-actions">
               <button type="button" className="btn btn-secondary" onClick={() => setSelectedPack(null)}>Close</button>
-              <button type="button" className="btn btn-secondary" disabled>
-                <IconPlus /> Add to Project
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => toggleFavorite(selectedPack.id)}
+                style={{ color: favorites.has(selectedPack.id) ? 'var(--color-warning)' : undefined }}
+              >
+                <IconStar /> {favorites.has(selectedPack.id) ? 'Saved' : 'Save to Favorites'}
               </button>
               <button type="button" className="btn btn-primary" disabled>
                 <IconDownload /> Download Pack

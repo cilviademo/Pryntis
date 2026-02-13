@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
+import useEscapeKey from '../utils/useEscapeKey';
 import api from '../services/api';
 
 const PRIORITIES = ['low', 'medium', 'high', 'urgent'];
@@ -20,6 +21,8 @@ export default function TasksPage() {
   const [page, setPage] = useState(1);
   const [resultCount, setResultCount] = useState(0);
   const limit = 20;
+
+  useEscapeKey(() => { if (showModal) setShowModal(false); else if (selectedTask) setSelectedTask(null); }, showModal || !!selectedTask);
 
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);

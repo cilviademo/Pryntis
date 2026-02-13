@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import useEscapeKey from '../utils/useEscapeKey';
 import api from '../services/api';
 
 const FILE_TYPES = ['recording', 'composition', 'master', 'sync', 'sample', 'stem', 'other'];
@@ -19,6 +20,8 @@ export default function AssetsPage() {
   const [page, setPage] = useState(1);
   const [resultCount, setResultCount] = useState(0);
   const limit = 20;
+
+  useEscapeKey(() => setShowModal(false), showModal);
 
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);

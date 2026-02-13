@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import GlobalSearch from './GlobalSearch';
 
 export default function Layout() {
   const { user, isAdmin, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -102,6 +104,9 @@ export default function Layout() {
           <NavLink to="/business" className="nav-link">
             Business Ops
           </NavLink>
+          <NavLink to="/calendar" className="nav-link">
+            Calendar
+          </NavLink>
 
           {/* ADMIN */}
           {isAdmin && (
@@ -123,6 +128,13 @@ export default function Layout() {
               <span className={`badge badge--${user?.role}`}>{(user?.role || '').replace(/_/g, ' ')}</span>
             </div>
           </div>
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={toggleTheme}
+            style={{ width: '100%', marginBottom: '8px', fontSize: '12px' }}
+          >
+            {theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          </button>
           <button className="logout-btn" onClick={handleLogout}>
             Log out
           </button>

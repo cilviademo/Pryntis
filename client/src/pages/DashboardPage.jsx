@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import ReactECharts from 'echarts-for-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import InsightsPanel from '../components/InsightsPanel';
 
 const CHART_COLORS = ['#6c63ff', '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
@@ -625,6 +626,34 @@ export default function DashboardPage() {
           <button className="btn btn-secondary btn-sm" onClick={() => navigate('/analytics')}>
             Revenue Trends
           </button>
+        </div>
+      )}
+
+      {isElevated && <InsightsPanel kpi={kpi} healthScores={healthScores} />}
+
+      {/* ROI Projections */}
+      {isElevated && kpi && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '20px' }}>
+          <div style={{ padding: '14px 16px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', borderLeft: '4px solid var(--color-success)' }}>
+            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Expected 30-Day Revenue</div>
+            <div style={{ fontSize: '20px', fontWeight: 700 }}>{formatCurrency((parseFloat(kpi.pipelineValue) || 0) * 0.35)}</div>
+            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Based on pipeline conversion rate</div>
+          </div>
+          <div style={{ padding: '14px 16px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', borderLeft: '4px solid var(--color-warning)' }}>
+            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Expected 60-Day Revenue</div>
+            <div style={{ fontSize: '20px', fontWeight: 700 }}>{formatCurrency((parseFloat(kpi.pipelineValue) || 0) * 0.55)}</div>
+            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Includes confirmed placements</div>
+          </div>
+          <div style={{ padding: '14px 16px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', borderLeft: '4px solid var(--color-info)' }}>
+            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Expected 90-Day Revenue</div>
+            <div style={{ fontSize: '20px', fontWeight: 700 }}>{formatCurrency((parseFloat(kpi.pipelineValue) || 0) * 0.75)}</div>
+            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Full pipeline projection</div>
+          </div>
+          <div style={{ padding: '14px 16px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', borderLeft: '4px solid var(--color-danger)' }}>
+            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Bottleneck Alert</div>
+            <div style={{ fontSize: '14px', fontWeight: 600 }}>{parseInt(kpi.pendingPlacements) > 5 ? `${kpi.pendingPlacements} stalled placements` : 'No bottlenecks detected'}</div>
+            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Pending &gt; 10 days flagged</div>
+          </div>
         </div>
       )}
 

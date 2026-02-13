@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
+import { ThemeProvider } from './context/ThemeContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
@@ -20,6 +21,7 @@ import AnalyticsPage from './pages/AnalyticsPage';
 import ContactsPage from './pages/ContactsPage';
 import TemplatesPage from './pages/TemplatesPage';
 import BusinessOpsPage from './pages/BusinessOpsPage';
+import CalendarPage from './pages/CalendarPage';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -74,6 +76,7 @@ function AppRoutes() {
         <Route path="tasks" element={<TasksPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="business" element={<BusinessOpsPage />} />
+        <Route path="calendar" element={<CalendarPage />} />
       </Route>
     </Routes>
   );
@@ -84,9 +87,11 @@ export default function App() {
     <ErrorBoundary>
       <BrowserRouter>
         <AuthProvider>
-          <ToastProvider>
-            <AppRoutes />
-          </ToastProvider>
+          <ThemeProvider>
+            <ToastProvider>
+              <AppRoutes />
+            </ToastProvider>
+          </ThemeProvider>
         </AuthProvider>
       </BrowserRouter>
     </ErrorBoundary>

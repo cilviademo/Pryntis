@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import useEscapeKey from '../utils/useEscapeKey';
 import api from '../services/api';
 
 const PIPELINE_STATUSES = ['pending', 'confirmed', 'completed', 'declined'];
@@ -19,6 +20,8 @@ export default function PlacementsPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const limit = 30;
+
+  useEscapeKey(() => { if (showModal) setShowModal(false); else if (selectedPlacement) setSelectedPlacement(null); }, showModal || !!selectedPlacement);
 
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);

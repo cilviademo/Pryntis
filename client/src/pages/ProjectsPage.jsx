@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import useDebounce from '../utils/useDebounce';
+import useEscapeKey from '../utils/useEscapeKey';
 import api from '../services/api';
 
 export default function ProjectsPage() {
@@ -22,6 +23,7 @@ export default function ProjectsPage() {
   const limit = 20;
 
   const [showModal, setShowModal] = useState(false);
+  useEscapeKey(() => setShowModal(false), showModal);
   const [editing, setEditing] = useState(null);
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);

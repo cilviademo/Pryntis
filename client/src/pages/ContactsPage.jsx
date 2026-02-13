@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
+import useEscapeKey from '../utils/useEscapeKey';
 import api from '../services/api';
 
 const ROLE_OPTIONS = ['Lawyer', 'Publisher', 'A&R', 'Music Supervisor', 'Manager', 'Producer', 'Distributor', 'Other'];
@@ -18,6 +19,7 @@ export default function ContactsPage() {
   const limit = 25;
 
   const [showModal, setShowModal] = useState(false);
+  useEscapeKey(() => setShowModal(false), showModal);
   const [editing, setEditing] = useState(null);
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
