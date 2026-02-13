@@ -10,11 +10,15 @@ const chartTooltip = {
   textStyle: { color: '#e4e6ef' },
 };
 
+function capitalize(str) {
+  return str.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function objToArray(obj) {
   if (!obj) return [];
   if (Array.isArray(obj)) return obj;
   return Object.entries(obj).map(([name, count]) => ({
-    name: name.replace(/_/g, ' '),
+    name: capitalize(name),
     value: parseInt(count, 10),
   }));
 }
@@ -208,7 +212,7 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', margin: '24px 0' }}>
+      <div className="chart-grid" style={{ margin: '24px 0' }}>
         <div className="card">
           <h3 style={{ marginBottom: '16px' }}>Projects by Status</h3>
           {projectBarOption ? (

@@ -1,10 +1,17 @@
-import React from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Layout() {
   const { user, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
@@ -13,10 +20,36 @@ export default function Layout() {
 
   return (
     <div className="layout">
-      <aside className="sidebar">
+      {/* Mobile header */}
+      <header className="mobile-header">
+        <button
+          className="hamburger-btn"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Open navigation"
+        >
+          <span className="hamburger-line" />
+          <span className="hamburger-line" />
+          <span className="hamburger-line" />
+        </button>
+        <span className="mobile-brand">Pryntis</span>
+      </header>
+
+      {/* Sidebar overlay for mobile */}
+      {sidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      <aside className={`sidebar${sidebarOpen ? ' sidebar--open' : ''}`}>
         <div className="sidebar-header">
           <h1 className="sidebar-brand">Pryntis</h1>
           <span className="sidebar-subtitle">Panel</span>
+          <button
+            className="sidebar-close-btn"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close navigation"
+          >
+            &times;
+          </button>
         </div>
 
         <nav className="sidebar-nav">

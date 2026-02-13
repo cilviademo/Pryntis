@@ -164,7 +164,7 @@ export default function ProjectDetailPage() {
               <tbody>
                 {assets.map((asset) => (
                   <tr key={asset.id}>
-                    <td><Link to={`/assets/${asset.id}`}>{asset.title}</Link></td>
+                    <td><Link to={`/port/assets/${asset.id}`}>{asset.title}</Link></td>
                     <td>
                       <span className={`badge badge--${asset.file_type || 'unknown'}`}>
                         {asset.file_type || '--'}

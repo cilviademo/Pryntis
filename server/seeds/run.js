@@ -32,7 +32,7 @@ async function seed() {
   console.log('Cleared all tables.\n');
 
   // ============================================
-  // 1. USERS (5) — 2 admin, 2 manager, 1 viewer
+  // 1. USERS (3) — 1 admin, 1 manager, 1 viewer
   // ============================================
   const adminHash   = await bcrypt.hash('admin123', 12);
   const managerHash = await bcrypt.hash('manager123', 12);
@@ -41,9 +41,7 @@ async function seed() {
   const { rows: users } = await db.query(
     `INSERT INTO users (email, password_hash, first_name, last_name, role) VALUES
       ('admin@pryntis.io',    $1, 'Marc',   'Miller-Nelson', 'admin'),
-      ('admin2@pryntis.io',   $1, 'Jordan', 'Hayes',         'admin'),
       ('manager@pryntis.io',  $2, 'Taylor', 'Brooks',        'manager'),
-      ('manager2@pryntis.io', $2, 'Casey',  'Reeves',        'manager'),
       ('viewer@pryntis.io',   $3, 'Riley',  'Chen',          'viewer')
     RETURNING id, email, role`,
     [adminHash, managerHash, viewerHash]
@@ -476,6 +474,21 @@ async function seed() {
     [38, 'sync',    'completed', 'Lionsgate - John Wick: Chapter 5',                  '2025-08-01', 22000.00, 'Cinematic underscore placement'],
     [37, 'license', 'pending',   'Music supervisor: Rachel Wong, Heard Well',          '2026-02-01', 4000.00,  'Hip-hop library placement'],
     [39, 'sync',    'confirmed', 'Disney+ - National Geographic Series',               '2026-01-20', 9000.00,  'World music documentary cue'],
+
+    // Additional roster placements for Port coverage
+    [2,  'sync',    'confirmed', 'FX - Shogun S3',                                    '2026-02-01', 14000.00, 'Ambient electronic cue for battle scene'],
+    [4,  'license', 'pending',   'Music supervisor: Amanda Foster, Spotify Editorial', '2026-02-10', 0.00,     'Neon Cathedral submitted for editorial playlist'],
+    [5,  'sync',    'pending',   'Apple TV+ - Severance S3',                           '2026-03-01', 18000.00, 'Dark electronic underscore submission'],
+    [6,  'sync',    'completed', 'Universal Pictures - Film Placement',                '2025-08-20', 32000.00, 'R&B vocal placement in romantic drama'],
+    [9,  'license', 'confirmed', 'YouTube Music - Discover Weekly',                    '2025-12-15', 2500.00,  'Algorithmic playlist feature'],
+    [14, 'sync',    'pending',   'Paramount+ - Yellowstone Spinoff',                   '2026-01-28', 11000.00, 'Electronic ambient cue for landscape montage'],
+    [17, 'license', 'completed', 'Spotify - Beats Unwind Playlist',                    '2025-10-01', 0.00,     'Chopped and screwed beat featured in curation'],
+    [19, 'sync',    'declined',  'Warner Bros - Film Submission',                       '2025-09-10', 15000.00, 'Candy Paint submitted but style mismatch'],
+    [25, 'sync',    'pending',   'A24 - Independent Film',                             '2026-02-05', 7500.00,  'Lotus Effect submitted for indie drama'],
+    [27, 'license', 'confirmed', 'Music supervisor: Kevin O\'Malley, Apple Music',     '2025-11-20', 3500.00,  'Indigo Waves for curated neo-soul playlist'],
+    [30, 'sync',    'confirmed', 'Peacock - Drama Series',                             '2026-01-25', 10000.00, 'Ritmo Sagrado for Latin drama series'],
+    [34, 'sync',    'pending',   'HBO Max - Documentary',                              '2026-02-18', 8500.00,  'Driftwood submitted for oceanography documentary'],
+    [35, 'license', 'confirmed', 'Tidal - Rising Artist Feature',                      '2025-12-01', 0.00,     'Morning Fog featured in lo-fi R&B rising artists'],
   ];
 
   const placementRows = [];
@@ -891,8 +904,7 @@ async function seed() {
   // 13. TASKS (~50 for 7 case artists, 6-10 each)
   // ============================================
   const adminId = users[0].id;
-  const managerId = users[2].id;
-  const manager2Id = users[3].id;
+  const managerId = users[1].id;
 
   const taskData = [
     // MVRK tasks (8)
@@ -900,63 +912,63 @@ async function seed() {
     [0, 'Approve Nike Air Max sync contract',           'Legal review complete. $35k sync fee pending final approval. Ensure recoupment allocation is correct.',    'in_progress', 'urgent', '2026-02-15', adminId,    'placement'],
     [0, 'Schedule Neon Nights EP mastering',            'Book mastering sessions with Sterling Sound. Target completion by March 1.',                               'open',        'medium', '2026-02-20', managerId,  'project'],
     [0, 'Update streaming analytics dashboard',         'Midnight Meridian streaming numbers need reconciliation with distributor reports.',                        'done',        'low',    '2025-12-15', managerId,  'asset'],
-    [0, 'Clear Adidas sync — pending brand approval',   'Follow up with Adidas creative team. Concrete Garden submitted for Originals campaign.',                  'open',        'high',   '2026-03-20', manager2Id, 'placement'],
+    [0, 'Clear Adidas sync — pending brand approval',   'Follow up with Adidas creative team. Concrete Garden submitted for Originals campaign.',                  'open',        'high',   '2026-03-20', managerId, 'placement'],
     [0, 'Plan MVRK x Sable collab sessions',           'Coordinate studio availability for collaborative EP. Both artists confirmed interest.',                   'open',        'medium', '2026-03-01', managerId,  'project'],
     [0, 'Quarterly royalty statement review',           'Prepare Q4 2025 royalty statement showing recoupment progress. Share with artist management.',             'open',        'medium', '2026-01-31', adminId,    'artist'],
-    [0, 'Register Phantom Frequency with BMI',         'Co-production with Sable — ensure both writers are registered with correct splits.',                       'open',        'high',   '2026-02-28', manager2Id, 'asset'],
+    [0, 'Register Phantom Frequency with BMI',         'Co-production with Sable — ensure both writers are registered with correct splits.',                       'open',        'high',   '2026-02-28', managerId, 'asset'],
 
     // Luna Rey tasks (7)
     [1, 'URGENT: Resolve Velvet Horizon ownership dispute', 'Writer splits on Velvet Horizon total 115% (Reyes 60% + Thompson 55%). Must resolve before next royalty distribution.', 'open', 'urgent', '2026-02-10', adminId, 'asset'],
     [1, 'Audit all Luna Rey ownership records',         'Following Velvet Horizon dispute, audit all tracks for split accuracy. Check PRO registrations.',          'open',        'high',   '2026-02-20', managerId,  'artist'],
-    [1, 'Coordinate Luna Rising album artwork',         'Album art concepts due from designer. Need approval before pressing deadline.',                            'in_progress', 'medium', '2026-03-01', manager2Id, 'project'],
+    [1, 'Coordinate Luna Rising album artwork',         'Album art concepts due from designer. Need approval before pressing deadline.',                            'in_progress', 'medium', '2026-03-01', managerId, 'project'],
     [1, 'Follow up on Bilingual Sessions producers',    'Spanish-language EP needs producer confirmations. Budget approved for 3 external producers.',              'open',        'medium', '2026-03-15', managerId,  'project'],
     [1, 'Process iPhone 17 sync royalty payment',       'Apple sync fee of $45k received. Allocate to Luna Rey account and update revenue records.',                'done',        'high',   '2025-10-01', adminId,    'placement'],
     [1, 'Submit Seda y Fuego for Grammy consideration', 'Best Latin Pop Song category. Submission deadline approaching.',                                           'open',        'medium', '2026-04-01', managerId,  'asset'],
-    [1, 'Schedule Luna Rey press interviews',           'Album promo cycle starting. Coordinate with PR team for interview schedule.',                              'open',        'low',    '2026-03-15', manager2Id, 'artist'],
+    [1, 'Schedule Luna Rey press interviews',           'Album promo cycle starting. Coordinate with PR team for interview schedule.',                              'open',        'low',    '2026-03-15', managerId, 'artist'],
 
     // Sable tasks (7)
     [2, 'DEADLINE: Clear Netflix sync by Feb 28',       'Glass Cathedral submitted for Stranger Things S6. $25k deal. Music supervisor needs stems and clearance docs by end of February.', 'in_progress', 'urgent', '2026-02-28', adminId, 'placement'],
     [2, 'Prepare sync clearance documentation',         'Compile ownership certificates, PRO registrations, and master use license for Netflix legal team.',        'in_progress', 'urgent', '2026-02-25', managerId,  'asset'],
-    [2, 'Follow up on HBO Last of Us placement',        'Whisper Network submitted for S3. Expected value $15k. Awaiting music supervisor response.',               'open',        'high',   '2026-03-15', manager2Id, 'placement'],
+    [2, 'Follow up on HBO Last of Us placement',        'Whisper Network submitted for S3. Expected value $15k. Awaiting music supervisor response.',               'open',        'high',   '2026-03-15', managerId, 'placement'],
     [2, 'Review Sync Library Vol. 1 for completeness',  'Ensure all tracks have cleared metadata, stems, and ownership documentation for library.',                 'open',        'medium', '2026-02-28', managerId,  'project'],
     [2, 'Book studio time for Digital Mirage',          'Concept album sessions starting Q2 2026. Need to reserve studio blocks.',                                  'open',        'low',    '2026-04-01', managerId,  'project'],
-    [2, 'Update Sable artist bio and press kit',        'Bio needs updating with Netflix placement mention. Press kit refresh for sync pitch deck.',                 'open',        'low',    '2026-03-01', manager2Id, 'artist'],
+    [2, 'Update Sable artist bio and press kit',        'Bio needs updating with Netflix placement mention. Press kit refresh for sync pitch deck.',                 'open',        'low',    '2026-03-01', managerId, 'artist'],
     [2, 'Register Binary Sunset stems with SESAC',      'Stem pack needs PRO registration before sync licensing can proceed.',                                      'open',        'medium', '2026-02-20', managerId,  'asset'],
 
     // JO Beats tasks (7)
     [3, 'Analyze streaming drop-off — JO Beats catalogue', 'Bayou Bounce and Screwston Nights showing significant stream decline. Investigate playlist removal or algorithm changes.', 'open', 'high', '2026-02-15', managerId, 'artist'],
-    [3, 'Develop placement strategy for catalogue',     'Large catalogue but under 10% placement rate. Identify top 5 tracks for active pitching.',                 'open',        'high',   '2026-03-01', manager2Id, 'artist'],
+    [3, 'Develop placement strategy for catalogue',     'Large catalogue but under 10% placement rate. Identify top 5 tracks for active pitching.',                 'open',        'high',   '2026-03-01', managerId, 'artist'],
     [3, 'Remaster Southern Comfort Beats for sync',     'Older masters may not meet current sync technical specs. Get remastering quotes.',                         'open',        'medium', '2026-03-15', managerId,  'project'],
-    [3, 'Follow up on YouTube Premium placement',       'Bayou Bounce submitted for YouTube Originals. Low-value ($3k) but good exposure.',                         'open',        'low',    '2026-02-28', manager2Id, 'placement'],
+    [3, 'Follow up on YouTube Premium placement',       'Bayou Bounce submitted for YouTube Originals. Low-value ($3k) but good exposure.',                         'open',        'low',    '2026-02-28', managerId, 'placement'],
     [3, 'Review Lionsgate rejection feedback',          'H-Town Anthem declined for John Wick franchise. Get specific feedback for future submissions.',            'done',        'medium', '2025-09-01', managerId,  'placement'],
-    [3, 'Update JO Beats social media strategy',        'Streaming plateau may be connected to low social engagement. Coordinate with marketing.',                  'open',        'medium', '2026-03-01', manager2Id, 'artist'],
+    [3, 'Update JO Beats social media strategy',        'Streaming plateau may be connected to low social engagement. Coordinate with marketing.',                  'open',        'medium', '2026-03-01', managerId, 'artist'],
     [3, 'Houston We Have Beats — track listing review',  'Review 20-track instrumental project. Identify strongest tracks for lead singles.',                        'in_progress', 'medium', '2026-02-20', managerId,  'project'],
 
     // Mayavision tasks (7)
     [4, 'COMPLIANCE: Audit Mayavision ownership records',  'Multiple tracks have incomplete or missing ownership records. Lotus Effect has only writer at 35%. Third Eye Open missing producer/publisher.', 'open', 'urgent', '2026-02-15', adminId, 'artist'],
     [4, 'Resolve Collaborative Chaos contributor splits',  '6+ collaborators on project. Need written agreements for all contributors before any licensing.',        'open',        'high',   '2026-03-01', managerId,  'project'],
-    [4, 'Collect missing IPI numbers for collaborators',   'Several session musicians on Karma Circuit lack IPI registrations. Cannot process PRO payments.',        'open',        'high',   '2026-02-28', manager2Id, 'asset'],
+    [4, 'Collect missing IPI numbers for collaborators',   'Several session musicians on Karma Circuit lack IPI registrations. Cannot process PRO payments.',        'open',        'high',   '2026-02-28', managerId, 'asset'],
     [4, 'Review Soul Circuit project timeline',            'Project behind schedule. Live session recordings need final mixing. Target February completion.',        'in_progress', 'medium', '2026-02-28', managerId,  'project'],
-    [4, 'Contact Jasmine Howard re: horn arrangement credit','Horn parts on Karma Circuit — confirm writing credit percentage and PRO registration.',                'open',        'medium', '2026-02-20', manager2Id, 'asset'],
+    [4, 'Contact Jasmine Howard re: horn arrangement credit','Horn parts on Karma Circuit — confirm writing credit percentage and PRO registration.',                'open',        'medium', '2026-02-20', managerId, 'asset'],
     [4, 'Prepare Neon Gold placement paperwork',           'Third Eye Open — library placement confirmed at $6k. Need all contributor signatures.',                 'open',        'high',   '2026-02-15', adminId,    'placement'],
     [4, 'Schedule Patel Sessions: Live master review',     'Completed project needs final master approval before distribution.',                                     'done',        'low',    '2025-08-15', managerId,  'project'],
 
     // Crux tasks (6)
     [5, 'Review subscription downgrade impact',            'Crux downgraded from Pro to Basic. Identify which Port features are now tier-gated and notify artist.',  'open',        'high',   '2026-02-15', adminId,    'artist'],
     [5, 'Discuss Pro re-upgrade with Crux management',     'Artist may need Pro features for Reggaeton Revival project. Schedule call with management.',            'open',        'medium', '2026-02-28', managerId,  'artist'],
-    [5, 'Finalize Reggaeton Revival tracklist',            'Project in progress — need final track selection from 15 demos.',                                       'in_progress', 'medium', '2026-03-15', manager2Id, 'project'],
+    [5, 'Finalize Reggaeton Revival tracklist',            'Project in progress — need final track selection from 15 demos.',                                       'in_progress', 'medium', '2026-03-15', managerId, 'project'],
     [5, 'Process Telemundo sync payment',                  'Fuego Eterno — $8k sync fee received from Telemundo. Update revenue records.',                          'done',        'medium', '2025-08-15', adminId,    'placement'],
     [5, 'Crux Beats Library — tier access review',         'Beat library project may require Pro tier for full functionality. Assess Basic tier limitations.',       'open',        'medium', '2026-03-01', managerId,  'project'],
-    [5, 'Register Ritmo Sagrado with BMI',                 'New production needs PRO registration before any licensing activity.',                                   'open',        'low',    '2026-03-01', manager2Id, 'asset'],
+    [5, 'Register Ritmo Sagrado with BMI',                 'New production needs PRO registration before any licensing activity.',                                   'open',        'low',    '2026-03-01', managerId, 'asset'],
 
     // Bree Wave tasks (8)
     [6, 'Initiate contract renewal — Bree Wave',           '$18k Citadel sync triggers automatic renewal clause. Prepare renewal paperwork using contract template.','open',        'urgent', '2026-02-15', adminId,    'artist'],
     [6, 'Apply contract renewal template',                 'Use standard artist renewal template. Include updated sync bonus clause based on Citadel performance.',  'open',        'high',   '2026-02-20', adminId,    'artist'],
     [6, 'Confirm Hulu placement details',                  'Only Murders S5 end credits — Paper Cranes. $12k confirmed. Verify broadcast dates.',                   'in_progress', 'high',   '2026-02-28', managerId,  'placement'],
     [6, 'Wave II project — midpoint review',               'Project 50% complete. Review current mixes and production direction.',                                  'open',        'medium', '2026-03-01', managerId,  'project'],
-    [6, 'Update Bree Wave streaming analytics',            'Post-sync streaming boost significant. Update dashboards and prepare report for artist.',                'open',        'medium', '2026-02-15', manager2Id, 'asset'],
+    [6, 'Update Bree Wave streaming analytics',            'Post-sync streaming boost significant. Update dashboards and prepare report for artist.',                'open',        'medium', '2026-02-15', managerId, 'asset'],
     [6, 'Process Citadel S2 sync payment',                 '$18k payment received from Amazon Prime. Allocate to Bree Wave account.',                               'done',        'high',   '2025-11-15', adminId,    'placement'],
-    [6, 'Coordinate Bree Wave press for sync placement',   'Citadel placement is a major career milestone. Coordinate press release with PR team.',                 'open',        'low',    '2026-03-01', manager2Id, 'artist'],
+    [6, 'Coordinate Bree Wave press for sync placement',   'Citadel placement is a major career milestone. Coordinate press release with PR team.',                 'open',        'low',    '2026-03-01', managerId, 'artist'],
     [6, 'Register Driftwood with ASCAP',                   'Wave II track in progress — register early for sync readiness.',                                        'open',        'medium', '2026-02-28', managerId,  'asset'],
   ];
 
@@ -987,9 +999,9 @@ async function seed() {
     ['asset_uploaded',    managerId,  'asset',     0,  'Uploaded asset: Midnight Meridian (beat) for MVRK',                       '2025-03-01'],
     ['asset_uploaded',    managerId,  'asset',     6,  'Uploaded asset: Velvet Horizon (master) for Luna Rey',                    '2025-05-01'],
     ['asset_uploaded',    managerId,  'asset',     11, 'Uploaded asset: Glass Cathedral (master) for Sable',                      '2025-09-15'],
-    ['placement_created', manager2Id, 'placement', 0,  'Created sync placement: Glass Cathedral for Netflix Stranger Things S6',  '2026-01-15'],
+    ['placement_created', managerId, 'placement', 0,  'Created sync placement: Glass Cathedral for Netflix Stranger Things S6',  '2026-01-15'],
     ['placement_updated', adminId,    'placement', 3,  'Completed sync placement: Tidal Serenade for Amazon Prime Citadel S2',   '2025-10-30'],
-    ['placement_created', manager2Id, 'placement', 5,  'Created sync placement: Midnight Meridian for Nike Air Max Campaign',    '2026-01-10'],
+    ['placement_created', managerId, 'placement', 5,  'Created sync placement: Midnight Meridian for Nike Air Max Campaign',    '2026-01-10'],
     ['ownership_flagged', adminId,    'asset',     6,  'ALERT: Velvet Horizon writer splits total 115% — dispute flagged',        '2025-12-01'],
     ['revenue_received',  adminId,    'artist',    1,  'Revenue received: $45,000 from Apple iPhone 17 sync (Luna Rey)',           '2025-09-15'],
     ['revenue_received',  adminId,    'artist',    6,  'Revenue received: $18,000 from Amazon Prime Citadel S2 sync (Bree Wave)', '2025-10-30'],
@@ -1004,7 +1016,7 @@ async function seed() {
     ['expense_logged',    adminId,    'artist',    0,  'Logged expense: $20,000 second advance tranche for MVRK',                 '2024-12-01'],
     ['compliance_alert',  adminId,    'artist',    4,  'Compliance alert: Mayavision has tracks with incomplete ownership records','2026-01-10'],
     ['task_created',      adminId,    'artist',    6,  'Created task: Initiate contract renewal for Bree Wave',                   '2026-02-01'],
-    ['placement_updated', manager2Id, 'placement', 8,  'Placement confirmed: Lavender Skies for Apple iPhone 17 Launch Ad',      '2025-09-01'],
+    ['placement_updated', managerId, 'placement', 8,  'Placement confirmed: Lavender Skies for Apple iPhone 17 Launch Ad',      '2025-09-01'],
   ];
 
   for (const [eventType, actorId, entityType, entityIdx, summary, date] of activityData) {
@@ -1086,9 +1098,7 @@ async function seed() {
   console.log('TEST ACCOUNT CREDENTIALS:');
   console.log('========================================');
   console.log('  admin@pryntis.io       / admin123     (admin)');
-  console.log('  admin2@pryntis.io      / admin123     (admin)');
   console.log('  manager@pryntis.io     / manager123   (manager)');
-  console.log('  manager2@pryntis.io    / manager123   (manager)');
   console.log('  viewer@pryntis.io      / viewer123    (viewer)');
   console.log('========================================\n');
 

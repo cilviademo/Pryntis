@@ -16,7 +16,7 @@ export default function PlacementsPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [viewMode, setViewMode] = useState('table');
   const [page, setPage] = useState(1);
-  const [resultCount, setResultCount] = useState(0);
+  const [total, setTotal] = useState(0);
   const limit = 30;
 
   const [showModal, setShowModal] = useState(false);
@@ -24,8 +24,8 @@ export default function PlacementsPage() {
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
-    asset_id: '', platform: '', placement_type: '', status: 'pending',
-    fee: '', placed_date: '', notes: '',
+    asset_id: '', placed_with: '', placement_type: '', status: 'pending',
+    expected_value: '', placement_date: '', notes: '',
   });
 
   const fetchPlacements = useCallback(async () => {
@@ -33,19 +33,18 @@ export default function PlacementsPage() {
     setError('');
     try {
       const params = new URLSearchParams({ page, limit });
-      if (search) params.set('q', search);
       if (statusFilter) params.set('status', statusFilter);
-      const res = await api.get(`/placements?${params}`);
-      const data = Array.isArray(res) ? res : [];
+      const res = await api.getFullResponse('GET', `/port/placements?${params}`);
+      const data = Array.isArray(res.data) ? res.data : [];
       setPlacements(data);
-      setResultCount(data.length);
+      setTotal(res.pagination?.total || data.length);
     } catch (err) {
       setError('Failed to load placements');
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }, [search, statusFilter, page]);
+  }, [statusFilter, page]);
 
   useEffect(() => {
     fetchPlacements();
@@ -53,13 +52,13 @@ export default function PlacementsPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, statusFilter]);
+  }, [statusFilter]);
 
   const openCreate = () => {
     setEditing(null);
     setForm({
-      asset_id: '', platform: '', placement_type: '', status: 'pending',
-      fee: '', placed_date: '', notes: '',
+      asset_id: '', placed_with: '', placement_type: '', status: 'pending',
+      expected_value: '', placement_date: '', notes: '',
     });
     setFormError('');
     setShowModal(true);
@@ -69,11 +68,11 @@ export default function PlacementsPage() {
     setEditing(placement);
     setForm({
       asset_id: placement.asset_id || '',
-      platform: placement.platform || '',
+      placed_with: placement.placed_with || '',
       placement_type: placement.placement_type || '',
       status: placement.status || 'pending',
-      fee: placement.fee != null ? String(placement.fee) : '',
-      placed_date: placement.placed_date ? placement.placed_date.split('T')[0] : '',
+      expected_value: placement.expected_value != null ? String(placement.expected_value) : '',
+      placement_date: placement.placement_date ? placement.placement_date.split('T')[0] : '',
       notes: placement.notes || '',
     });
     setFormError('');
@@ -92,15 +91,16 @@ export default function PlacementsPage() {
     setSubmitting(true);
     try {
       const payload = { ...form };
-      if (payload.fee) payload.fee = parseFloat(payload.fee);
-      else delete payload.fee;
-      if (!payload.placed_date) delete payload.placed_date;
+      if (payload.expected_value) payload.expected_value = parseFloat(payload.expected_value);
+      else delete payload.expected_value;
+      if (!payload.placement_date) delete payload.placement_date;
+      if (!payload.placed_with) delete payload.placed_with;
       if (!payload.notes) delete payload.notes;
 
       if (editing) {
-        await api.put(`/placements/${editing.id}`, payload);
+        await api.put(`/port/placements/${editing.id}`, payload);
       } else {
-        await api.post('/placements', payload);
+        await api.post('/port/placements', payload);
       }
       setShowModal(false);
       fetchPlacements();
@@ -122,6 +122,8 @@ export default function PlacementsPage() {
       pipelineGroups.pending.push(p);
     }
   });
+
+  const totalPages = Math.ceil(total / limit);
 
   return (
     <div>
@@ -150,17 +152,13 @@ export default function PlacementsPage() {
 
       {viewMode === 'table' && (
         <div className="filter-bar">
-          <input
-            placeholder="Search placements..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
           <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
             <option value="">All Statuses</option>
             {PIPELINE_STATUSES.map((s) => (
               <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
             ))}
           </select>
+          <span className="filter-count">{total} placement{total !== 1 ? 's' : ''}</span>
         </div>
       )}
 
@@ -174,16 +172,16 @@ export default function PlacementsPage() {
           <div className="empty-state">No placements found</div>
         ) : (
           <>
-            <div className="data-table-wrapper">
+            <div className="data-table-wrapper" style={{ overflowX: 'auto' }}>
               <table className="data-table">
                 <thead>
                   <tr>
                     <th>Asset</th>
-                    <th>Platform</th>
+                    <th>Placed With</th>
                     <th>Type</th>
                     <th>Status</th>
-                    <th>Fee</th>
-                    <th>Placed Date</th>
+                    <th>Value</th>
+                    <th>Date</th>
                     {canEdit && <th>Actions</th>}
                   </tr>
                 </thead>
@@ -192,18 +190,18 @@ export default function PlacementsPage() {
                     <tr key={p.id}>
                       <td>
                         {p.asset_id ? (
-                          <Link to={`/assets/${p.asset_id}`}>{p.asset_title || 'View Asset'}</Link>
+                          <Link to={`/port/assets/${p.asset_id}`}>{p.asset_title || 'View Asset'}</Link>
                         ) : '--'}
                       </td>
-                      <td>{p.platform || '--'}</td>
-                      <td>{p.placement_type || '--'}</td>
+                      <td>{p.placed_with || '--'}</td>
+                      <td style={{ textTransform: 'capitalize' }}>{p.placement_type || '--'}</td>
                       <td>
                         <span className={`badge badge--${p.status}`}>
-                          {(p.status || '').replace(/_/g, ' ')}
+                          {(p.status || '').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
                         </span>
                       </td>
-                      <td>{p.fee != null ? `$${Number(p.fee).toLocaleString()}` : '--'}</td>
-                      <td>{p.placed_date ? new Date(p.placed_date).toLocaleDateString() : '--'}</td>
+                      <td>{p.expected_value != null ? `$${Number(p.expected_value).toLocaleString()}` : '--'}</td>
+                      <td>{p.placement_date ? new Date(p.placement_date).toLocaleDateString() : '--'}</td>
                       {canEdit && (
                         <td>
                           <button className="btn btn-secondary btn-sm" onClick={() => openEdit(p)}>Edit</button>
@@ -214,45 +212,42 @@ export default function PlacementsPage() {
                 </tbody>
               </table>
             </div>
-            <div className="pagination">
-              <span>Showing {resultCount} results</span>
-              <div>
-                <button
-                  className="btn btn-secondary btn-sm"
-                  disabled={page <= 1}
-                  onClick={() => setPage((pg) => pg - 1)}
-                >
-                  Previous
-                </button>
-                <span style={{ margin: '0 12px' }}>Page {page}</span>
-                <button
-                  className="btn btn-secondary btn-sm"
-                  disabled={resultCount < limit}
-                  onClick={() => setPage((pg) => pg + 1)}
-                >
-                  Next
-                </button>
+            {totalPages > 1 && (
+              <div className="pagination">
+                <span className="pagination-info">
+                  Page {page} of {totalPages} ({total} total)
+                </span>
+                <div className="pagination-buttons">
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    disabled={page <= 1}
+                    onClick={() => setPage((pg) => pg - 1)}
+                  >
+                    Previous
+                  </button>
+                  <span className="page-current">{page}</span>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    disabled={page >= totalPages}
+                    onClick={() => setPage((pg) => pg + 1)}
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </>
         )
       ) : (
         /* Pipeline View */
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', minHeight: '400px' }}>
+        <div className="pipeline-grid">
           {PIPELINE_STATUSES.map((status) => (
-            <div key={status} style={{
-              background: 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
-              borderRadius: '8px',
-              padding: '16px',
-              display: 'flex',
-              flexDirection: 'column',
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <div key={status} className="pipeline-column">
+              <div className="pipeline-column__header">
                 <h4 style={{ margin: 0, fontSize: '14px', textTransform: 'capitalize' }}>{status}</h4>
                 <span className={`badge badge--${status}`}>{pipelineGroups[status].length}</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, overflowY: 'auto' }}>
+              <div className="pipeline-column__cards">
                 {pipelineGroups[status].length === 0 ? (
                   <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', textAlign: 'center', padding: '24px 0' }}>
                     No placements
@@ -269,16 +264,16 @@ export default function PlacementsPage() {
                         {p.asset_title || 'Untitled Asset'}
                       </div>
                       <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
-                        {p.platform || 'No platform'}
+                        {p.placed_with || 'No platform'}
                       </div>
-                      {p.fee != null && (
+                      {p.expected_value != null && Number(p.expected_value) > 0 && (
                         <div style={{ fontSize: '12px', color: 'var(--color-primary)', marginTop: '4px', fontWeight: 600 }}>
-                          ${Number(p.fee).toLocaleString()}
+                          ${Number(p.expected_value).toLocaleString()}
                         </div>
                       )}
-                      {p.placed_date && (
+                      {p.placement_date && (
                         <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
-                          {new Date(p.placed_date).toLocaleDateString()}
+                          {new Date(p.placement_date).toLocaleDateString()}
                         </div>
                       )}
                     </div>
@@ -294,23 +289,27 @@ export default function PlacementsPage() {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h3>{editing ? 'Edit Placement' : 'Add Placement'}</h3>
-            <form onSubmit={handleSubmit}>
-              {formError && <div className="login-error" style={{ marginBottom: '16px' }}>{formError}</div>}
+            <form onSubmit={handleSubmit} className="form-stack">
+              {formError && <div className="form-error">{formError}</div>}
               <div className="form-group">
                 <label>Asset ID *</label>
                 <input value={form.asset_id} onChange={handleChange('asset_id')} placeholder="Asset UUID" required />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div className="form-group">
-                  <label>Platform</label>
-                  <input value={form.platform} onChange={handleChange('platform')} placeholder="e.g. Spotify, Film, TV" />
-                </div>
+              <div className="form-group">
+                <label>Placed With</label>
+                <input value={form.placed_with} onChange={handleChange('placed_with')} placeholder="e.g. Netflix, Nike, Spotify" />
+              </div>
+              <div className="form-row">
                 <div className="form-group">
                   <label>Placement Type</label>
-                  <input value={form.placement_type} onChange={handleChange('placement_type')} placeholder="e.g. sync, license" />
+                  <select value={form.placement_type} onChange={handleChange('placement_type')}>
+                    <option value="">Select Type</option>
+                    <option value="sync">Sync</option>
+                    <option value="license">License</option>
+                    <option value="feature">Feature</option>
+                    <option value="release">Release</option>
+                  </select>
                 </div>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div className="form-group">
                   <label>Status</label>
                   <select value={form.status} onChange={handleChange('status')}>
@@ -319,14 +318,16 @@ export default function PlacementsPage() {
                     ))}
                   </select>
                 </div>
-                <div className="form-group">
-                  <label>Fee</label>
-                  <input type="number" step="0.01" min="0" value={form.fee} onChange={handleChange('fee')} placeholder="0.00" />
-                </div>
               </div>
-              <div className="form-group">
-                <label>Placed Date</label>
-                <input type="date" value={form.placed_date} onChange={handleChange('placed_date')} />
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Expected Value ($)</label>
+                  <input type="number" step="0.01" min="0" value={form.expected_value} onChange={handleChange('expected_value')} placeholder="0.00" />
+                </div>
+                <div className="form-group">
+                  <label>Placement Date</label>
+                  <input type="date" value={form.placement_date} onChange={handleChange('placement_date')} />
+                </div>
               </div>
               <div className="form-group">
                 <label>Notes</label>

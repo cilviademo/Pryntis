@@ -288,3 +288,32 @@ Configuration is managed via `.env` file at the server root:
 4. **Token versioning**: The `token_version` column on users enables instant token revocation without a token blacklist.
 5. **Centralized error handling**: All errors flow through `errorHandler` middleware with a consistent JSON response shape.
 6. **Full-text search**: PostgreSQL-native tsvector with weighted fields and GIN indexes, avoiding external search services.
+
+---
+
+## Advanced Analytics (Apache Superset)
+
+Apache Superset integration is available for advanced analytics, custom dashboards, and deep data exploration.
+
+### Setup
+
+1. Deploy a Superset instance (Docker recommended): `docker pull apache/superset`
+2. Connect Superset to the same PostgreSQL database using the `DATABASE_URL` connection string
+3. Configure a read-only database user for Superset to prevent accidental writes:
+   ```sql
+   CREATE ROLE superset_reader WITH LOGIN PASSWORD 'your_password';
+   GRANT CONNECT ON DATABASE pryntis TO superset_reader;
+   GRANT USAGE ON SCHEMA public TO superset_reader;
+   GRANT SELECT ON ALL TABLES IN SCHEMA public TO superset_reader;
+   ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO superset_reader;
+   ```
+4. In Superset, add a new database connection under **Settings > Database Connections**
+5. Use the built-in SQL Lab to explore data or create custom charts and dashboards
+
+### Recommended Dashboards
+
+- **Revenue Analytics**: Revenue events by artist, time period, and source
+- **Streaming Performance**: Usage records aggregated by platform, asset, and month
+- **Placement Pipeline**: Placement status funnel with expected vs. actual revenue
+- **Catalogue Health**: Ownership completeness, asset distribution by genre/type
+- **Recoupment Tracking**: Expense vs. revenue waterfall for recoupable artists

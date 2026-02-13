@@ -5,11 +5,15 @@ import api from '../services/api';
 
 const CHART_COLORS = ['#6c63ff', '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
+function capitalize(str) {
+  return str.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function objToArray(obj) {
   if (!obj) return [];
   if (Array.isArray(obj)) return obj;
   return Object.entries(obj).map(([name, count]) => ({
-    name: name.replace(/_/g, ' '),
+    name: capitalize(name),
     value: parseInt(count, 10),
   }));
 }
@@ -164,7 +168,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+      <div className="dashboard-chart-grid">
         <div className="card">
           <h3 style={{ marginBottom: '16px' }}>Projects by Status</h3>
           {projectStatusArr.length > 0 ? (
@@ -191,7 +195,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+      <div className="dashboard-bottom-grid">
         <div className="detail-section">
           <h3>Recent Activity</h3>
           {activity.length === 0 ? (
@@ -211,7 +215,7 @@ export default function DashboardPage() {
                     <tr key={item.id}>
                       <td>
                         <span className="badge badge--active">
-                          {(item.event_type || '').replace(/_/g, ' ')}
+                          {capitalize(item.event_type || '')}
                         </span>
                       </td>
                       <td>{item.summary}</td>
@@ -244,7 +248,7 @@ export default function DashboardPage() {
                       <td>{task.title}</td>
                       <td>
                         <span className={`badge badge--${task.priority || 'medium'}`}>
-                          {task.priority || 'medium'}
+                          {capitalize(task.priority || 'medium')}
                         </span>
                       </td>
                       <td>{task.due_date ? new Date(task.due_date).toLocaleDateString() : '--'}</td>
@@ -258,6 +262,14 @@ export default function DashboardPage() {
             <Link to="/tasks" className="btn btn-secondary btn-sm">View All Tasks</Link>
           </div>
         </div>
+      </div>
+
+      <div className="detail-section">
+        <h3>Advanced Analytics</h3>
+        <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px', lineHeight: '1.6' }}>
+          Apache Superset integration is available for advanced analytics, custom dashboards,
+          and deep data exploration. See <code>docs/architecture.md</code> for setup instructions.
+        </p>
       </div>
     </div>
   );
