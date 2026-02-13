@@ -23,10 +23,10 @@ async function initDb() {
       console.log('[initDb] Schema created.');
     }
 
-    // Check if any users exist
-    const { rows: countRows } = await db.query('SELECT COUNT(*) FROM users');
+    // Check if demo data is populated (artists is the main indicator)
+    const { rows: countRows } = await db.query('SELECT COUNT(*) FROM artists');
     if (parseInt(countRows[0].count, 10) === 0) {
-      console.log('[initDb] No data found — running full seed...');
+      console.log('[initDb] No demo data found — running full seed...');
       await seed();
       console.log('[initDb] Full seed complete.');
     }
