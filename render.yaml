@@ -1,5 +1,8 @@
 # Render Blueprint — deploy Pryntis Panel with one click
 # https://render.com/docs/blueprint-spec
+#
+# After first deploy, run the DB schema + seed via Render Shell:
+#   npm run db:schema && npm run db:seed
 
 databases:
   - name: pryntis-db
@@ -12,12 +15,16 @@ services:
     name: pryntis-panel
     runtime: node
     plan: free
-    buildCommand: npm install && npm run client:install && npm run build:prod
-    startCommand: npm run server
+    region: oregon
+    numInstances: 1
+    buildCommand: npm install && cd client && npm install --include=dev && npm run build
+    startCommand: node server/server.js
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
+      - key: NODE_VERSION
+        value: 20
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRES_IN

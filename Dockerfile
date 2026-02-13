@@ -9,9 +9,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev
 
-# Install client deps and build
+# Install client deps (including devDeps for vite) and build
 COPY client/package*.json ./client/
-RUN cd client && npm ci
+RUN cd client && npm ci --include=dev
 COPY client/ ./client/
 RUN cd client && npx vite build
 
