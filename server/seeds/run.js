@@ -34,17 +34,19 @@ async function seed() {
   // ============================================
   // 1. USERS (5) — 2 admin, 2 manager, 1 viewer
   // ============================================
-  const passwordHash = await bcrypt.hash('password123', 12);
+  const adminHash   = await bcrypt.hash('admin123', 12);
+  const managerHash = await bcrypt.hash('manager123', 12);
+  const viewerHash  = await bcrypt.hash('viewer123', 12);
 
   const { rows: users } = await db.query(
     `INSERT INTO users (email, password_hash, first_name, last_name, role) VALUES
-      ('admin@pryntis.com',    $1, 'Marc',   'Miller-Nelson', 'admin'),
-      ('admin2@pryntis.com',   $1, 'Jordan', 'Hayes',         'admin'),
-      ('manager@pryntis.com',  $1, 'Taylor', 'Brooks',        'manager'),
-      ('manager2@pryntis.com', $1, 'Casey',  'Reeves',        'manager'),
-      ('viewer@pryntis.com',   $1, 'Riley',  'Chen',          'viewer')
+      ('admin@pryntis.io',    $1, 'Marc',   'Miller-Nelson', 'admin'),
+      ('admin2@pryntis.io',   $1, 'Jordan', 'Hayes',         'admin'),
+      ('manager@pryntis.io',  $2, 'Taylor', 'Brooks',        'manager'),
+      ('manager2@pryntis.io', $2, 'Casey',  'Reeves',        'manager'),
+      ('viewer@pryntis.io',   $3, 'Riley',  'Chen',          'viewer')
     RETURNING id, email, role`,
-    [passwordHash]
+    [adminHash, managerHash, viewerHash]
   );
   console.log(`Users: ${users.length}`);
 
@@ -1083,11 +1085,11 @@ async function seed() {
   console.log('\n========================================');
   console.log('TEST ACCOUNT CREDENTIALS:');
   console.log('========================================');
-  console.log('  admin@pryntis.com      / password123  (admin)');
-  console.log('  admin2@pryntis.com     / password123  (admin)');
-  console.log('  manager@pryntis.com    / password123  (manager)');
-  console.log('  manager2@pryntis.com   / password123  (manager)');
-  console.log('  viewer@pryntis.com     / password123  (viewer)');
+  console.log('  admin@pryntis.io       / admin123     (admin)');
+  console.log('  admin2@pryntis.io      / admin123     (admin)');
+  console.log('  manager@pryntis.io     / manager123   (manager)');
+  console.log('  manager2@pryntis.io    / manager123   (manager)');
+  console.log('  viewer@pryntis.io      / viewer123    (viewer)');
   console.log('========================================\n');
 
   process.exit(0);
