@@ -11,8 +11,8 @@ const TIER_COLORS = {
 
 export default function PassPage() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
-  const canEdit = user?.role === 'admin' || user?.role === 'manager';
+  const isAdmin = user?.role === 'admin' || user?.role === 'owner';
+  const canEdit = isAdmin || user?.role === 'manager';
 
   const [tiers, setTiers] = useState([]);
   const [subscriptions, setSubscriptions] = useState([]);
@@ -200,7 +200,7 @@ export default function PassPage() {
     <div>
       <div className="page-header">
         <h2>Pass - Subscriptions</h2>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="flex gap-8">
           {isAdmin && (
             <button className="btn btn-secondary" onClick={openCreateTier}>Add Tier</button>
           )}
@@ -212,106 +212,89 @@ export default function PassPage() {
 
       {error && <div className="empty-state">{error}</div>}
 
-      {/* Tab Navigation */}
-      <div style={{ display: 'flex', gap: '4px', marginBottom: '24px', borderBottom: '2px solid var(--color-border)' }}>
+      <div className="tabs">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            style={{
-              padding: '10px 20px',
-              border: 'none',
-              background: activeTab === tab.key ? 'var(--color-primary)' : 'transparent',
-              color: activeTab === tab.key ? 'white' : 'var(--color-text-secondary)',
-              borderRadius: 'var(--radius) var(--radius) 0 0',
-              cursor: 'pointer',
-              fontWeight: activeTab === tab.key ? 600 : 400,
-              fontSize: '14px',
-            }}
+            className={`tab${activeTab === tab.key ? ' active' : ''}`}
           >
             {tab.label}
           </button>
         ))}
       </div>
 
-      {/* Overview Tab */}
       {activeTab === 'overview' && (
         <>
-          {/* Summary KPIs */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
-            <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
-              <div style={{ fontSize: '32px', fontWeight: 700, color: 'var(--color-primary)' }}>{activeSubs}</div>
-              <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>Active Subscriptions</div>
+          <div className="summary-cards">
+            <div className="summary-card text-center">
+              <div className="summary-card__value text-primary">{activeSubs}</div>
+              <div className="summary-card__label">Active Subscriptions</div>
             </div>
-            <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
-              <div style={{ fontSize: '32px', fontWeight: 700, color: 'var(--color-primary)' }}>{tiers.length}</div>
-              <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>Tiers Available</div>
+            <div className="summary-card text-center">
+              <div className="summary-card__value text-primary">{tiers.length}</div>
+              <div className="summary-card__label">Tiers Available</div>
             </div>
-            <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
-              <div style={{ fontSize: '32px', fontWeight: 700, color: 'var(--color-primary)' }}>{subscriptions.length}</div>
-              <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>Total Subscriptions</div>
+            <div className="summary-card text-center">
+              <div className="summary-card__value text-primary">{subscriptions.length}</div>
+              <div className="summary-card__label">Total Subscriptions</div>
             </div>
-            <div className="card" style={{ padding: '20px', textAlign: 'center' }}>
-              <div style={{ fontSize: '32px', fontWeight: 700, color: 'var(--color-warning)' }}>
+            <div className="summary-card text-center">
+              <div className="summary-card__value text-warning">
                 {subscriptions.filter((s) => s.status === 'expired' || s.status === 'suspended').length}
               </div>
-              <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>Expired / Suspended</div>
+              <div className="summary-card__label">Expired / Suspended</div>
             </div>
           </div>
 
-          {/* Tier Distribution */}
           {Object.keys(tierDistribution).length > 0 && (
-            <div className="card" style={{ padding: '20px', marginBottom: '24px' }}>
-              <h4 style={{ margin: '0 0 16px 0', fontSize: '15px' }}>Active Tier Distribution</h4>
-              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+            <div className="card card--compact mb-24">
+              <h4>Active Tier Distribution</h4>
+              <div className="flex gap-16 flex-wrap">
                 {Object.entries(tierDistribution).map(([tier, count]) => (
-                  <div key={tier} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: TIER_COLORS[tier] || '#6b7280' }} />
-                    <span style={{ fontSize: '14px' }}>{tier}: <strong>{count}</strong></span>
+                  <div key={tier} className="flex items-center gap-8">
+                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: TIER_COLORS[tier] || '#6b7280' }} />
+                    <span className="text-sm">{tier}: <strong>{count}</strong></span>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Tier Cards */}
           <div className="detail-section">
             <h3>Subscription Tiers</h3>
             {tiers.length === 0 ? (
               <div className="empty-state">No tiers configured</div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '16px' }}>
+              <div className="card-grid">
                 {tiers.map((tier) => {
                   const limits = tier.limits || {};
                   const color = TIER_COLORS[tier.name] || '#6b7280';
                   return (
-                    <div key={tier.id} className="card" style={{ padding: '20px', borderTop: `3px solid ${color}` }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                        <h4 style={{ margin: 0, fontSize: '16px' }}>{tier.name}</h4>
+                    <div key={tier.id} className="card card--compact card--border-top" style={{ borderTopColor: color }}>
+                      <div className="card-header">
+                        <h4 style={{ margin: 0 }}>{tier.name}</h4>
                         {isAdmin && (
                           <button className="btn btn-secondary btn-sm" onClick={() => openEditTier(tier)}>Edit</button>
                         )}
                       </div>
-                      <div style={{ fontSize: '24px', fontWeight: 700, color, marginBottom: '8px' }}>
+                      <div className="card-price" style={{ color }}>
                         {tier.price_monthly != null && Number(tier.price_monthly) > 0 ? `$${Number(tier.price_monthly).toFixed(2)}` : 'Free'}
-                        {tier.price_monthly != null && Number(tier.price_monthly) > 0 && <span style={{ fontSize: '13px', fontWeight: 400, color: 'var(--color-text-secondary)' }}>/mo</span>}
+                        {tier.price_monthly != null && Number(tier.price_monthly) > 0 && <span className="card-price__period">/mo</span>}
                       </div>
-                      <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
+                      <div className="text-sm text-secondary mb-8">
                         Access Level: <span className="badge badge--in_progress">{tier.access_level || '--'}</span>
                       </div>
-                      {tier.description && (
-                        <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '8px 0' }}>{tier.description}</p>
-                      )}
-                      {/* Limits */}
-                      <div style={{ fontSize: '12px', margin: '12px 0 8px', padding: '8px', background: 'var(--color-bg)', borderRadius: 'var(--radius)' }}>
-                        <div style={{ fontWeight: 600, marginBottom: '4px' }}>Limits</div>
+                      {tier.description && <p className="text-sm text-secondary mb-8">{tier.description}</p>}
+                      <div className="card-limits">
+                        <div className="card-limits__title">Limits</div>
                         <div>Assets: {limits.assets === -1 ? 'Unlimited' : limits.assets || '--'}</div>
                         <div>Placements: {limits.placements === -1 ? 'Unlimited' : limits.placements || '--'}</div>
                       </div>
                       {tier.features && (Array.isArray(tier.features) ? tier.features : []).length > 0 && (
-                        <ul style={{ margin: '8px 0 0 0', padding: '0 0 0 16px', fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+                        <ul className="card-features">
                           {(Array.isArray(tier.features) ? tier.features : []).map((f, i) => (
-                            <li key={i} style={{ marginBottom: '4px' }}>{f}</li>
+                            <li key={i}>{f}</li>
                           ))}
                         </ul>
                       )}
@@ -324,16 +307,11 @@ export default function PassPage() {
         </>
       )}
 
-      {/* Subscriptions Tab */}
       {activeTab === 'subscriptions' && (
         <div className="detail-section">
           <h3>Artist Subscriptions</h3>
           <div className="filter-bar">
-            <input
-              placeholder="Search by artist name..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+            <input placeholder="Search by artist name..." value={search} onChange={(e) => setSearch(e.target.value)} />
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
               <option value="">All Statuses</option>
               <option value="active">Active</option>
@@ -342,7 +320,6 @@ export default function PassPage() {
             </select>
             <span className="filter-count">{filteredSubs.length} subscription{filteredSubs.length !== 1 ? 's' : ''}</span>
           </div>
-
           {filteredSubs.length === 0 ? (
             <div className="empty-state">No subscriptions found</div>
           ) : (
@@ -366,10 +343,10 @@ export default function PassPage() {
                       <tr key={sub.id} style={isExpired && sub.status === 'active' ? { opacity: 0.7 } : undefined}>
                         <td>
                           <div>{sub.artist_name || sub.artist_id}</div>
-                          {sub.stage_name && <div style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>{sub.stage_name}</div>}
+                          {sub.stage_name && <div className="text-xs text-muted">{sub.stage_name}</div>}
                         </td>
                         <td>
-                          <span style={{ color: TIER_COLORS[sub.tier_name] || 'inherit', fontWeight: 600 }}>
+                          <span className="font-semibold" style={{ color: TIER_COLORS[sub.tier_name] || 'inherit' }}>
                             {sub.tier_name || sub.tier_id}
                           </span>
                         </td>
@@ -379,15 +356,13 @@ export default function PassPage() {
                             {(sub.status || 'active').replace(/_/g, ' ')}
                           </span>
                           {isExpired && sub.status === 'active' && (
-                            <span style={{ fontSize: '10px', color: 'var(--color-danger)', display: 'block' }}>Past End Date</span>
+                            <span className="text-xs text-danger" style={{ display: 'block' }}>Past End Date</span>
                           )}
                         </td>
                         <td>{sub.start_date ? new Date(sub.start_date).toLocaleDateString() : '--'}</td>
                         <td>{sub.end_date ? new Date(sub.end_date).toLocaleDateString() : '--'}</td>
                         {canEdit && (
-                          <td>
-                            <button className="btn btn-secondary btn-sm" onClick={() => openEditSub(sub)}>Edit</button>
-                          </td>
+                          <td><button className="btn btn-secondary btn-sm" onClick={() => openEditSub(sub)}>Edit</button></td>
                         )}
                       </tr>
                     );
@@ -399,13 +374,10 @@ export default function PassPage() {
         </div>
       )}
 
-      {/* Feature Matrix Tab */}
       {activeTab === 'features' && (
         <div className="detail-section">
           <h3>Feature Matrix</h3>
-          <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
-            Comparison of features and limits available at each subscription tier.
-          </p>
+          <p className="text-sm text-secondary mb-16">Comparison of features and limits available at each subscription tier.</p>
           {featureMatrix.length === 0 ? (
             <div className="empty-state">No tiers configured</div>
           ) : (
@@ -415,9 +387,9 @@ export default function PassPage() {
                   <tr>
                     <th>Feature</th>
                     {featureMatrix.map((tier) => (
-                      <th key={tier.id} style={{ textAlign: 'center', color: TIER_COLORS[tier.name] || 'inherit' }}>
+                      <th key={tier.id} className="text-center" style={{ color: TIER_COLORS[tier.name] || 'inherit' }}>
                         {tier.name}
-                        <div style={{ fontSize: '11px', fontWeight: 400, color: 'var(--color-text-muted)' }}>
+                        <div className="text-xs text-muted" style={{ fontWeight: 400 }}>
                           {Number(tier.price_monthly) > 0 ? `$${Number(tier.price_monthly).toFixed(2)}/mo` : 'Free'}
                         </div>
                       </th>
@@ -425,126 +397,25 @@ export default function PassPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td style={{ fontWeight: 600 }}>Asset Limit</td>
-                    {featureMatrix.map((tier) => (
-                      <td key={tier.id} style={{ textAlign: 'center' }}>
-                        {tier.limits?.assets === -1 ? 'Unlimited' : tier.limits?.assets || '--'}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: 600 }}>Placement Limit</td>
-                    {featureMatrix.map((tier) => (
-                      <td key={tier.id} style={{ textAlign: 'center' }}>
-                        {tier.limits?.placements === -1 ? 'Unlimited' : tier.limits?.placements || '--'}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: 600 }}>Dashboard Access</td>
-                    {featureMatrix.map((tier) => (
-                      <td key={tier.id} style={{ textAlign: 'center', color: 'var(--color-success)' }}>Yes</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: 600 }}>Analytics</td>
-                    {featureMatrix.map((tier) => (
-                      <td key={tier.id} style={{ textAlign: 'center' }}>
-                        {tier.access_level >= 3 ? 'Advanced' : tier.access_level >= 2 ? 'Standard' : 'Basic'}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: 600 }}>Placement Tracking</td>
-                    {featureMatrix.map((tier) => (
-                      <td key={tier.id} style={{ textAlign: 'center', color: tier.access_level >= 2 ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
-                        {tier.access_level >= 2 ? 'Yes' : 'No'}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: 600 }}>Ownership Reports</td>
-                    {featureMatrix.map((tier) => (
-                      <td key={tier.id} style={{ textAlign: 'center' }}>
-                        {tier.access_level >= 3 ? 'Full Suite' : tier.access_level >= 2 ? 'Basic' : 'No'}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: 600 }}>Revenue Tracking</td>
-                    {featureMatrix.map((tier) => (
-                      <td key={tier.id} style={{ textAlign: 'center', color: tier.access_level >= 3 ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
-                        {tier.access_level >= 3 ? 'Yes' : 'No'}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: 600 }}>Priority Support</td>
-                    {featureMatrix.map((tier) => (
-                      <td key={tier.id} style={{ textAlign: 'center', color: tier.access_level >= 3 ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
-                        {tier.access_level >= 3 ? 'Yes' : 'No'}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: 600 }}>API Access</td>
-                    {featureMatrix.map((tier) => (
-                      <td key={tier.id} style={{ textAlign: 'center', color: tier.access_level >= 5 ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
-                        {tier.access_level >= 5 ? 'Yes' : 'No'}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: 600 }}>Custom Integrations</td>
-                    {featureMatrix.map((tier) => (
-                      <td key={tier.id} style={{ textAlign: 'center', color: tier.access_level >= 5 ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
-                        {tier.access_level >= 5 ? 'Yes' : 'No'}
-                      </td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Audit Log Tab (admin only) */}
-      {activeTab === 'audit' && isAdmin && (
-        <div className="detail-section">
-          <h3>Audit Log</h3>
-          <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
-            Recent subscription and tier changes tracked for compliance.
-          </p>
-          {auditLog.length === 0 ? (
-            <div className="empty-state">No audit entries yet</div>
-          ) : (
-            <div className="data-table-wrapper">
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>User</th>
-                    <th>Action</th>
-                    <th>Entity</th>
-                    <th>Details</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {auditLog.map((entry) => (
-                    <tr key={entry.id}>
-                      <td style={{ whiteSpace: 'nowrap' }}>{new Date(entry.created_at).toLocaleString()}</td>
-                      <td>{entry.user_name || entry.user_email || '--'}</td>
-                      <td>
-                        <span className="badge badge--active">
-                          {(entry.action || '').replace(/_/g, ' ')}
-                        </span>
-                      </td>
-                      <td style={{ fontSize: '12px' }}>{entry.entity_type}</td>
-                      <td style={{ fontSize: '12px', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {entry.details ? JSON.stringify(entry.details) : '--'}
-                      </td>
+                  {[
+                    { label: 'Asset Limit', render: (t) => t.limits?.assets === -1 ? 'Unlimited' : t.limits?.assets || '--' },
+                    { label: 'Placement Limit', render: (t) => t.limits?.placements === -1 ? 'Unlimited' : t.limits?.placements || '--' },
+                    { label: 'Dashboard Access', render: () => 'Yes', className: () => 'text-center text-success' },
+                    { label: 'Analytics', render: (t) => t.access_level >= 3 ? 'Advanced' : t.access_level >= 2 ? 'Standard' : 'Basic' },
+                    { label: 'Placement Tracking', render: (t) => t.access_level >= 2 ? 'Yes' : 'No', className: (t) => `text-center ${t.access_level >= 2 ? 'text-success' : 'text-muted'}` },
+                    { label: 'Ownership Reports', render: (t) => t.access_level >= 3 ? 'Full Suite' : t.access_level >= 2 ? 'Basic' : 'No' },
+                    { label: 'Revenue Tracking', render: (t) => t.access_level >= 3 ? 'Yes' : 'No', className: (t) => `text-center ${t.access_level >= 3 ? 'text-success' : 'text-muted'}` },
+                    { label: 'Priority Support', render: (t) => t.access_level >= 3 ? 'Yes' : 'No', className: (t) => `text-center ${t.access_level >= 3 ? 'text-success' : 'text-muted'}` },
+                    { label: 'API Access', render: (t) => t.access_level >= 5 ? 'Yes' : 'No', className: (t) => `text-center ${t.access_level >= 5 ? 'text-success' : 'text-muted'}` },
+                    { label: 'Custom Integrations', render: (t) => t.access_level >= 5 ? 'Yes' : 'No', className: (t) => `text-center ${t.access_level >= 5 ? 'text-success' : 'text-muted'}` },
+                  ].map((row) => (
+                    <tr key={row.label}>
+                      <td className="font-semibold">{row.label}</td>
+                      {featureMatrix.map((tier) => (
+                        <td key={tier.id} className={row.className ? row.className(tier) : 'text-center'}>
+                          {row.render(tier)}
+                        </td>
+                      ))}
                     </tr>
                   ))}
                 </tbody>
@@ -554,18 +425,46 @@ export default function PassPage() {
         </div>
       )}
 
-      {/* Tier Modal */}
+      {activeTab === 'audit' && isAdmin && (
+        <div className="detail-section">
+          <h3>Audit Log</h3>
+          <p className="text-sm text-secondary mb-16">Recent subscription and tier changes tracked for compliance.</p>
+          {auditLog.length === 0 ? (
+            <div className="empty-state">No audit entries yet</div>
+          ) : (
+            <div className="data-table-wrapper">
+              <table className="data-table">
+                <thead>
+                  <tr><th>Date</th><th>User</th><th>Action</th><th>Entity</th><th>Details</th></tr>
+                </thead>
+                <tbody>
+                  {auditLog.map((entry) => (
+                    <tr key={entry.id}>
+                      <td className="nowrap">{new Date(entry.created_at).toLocaleString()}</td>
+                      <td>{entry.user_name || entry.user_email || '--'}</td>
+                      <td><span className="badge badge--active">{(entry.action || '').replace(/_/g, ' ')}</span></td>
+                      <td className="text-xs">{entry.entity_type}</td>
+                      <td className="text-xs truncate" style={{ maxWidth: 300 }}>{entry.details ? JSON.stringify(entry.details) : '--'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
       {showTierModal && (
         <div className="modal-overlay" onClick={() => setShowTierModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h3>{editingTier ? 'Edit Tier' : 'Add Tier'}</h3>
-            <form onSubmit={submitTier}>
-              {tierFormError && <div className="login-error" style={{ marginBottom: '16px' }}>{tierFormError}</div>}
+            <form onSubmit={submitTier} className="form-stack">
+              {tierFormError && <div className="form-error">{tierFormError}</div>}
               <div className="form-group">
                 <label>Name *</label>
                 <input value={tierForm.name} onChange={handleTierChange('name')} required />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="form-row">
                 <div className="form-group">
                   <label>Access Level *</label>
                   <input type="number" min="1" max="5" value={tierForm.access_level} onChange={handleTierChange('access_level')} required />
@@ -594,13 +493,12 @@ export default function PassPage() {
         </div>
       )}
 
-      {/* Subscription Modal */}
       {showSubModal && (
         <div className="modal-overlay" onClick={() => setShowSubModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h3>{editingSub ? 'Edit Subscription' : 'Assign Subscription'}</h3>
-            <form onSubmit={submitSub}>
-              {subFormError && <div className="login-error" style={{ marginBottom: '16px' }}>{subFormError}</div>}
+            <form onSubmit={submitSub} className="form-stack">
+              {subFormError && <div className="form-error">{subFormError}</div>}
               <div className="form-group">
                 <label>Artist ID *</label>
                 <input value={subForm.artist_id} onChange={handleSubChange('artist_id')} placeholder="Artist UUID" required disabled={!!editingSub} />
@@ -622,7 +520,7 @@ export default function PassPage() {
                   <option value="suspended">Suspended</option>
                 </select>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="form-row">
                 <div className="form-group">
                   <label>Start Date</label>
                   <input type="date" value={subForm.start_date} onChange={handleSubChange('start_date')} />

@@ -9,9 +9,9 @@ router.use(authenticate);
 
 router.get('/', templateController.list);
 router.get('/:id', templateController.get);
-router.post('/', authorize('admin', 'manager'), templateController.create);
-router.put('/:id', authorize('admin', 'manager'), templateController.update);
-router.post('/validate', authorize('admin'), templateController.validateTemplates);
-router.delete('/:id', authorize('admin'), templateController.remove);
+router.post('/', authorize('owner', 'admin', 'manager'), templateController.create);
+router.put('/:id', authorize('owner', 'admin', 'manager'), templateController.update);
+router.post('/validate', authorize('owner', 'admin'), templateController.validateTemplates);
+router.delete('/:id', authorize('owner', 'admin'), templateController.remove);
 
 module.exports = router;

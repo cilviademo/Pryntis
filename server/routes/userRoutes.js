@@ -10,13 +10,13 @@ const router = express.Router();
 // All routes require authentication
 router.use(authenticate);
 
-router.get('/', authorize('admin', 'manager'), userController.list);
+router.get('/', authorize('owner', 'admin', 'manager'), userController.list);
 
-router.get('/:id', authorize('admin', 'manager'), userController.getById);
+router.get('/:id', authorize('owner', 'admin', 'manager'), userController.getById);
 
 router.put(
   '/:id',
-  authorize('admin'),
+  authorize('owner', 'admin'),
   [
     body('role').optional().isIn(['admin', 'manager', 'viewer']).withMessage('Invalid role'),
     body('is_active').optional().isBoolean().withMessage('is_active must be a boolean'),
@@ -25,6 +25,6 @@ router.put(
   userController.update
 );
 
-router.post('/:id/deactivate', authorize('admin'), userController.deactivate);
+router.post('/:id/deactivate', authorize('owner', 'admin'), userController.deactivate);
 
 module.exports = router;

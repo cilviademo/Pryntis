@@ -9,8 +9,8 @@ router.use(authenticate);
 
 router.get('/', contactController.list);
 router.get('/:id', contactController.get);
-router.post('/', authorize('admin', 'manager'), contactController.create);
-router.put('/:id', authorize('admin', 'manager'), contactController.update);
-router.delete('/:id', authorize('admin'), contactController.remove);
+router.post('/', authorize('owner', 'admin', 'manager'), contactController.create);
+router.put('/:id', authorize('owner', 'admin', 'manager'), contactController.update);
+router.delete('/:id', authorize('owner', 'admin'), contactController.remove);
 
 module.exports = router;

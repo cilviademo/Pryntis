@@ -7,7 +7,7 @@ const PIPELINE_STATUSES = ['pending', 'confirmed', 'completed', 'declined'];
 
 export default function PlacementsPage() {
   const { user } = useAuth();
-  const canEdit = user?.role === 'admin' || user?.role === 'manager';
+  const canEdit = user?.role === 'admin' || user?.role === 'owner' || user?.role === 'manager';
 
   const [placements, setPlacements] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -135,7 +135,7 @@ export default function PlacementsPage() {
       </div>
 
       {/* View Toggle */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+      <div className="flex gap-8 mb-16">
         <button
           className={`btn btn-sm ${viewMode === 'table' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setViewMode('table')}
@@ -172,7 +172,7 @@ export default function PlacementsPage() {
           <div className="empty-state">No placements found</div>
         ) : (
           <>
-            <div className="data-table-wrapper" style={{ overflowX: 'auto' }}>
+            <div className="data-table-wrapper">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -194,7 +194,7 @@ export default function PlacementsPage() {
                         ) : '--'}
                       </td>
                       <td>{p.placed_with || '--'}</td>
-                      <td style={{ textTransform: 'capitalize' }}>{p.placement_type || '--'}</td>
+                      <td className="capitalize">{p.placement_type || '--'}</td>
                       <td>
                         <span className={`badge badge--${p.status}`}>
                           {(p.status || '').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
@@ -244,37 +244,27 @@ export default function PlacementsPage() {
           {PIPELINE_STATUSES.map((status) => (
             <div key={status} className="pipeline-column">
               <div className="pipeline-column__header">
-                <h4 style={{ margin: 0, fontSize: '14px', textTransform: 'capitalize' }}>{status}</h4>
+                <h4 className="text-sm capitalize" style={{ margin: 0 }}>{status}</h4>
                 <span className={`badge badge--${status}`}>{pipelineGroups[status].length}</span>
               </div>
               <div className="pipeline-column__cards">
                 {pipelineGroups[status].length === 0 ? (
-                  <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', textAlign: 'center', padding: '24px 0' }}>
-                    No placements
-                  </div>
+                  <div className="pipeline-empty">No placements</div>
                 ) : (
                   pipelineGroups[status].map((p) => (
                     <div
                       key={p.id}
                       className="card"
-                      style={{ padding: '12px', cursor: canEdit ? 'pointer' : 'default' }}
+                      style={{ cursor: canEdit ? 'pointer' : 'default' }}
                       onClick={() => canEdit && openEdit(p)}
                     >
-                      <div style={{ fontSize: '13px', fontWeight: 600, marginBottom: '4px' }}>
-                        {p.asset_title || 'Untitled Asset'}
-                      </div>
-                      <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
-                        {p.placed_with || 'No platform'}
-                      </div>
+                      <div className="pipeline-card-title">{p.asset_title || 'Untitled Asset'}</div>
+                      <div className="pipeline-card-sub">{p.placed_with || 'No platform'}</div>
                       {p.expected_value != null && Number(p.expected_value) > 0 && (
-                        <div style={{ fontSize: '12px', color: 'var(--color-primary)', marginTop: '4px', fontWeight: 600 }}>
-                          ${Number(p.expected_value).toLocaleString()}
-                        </div>
+                        <div className="pipeline-card-value">${Number(p.expected_value).toLocaleString()}</div>
                       )}
                       {p.placement_date && (
-                        <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
-                          {new Date(p.placement_date).toLocaleDateString()}
-                        </div>
+                        <div className="pipeline-card-date">{new Date(p.placement_date).toLocaleDateString()}</div>
                       )}
                     </div>
                   ))

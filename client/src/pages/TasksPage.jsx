@@ -7,7 +7,7 @@ const STATUSES = ['open', 'in_progress', 'completed', 'cancelled'];
 
 export default function TasksPage() {
   const { user } = useAuth();
-  const canEdit = user?.role === 'admin' || user?.role === 'manager';
+  const canEdit = user?.role === 'admin' || user?.role === 'owner' || user?.role === 'manager';
 
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);

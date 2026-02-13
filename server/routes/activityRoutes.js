@@ -14,7 +14,7 @@ router.delete('/:activityId/reactions/:reaction', activityController.removeReact
 
 // Comments — manager/admin can create; admin can delete; all can read
 router.get('/:activityId/comments', activityController.listComments);
-router.post('/:activityId/comments', authorize('admin', 'manager'), activityController.addComment);
-router.delete('/:activityId/comments/:commentId', authorize('admin'), activityController.deleteComment);
+router.post('/:activityId/comments', authorize('owner', 'admin', 'manager'), activityController.addComment);
+router.delete('/:activityId/comments/:commentId', authorize('owner', 'admin'), activityController.deleteComment);
 
 module.exports = router;

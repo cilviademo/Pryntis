@@ -16,7 +16,7 @@ router.get('/:id', artistController.getById);
 
 router.post(
   '/',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   [
     body('name').notEmpty().withMessage('Name is required'),
     body('status').optional().isIn(['active', 'inactive', 'archived']).withMessage('Invalid status'),
@@ -28,7 +28,7 @@ router.post(
 
 router.put(
   '/:id',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   [
     body('name').optional().notEmpty().withMessage('Name cannot be empty'),
     body('status').optional().isIn(['active', 'inactive', 'archived']).withMessage('Invalid status'),
@@ -38,8 +38,8 @@ router.put(
   artistController.update
 );
 
-router.delete('/:id', authorize('admin'), artistController.softDelete);
+router.delete('/:id', authorize('owner', 'admin'), artistController.softDelete);
 
-router.post('/:id/restore', authorize('admin'), artistController.restore);
+router.post('/:id/restore', authorize('owner', 'admin'), artistController.restore);
 
 module.exports = router;

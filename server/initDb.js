@@ -127,6 +127,19 @@ async function ensureNewTables() {
       await db.query(m.sql);
     }
   }
+
+  // Expand user_role enum if new roles are missing
+  const newRoles = ['owner', 'audio_engineer', 'contributor'];
+  for (const role of newRoles) {
+    const { rows: enumCheck } = await db.query(
+      `SELECT 1 FROM pg_enum WHERE enumlabel = $1 AND enumtypid = 'user_role'::regtype`,
+      [role]
+    );
+    if (enumCheck.length === 0) {
+      console.log(`[initDb] Adding role to user_role enum: ${role}`);
+      await db.query(`ALTER TYPE user_role ADD VALUE IF NOT EXISTS '${role}'`);
+    }
+  }
 }
 
 module.exports = initDb;

@@ -15,7 +15,7 @@ router.get('/tiers', passController.listTiers);
 
 router.post(
   '/tiers',
-  authorize('admin'),
+  authorize('owner', 'admin'),
   [
     body('name').notEmpty().withMessage('Name is required'),
     body('access_level').notEmpty().withMessage('Access level is required'),
@@ -26,7 +26,7 @@ router.post(
 
 router.put(
   '/tiers/:id',
-  authorize('admin'),
+  authorize('owner', 'admin'),
   passController.updateTier
 );
 
@@ -35,7 +35,7 @@ router.get('/subscriptions', passController.listSubscriptions);
 
 router.post(
   '/subscriptions',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   [
     body('artist_id').isUUID().withMessage('Valid artist ID required'),
     body('tier_id').isUUID().withMessage('Valid tier ID required'),
@@ -46,7 +46,7 @@ router.post(
 
 router.put(
   '/subscriptions/:id',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   passController.updateSubscription
 );
 
@@ -55,6 +55,6 @@ router.get('/feature-matrix', passController.featureMatrix);
 router.get('/limits/:artistId', passController.getArtistLimits);
 
 // Audit Log (admin only)
-router.get('/audit', authorize('admin'), passController.listAuditLog);
+router.get('/audit', authorize('owner', 'admin'), passController.listAuditLog);
 
 module.exports = router;

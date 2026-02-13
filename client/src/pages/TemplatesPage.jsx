@@ -6,8 +6,8 @@ const CATEGORIES = ['Sync License', 'Publishing', 'Distribution', 'Recording Agr
 
 export default function TemplatesPage() {
   const { user } = useAuth();
-  const canEdit = user?.role === 'admin' || user?.role === 'manager';
-  const isAdmin = user?.role === 'admin';
+  const canEdit = user?.role === 'admin' || user?.role === 'owner' || user?.role === 'manager';
+  const isAdmin = user?.role === 'admin' || user?.role === 'owner';
 
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -112,7 +112,7 @@ export default function TemplatesPage() {
     <div>
       <div className="page-header">
         <h2>Templates & SOPs</h2>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="flex gap-8">
           {isAdmin && (
             <button className="btn btn-secondary" onClick={runValidation} disabled={validating}>
               {validating ? 'Validating...' : 'Validate All'}
@@ -139,22 +139,20 @@ export default function TemplatesPage() {
         <div className="empty-state">No templates found</div>
       ) : (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+          <div className="card-grid card-grid--wide">
             {templates.map((t) => (
-              <div key={t.id} className="card" style={{ padding: '20px', cursor: 'pointer' }} onClick={() => setSelected(t)}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                  <h4 style={{ margin: 0, fontSize: '15px' }}>{t.title}</h4>
+              <div key={t.id} className="card card--compact" style={{ cursor: 'pointer' }} onClick={() => setSelected(t)}>
+                <div className="card-header">
+                  <h4 style={{ margin: 0 }}>{t.title}</h4>
                   <span className="badge badge--active">{t.category}</span>
                 </div>
-                <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '8px 0', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
-                  {t.body}
-                </p>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px', fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                <p className="text-sm text-secondary line-clamp-3 mb-8">{t.body}</p>
+                <div className="flex justify-between items-center mt-8 text-xs text-muted">
                   <span>
                     {t.verification_status === 'verified' ? (
-                      <span style={{ color: 'var(--color-success)' }}>Verified {t.last_verified_at ? new Date(t.last_verified_at).toLocaleDateString() : ''}</span>
+                      <span className="text-success">Verified {t.last_verified_at ? new Date(t.last_verified_at).toLocaleDateString() : ''}</span>
                     ) : (
-                      <span style={{ color: 'var(--color-warning)' }}>Unverified</span>
+                      <span className="text-warning">Unverified</span>
                     )}
                   </span>
                   <button className="btn btn-secondary btn-sm" onClick={(e) => { e.stopPropagation(); copyBody(t); }}>
@@ -166,7 +164,7 @@ export default function TemplatesPage() {
           </div>
 
           {totalPages > 1 && (
-            <div className="pagination" style={{ marginTop: '24px' }}>
+            <div className="pagination mt-24">
               <span className="pagination-info">Page {page} of {totalPages}</span>
               <div className="pagination-buttons">
                 <button className="btn btn-secondary btn-sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Previous</button>
@@ -181,25 +179,25 @@ export default function TemplatesPage() {
       {/* Detail / Preview Modal */}
       {selected && (
         <div className="modal-overlay" onClick={() => setSelected(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '640px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 640 }}>
+            <div className="card-header mb-16">
               <div>
                 <h3 style={{ margin: 0 }}>{selected.title}</h3>
-                <span className="badge badge--active" style={{ marginTop: '8px' }}>{selected.category}</span>
+                <span className="badge badge--active mt-8">{selected.category}</span>
               </div>
               <button className="btn btn-secondary btn-sm" onClick={() => copyBody(selected)}>
                 {copied === selected.id ? 'Copied!' : 'Copy'}
               </button>
             </div>
-            <pre style={{ whiteSpace: 'pre-wrap', fontSize: '13px', color: 'var(--color-text)', background: 'var(--color-bg)', padding: '16px', borderRadius: 'var(--radius)', maxHeight: '400px', overflow: 'auto', lineHeight: '1.6' }}>
+            <pre className="template-preview">
               {selected.body}
             </pre>
             {selected.source_url && (
-              <div style={{ marginTop: '12px', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+              <div className="mt-8 text-xs text-secondary">
                 Source: <code>{selected.source_url}</code>
               </div>
             )}
-            <div className="modal-actions" style={{ marginTop: '16px' }}>
+            <div className="modal-actions mt-16">
               <button className="btn btn-secondary" onClick={() => setSelected(null)}>Close</button>
               {canEdit && <button className="btn btn-primary" onClick={() => { setSelected(null); openEdit(selected); }}>Edit</button>}
             </div>
@@ -210,7 +208,7 @@ export default function TemplatesPage() {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '640px' }}>
+          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 640 }}>
             <h3>{editing ? 'Edit Template' : 'Add Template'}</h3>
             <form onSubmit={handleSubmit} className="form-stack">
               {formError && <div className="form-error">{formError}</div>}

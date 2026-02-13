@@ -16,7 +16,7 @@ router.get('/artist/:artistId/revenue', kpiController.listRevenueEvents);
 
 router.post(
   '/artist/:artistId/revenue',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   kpiController.createRevenueEvent
 );
 
@@ -24,7 +24,7 @@ router.get('/artist/:artistId/expenses', kpiController.listExpenses);
 
 router.post(
   '/artist/:artistId/expenses',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   kpiController.createExpense
 );
 

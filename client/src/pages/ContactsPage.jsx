@@ -6,7 +6,7 @@ const ROLE_OPTIONS = ['Lawyer', 'Publisher', 'A&R', 'Music Supervisor', 'Manager
 
 export default function ContactsPage() {
   const { user } = useAuth();
-  const canEdit = user?.role === 'admin' || user?.role === 'manager';
+  const canEdit = user?.role === 'admin' || user?.role === 'owner' || user?.role === 'manager';
 
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);

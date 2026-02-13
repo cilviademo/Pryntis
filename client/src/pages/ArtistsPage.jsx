@@ -10,7 +10,7 @@ const GENRES = ['Hip-Hop', 'R&B', 'Pop', 'Rock', 'Electronic', 'Jazz', 'Classica
 export default function ArtistsPage() {
   const { user } = useAuth();
   const { addToast } = useToast();
-  const canEdit = user?.role === 'admin' || user?.role === 'manager';
+  const canEdit = user?.role === 'admin' || user?.role === 'owner' || user?.role === 'manager';
 
   const [artists, setArtists] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -190,7 +190,7 @@ export default function ArtistsPage() {
               >
                 Previous
               </button>
-              <span style={{ margin: '0 12px' }}>Page {page}</span>
+              <span className="mx-12">Page {page}</span>
               <button
                 className="btn btn-secondary btn-sm"
                 disabled={resultCount < limit}
@@ -208,7 +208,7 @@ export default function ArtistsPage() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h3>{editing ? 'Edit Artist' : 'Add Artist'}</h3>
             <form onSubmit={handleSubmit}>
-              {formError && <div className="login-error" style={{ marginBottom: '16px' }}>{formError}</div>}
+              {formError && <div className="form-error mb-16">{formError}</div>}
               <div className="form-group">
                 <label>Name *</label>
                 <input value={form.name} onChange={handleChange('name')} required />
@@ -217,7 +217,7 @@ export default function ArtistsPage() {
                 <label>Stage Name</label>
                 <input value={form.stage_name} onChange={handleChange('stage_name')} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="form-row">
                 <div className="form-group">
                   <label>Email</label>
                   <input type="email" value={form.email} onChange={handleChange('email')} />
@@ -227,7 +227,7 @@ export default function ArtistsPage() {
                   <input value={form.phone} onChange={handleChange('phone')} />
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="form-row">
                 <div className="form-group">
                   <label>Genre</label>
                   <select value={form.genre} onChange={handleChange('genre')}>

@@ -56,11 +56,16 @@ export function AuthProvider({ children }) {
   );
 
   const canEdit = useMemo(
-    () => user?.role === 'admin' || user?.role === 'manager',
+    () => ['owner', 'admin', 'manager'].includes(user?.role),
     [user]
   );
 
-  const isAdmin = useMemo(() => user?.role === 'admin', [user]);
+  const isAdmin = useMemo(
+    () => user?.role === 'admin' || user?.role === 'owner',
+    [user]
+  );
+
+  const isEngineer = useMemo(() => user?.role === 'audio_engineer', [user]);
 
   const value = useMemo(
     () => ({
@@ -72,9 +77,10 @@ export function AuthProvider({ children }) {
       hasRole,
       canEdit,
       isAdmin,
+      isEngineer,
       isAuthenticated: !!token,
     }),
-    [user, token, loading, login, logout, hasRole, canEdit, isAdmin]
+    [user, token, loading, login, logout, hasRole, canEdit, isAdmin, isEngineer]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

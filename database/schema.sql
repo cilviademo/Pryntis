@@ -7,7 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 -- ============================================
 -- ENUM TYPES
 -- ============================================
-CREATE TYPE user_role        AS ENUM ('admin', 'manager', 'viewer');
+CREATE TYPE user_role        AS ENUM ('owner', 'admin', 'manager', 'audio_engineer', 'contributor', 'viewer');
 CREATE TYPE artist_status    AS ENUM ('active', 'inactive', 'archived');
 CREATE TYPE project_status   AS ENUM ('draft', 'in_progress', 'completed', 'archived');
 CREATE TYPE subscription_st  AS ENUM ('active', 'expired', 'suspended');

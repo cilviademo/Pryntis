@@ -8,7 +8,7 @@ const GENRES = ['Hip-Hop', 'R&B', 'Pop', 'Rock', 'Electronic', 'Jazz', 'Classica
 
 export default function AssetsPage() {
   const { user } = useAuth();
-  const canEdit = user?.role === 'admin' || user?.role === 'manager';
+  const canEdit = user?.role === 'admin' || user?.role === 'owner' || user?.role === 'manager';
 
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -240,7 +240,7 @@ export default function AssetsPage() {
                 <label>Title *</label>
                 <input value={form.title} onChange={handleChange('title')} required />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="form-row">
                 <div className="form-group">
                   <label>File Type</label>
                   <select value={form.file_type} onChange={handleChange('file_type')}>
@@ -274,7 +274,7 @@ export default function AssetsPage() {
                   <input type="number" min="0" value={form.duration} onChange={handleChange('duration')} />
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="form-row">
                 <div className="form-group">
                   <label>Artist ID</label>
                   <input value={form.artist_id} onChange={handleChange('artist_id')} placeholder="UUID" />

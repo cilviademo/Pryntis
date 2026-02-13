@@ -112,7 +112,7 @@ export default function Layout() {
               <span className="user-name">
                 {user?.first_name} {user?.last_name}
               </span>
-              <span className="user-role-badge">{user?.role}</span>
+              <span className={`badge badge--${user?.role}`}>{(user?.role || '').replace(/_/g, ' ')}</span>
             </div>
           </div>
           <button className="logout-btn" onClick={handleLogout}>

@@ -18,30 +18,30 @@ router.get('/assets/:id', portController.getAsset);
 
 router.post(
   '/assets',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   requireTier(1),
   portController.createAsset
 );
 
 router.put(
   '/assets/:id',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   portController.updateAsset
 );
 
-router.delete('/assets/:id', authorize('admin'), portController.softDeleteAsset);
+router.delete('/assets/:id', authorize('owner', 'admin'), portController.softDeleteAsset);
 
-router.post('/assets/:id/restore', authorize('admin'), portController.restoreAsset);
+router.post('/assets/:id/restore', authorize('owner', 'admin'), portController.restoreAsset);
 
 router.post(
   '/assets/:id/tags',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   portController.addTags
 );
 
 router.delete(
   '/assets/:id/tags/:tag',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   portController.removeTag
 );
 
@@ -50,14 +50,14 @@ router.get('/placements', portController.listPlacements);
 
 router.post(
   '/placements',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   requireTier(2),
   portController.createPlacement
 );
 
 router.put(
   '/placements/:id',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   portController.updatePlacement
 );
 
@@ -66,13 +66,13 @@ router.get('/ownership', portController.listOwnership);
 
 router.post(
   '/ownership',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   portController.createOwnership
 );
 
 router.put(
   '/ownership/:id',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   portController.updateOwnership
 );
 
@@ -81,7 +81,7 @@ router.get('/usage', portController.listUsage);
 
 router.post(
   '/usage',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   portController.createUsage
 );
 

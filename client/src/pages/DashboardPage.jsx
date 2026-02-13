@@ -28,7 +28,7 @@ const formatCurrency = (val) => {
 export default function DashboardPage() {
   const { user } = useAuth();
   const role = user?.role || 'viewer';
-  const isElevated = role === 'admin' || role === 'manager';
+  const isElevated = role === 'admin' || role === 'owner' || role === 'manager';
 
   const [summary, setSummary] = useState(null);
   const [activity, setActivity] = useState([]);
@@ -241,7 +241,7 @@ export default function DashboardPage() {
 
       {/* KPI Cards — manager/admin */}
       {isElevated && (
-        <div className="summary-cards" style={{ marginTop: '16px' }}>
+        <div className="summary-cards mt-16">
           <div className="summary-card">
             <div className="summary-card__label">Gross Revenue</div>
             <div className="summary-card__value">{formatCurrency(kpi.grossRevenue)}</div>
@@ -268,7 +268,7 @@ export default function DashboardPage() {
       {/* Charts */}
       <div className="dashboard-chart-grid">
         <div className="card">
-          <h3 style={{ marginBottom: '16px' }}>Projects by Status</h3>
+          <h3>Projects by Status</h3>
           {projectStatusArr.length > 0 ? (
             <ReactECharts option={projectBarOption} style={{ height: 260 }} />
           ) : <div className="empty-state">No project data</div>}
@@ -276,14 +276,14 @@ export default function DashboardPage() {
 
         {isElevated && placementBarOption && (
           <div className="card">
-            <h3 style={{ marginBottom: '16px' }}>Placement Pipeline</h3>
+            <h3>Placement Pipeline</h3>
             <ReactECharts option={placementBarOption} style={{ height: 260 }} />
           </div>
         )}
 
         {!isElevated && (
           <div className="card">
-            <h3 style={{ marginBottom: '16px' }}>Artists by Status</h3>
+            <h3>Artists by Status</h3>
             {artistStatusArr.length > 0 ? (
               <ReactECharts option={artistPieOption} style={{ height: 260 }} />
             ) : <div className="empty-state">No artist data</div>}
@@ -291,7 +291,7 @@ export default function DashboardPage() {
         )}
 
         <div className="card">
-          <h3 style={{ marginBottom: '16px' }}>Subscription Distribution</h3>
+          <h3>Subscription Distribution</h3>
           {subscriptionData.length > 0 ? (
             <ReactECharts option={subscriptionPieOption} style={{ height: 260 }} />
           ) : <div className="empty-state">No subscription data</div>}
@@ -300,16 +300,16 @@ export default function DashboardPage() {
 
       {/* Admin/Manager extra charts */}
       {isElevated && (
-        <div className="chart-grid" style={{ margin: '24px 0' }}>
+        <div className="chart-grid mt-24 mb-24">
           <div className="card">
-            <h3 style={{ marginBottom: '16px' }}>Recouped vs Unrecouped vs Payable</h3>
+            <h3>Recouped vs Unrecouped vs Payable</h3>
             {recoupStackOption ? (
               <ReactECharts option={recoupStackOption} style={{ height: 280 }} />
             ) : <div className="empty-state">No recoupment data</div>}
           </div>
 
           <div className="card">
-            <h3 style={{ marginBottom: '16px' }}>Project Throughput (Monthly)</h3>
+            <h3>Project Throughput (Monthly)</h3>
             {throughputOption ? (
               <ReactECharts option={throughputOption} style={{ height: 280 }} />
             ) : <div className="empty-state">No throughput data</div>}
@@ -392,7 +392,7 @@ export default function DashboardPage() {
               </table>
             </div>
           )}
-          <div style={{ marginTop: '12px', textAlign: 'right' }}>
+          <div className="mt-16 text-right">
             <Link to="/tasks" className="btn btn-secondary btn-sm">View All Tasks</Link>
           </div>
         </div>

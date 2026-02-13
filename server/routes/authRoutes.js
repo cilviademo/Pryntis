@@ -23,7 +23,7 @@ const loginLimiter = rateLimit({
 router.post(
   '/register',
   authenticate,
-  authorize('admin'),
+  authorize('owner', 'admin'),
   [
     body('email').isEmail().withMessage('Valid email required'),
     body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),

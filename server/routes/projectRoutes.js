@@ -15,7 +15,7 @@ router.get('/:id', projectController.getById);
 
 router.post(
   '/',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   [
     body('title').notEmpty().withMessage('Title is required'),
     body('status')
@@ -30,7 +30,7 @@ router.post(
 
 router.put(
   '/:id',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   [
     body('title').optional().notEmpty().withMessage('Title cannot be empty'),
     body('status')
@@ -42,14 +42,14 @@ router.put(
   projectController.update
 );
 
-router.delete('/:id', authorize('admin'), projectController.softDelete);
+router.delete('/:id', authorize('owner', 'admin'), projectController.softDelete);
 
-router.post('/:id/restore', authorize('admin'), projectController.restore);
+router.post('/:id/restore', authorize('owner', 'admin'), projectController.restore);
 
 // Collaborators
 router.post(
   '/:id/collaborators',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   [
     body('artist_id').isUUID().withMessage('Valid artist ID required'),
     body('role_description').optional().isString(),
@@ -60,7 +60,7 @@ router.post(
 
 router.delete(
   '/:id/collaborators/:artistId',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   projectController.removeCollaborator
 );
 

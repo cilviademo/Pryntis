@@ -8,7 +8,7 @@ import api from '../services/api';
 export default function ProjectsPage() {
   const { user } = useAuth();
   const { addToast } = useToast();
-  const canEdit = user?.role === 'admin' || user?.role === 'manager';
+  const canEdit = user?.role === 'admin' || user?.role === 'owner' || user?.role === 'manager';
 
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -197,7 +197,7 @@ export default function ProjectsPage() {
               >
                 Previous
               </button>
-              <span style={{ margin: '0 12px' }}>Page {page}</span>
+              <span className="mx-12">Page {page}</span>
               <button
                 className="btn btn-secondary btn-sm"
                 disabled={resultCount < limit}
@@ -215,7 +215,7 @@ export default function ProjectsPage() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h3>{editing ? 'Edit Project' : 'Add Project'}</h3>
             <form onSubmit={handleSubmit}>
-              {formError && <div className="login-error" style={{ marginBottom: '16px' }}>{formError}</div>}
+              {formError && <div className="form-error mb-16">{formError}</div>}
               <div className="form-group">
                 <label>Title *</label>
                 <input value={form.title} onChange={handleChange('title')} required />
@@ -237,7 +237,7 @@ export default function ProjectsPage() {
                   <option value="archived">Archived</option>
                 </select>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="form-row">
                 <div className="form-group">
                   <label>Start Date</label>
                   <input type="date" value={form.start_date} onChange={handleChange('start_date')} />

@@ -16,13 +16,13 @@ router.get('/:id', taskController.getById);
 
 router.post(
   '/',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   taskController.create
 );
 
 router.put(
   '/:id',
-  authorize('admin', 'manager'),
+  authorize('owner', 'admin', 'manager'),
   taskController.update
 );
 

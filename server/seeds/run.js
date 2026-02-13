@@ -36,19 +36,25 @@ async function seed() {
   console.log('Cleared all tables.\n');
 
   // ============================================
-  // 1. USERS (3) — 1 admin, 1 manager, 1 viewer
+  // 1. USERS (6) — one per role
   // ============================================
-  const adminHash   = await bcrypt.hash('admin123', 12);
-  const managerHash = await bcrypt.hash('manager123', 12);
-  const viewerHash  = await bcrypt.hash('viewer123', 12);
+  const ownerHash    = await bcrypt.hash('owner123', 12);
+  const adminHash    = await bcrypt.hash('admin123', 12);
+  const managerHash  = await bcrypt.hash('manager123', 12);
+  const engineerHash = await bcrypt.hash('engineer123', 12);
+  const contribHash  = await bcrypt.hash('contributor123', 12);
+  const viewerHash   = await bcrypt.hash('viewer123', 12);
 
   const { rows: users } = await db.query(
     `INSERT INTO users (email, password_hash, first_name, last_name, role) VALUES
-      ('admin@pryntis.io',    $1, 'Marc',   'Miller-Nelson', 'admin'),
-      ('manager@pryntis.io',  $2, 'Taylor', 'Brooks',        'manager'),
-      ('viewer@pryntis.io',   $3, 'Riley',  'Chen',          'viewer')
+      ('owner@pryntis.io',      $1, 'Dana',   'Whitfield',     'owner'),
+      ('admin@pryntis.io',      $2, 'Marc',   'Miller-Nelson', 'admin'),
+      ('manager@pryntis.io',    $3, 'Taylor', 'Brooks',        'manager'),
+      ('engineer@pryntis.io',   $4, 'Jordan', 'Reeves',        'audio_engineer'),
+      ('contributor@pryntis.io',$5, 'Skyler', 'Imani',         'contributor'),
+      ('viewer@pryntis.io',     $6, 'Riley',  'Chen',          'viewer')
     RETURNING id, email, role`,
-    [adminHash, managerHash, viewerHash]
+    [ownerHash, adminHash, managerHash, engineerHash, contribHash, viewerHash]
   );
   console.log(`Users: ${users.length}`);
 
@@ -1127,9 +1133,12 @@ async function seed() {
   console.log('\n========================================');
   console.log('TEST ACCOUNT CREDENTIALS:');
   console.log('========================================');
-  console.log('  admin@pryntis.io       / admin123     (admin)');
-  console.log('  manager@pryntis.io     / manager123   (manager)');
-  console.log('  viewer@pryntis.io      / viewer123    (viewer)');
+  console.log('  owner@pryntis.io       / owner123        (owner)');
+  console.log('  admin@pryntis.io       / admin123        (admin)');
+  console.log('  manager@pryntis.io     / manager123      (manager)');
+  console.log('  engineer@pryntis.io    / engineer123     (audio_engineer)');
+  console.log('  contributor@pryntis.io / contributor123  (contributor)');
+  console.log('  viewer@pryntis.io      / viewer123       (viewer)');
   console.log('========================================\n');
 
 }
