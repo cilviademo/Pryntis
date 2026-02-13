@@ -1092,10 +1092,16 @@ async function seed() {
   console.log('  viewer@pryntis.io      / viewer123    (viewer)');
   console.log('========================================\n');
 
-  process.exit(0);
 }
 
-seed().catch((err) => {
-  console.error('Seed failed:', err);
-  process.exit(1);
-});
+module.exports = seed;
+
+// Run directly when executed as a script
+if (require.main === module) {
+  seed()
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error('Seed failed:', err);
+      process.exit(1);
+    });
+}

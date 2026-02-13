@@ -1,12 +1,12 @@
 const fs = require('fs');
 const path = require('path');
-const bcrypt = require('bcryptjs');
 const db = require('./config/db');
+const seed = require('./seeds/run');
 
 /**
  * Auto-initialize database on first startup.
  * - Creates schema if users table doesn't exist
- * - Seeds demo users if the users table is empty
+ * - Runs full seed (users + artists + projects + everything) if empty
  */
 async function initDb() {
   try {
@@ -26,20 +26,9 @@ async function initDb() {
     // Check if any users exist
     const { rows: countRows } = await db.query('SELECT COUNT(*) FROM users');
     if (parseInt(countRows[0].count, 10) === 0) {
-      console.log('[initDb] No users found — seeding demo accounts...');
-
-      const adminHash = await bcrypt.hash('admin123', 12);
-      const managerHash = await bcrypt.hash('manager123', 12);
-      const viewerHash = await bcrypt.hash('viewer123', 12);
-
-      await db.query(
-        `INSERT INTO users (email, password_hash, first_name, last_name, role) VALUES
-          ('admin@pryntis.io',   $1, 'Marc',   'Miller-Nelson', 'admin'),
-          ('manager@pryntis.io', $2, 'Taylor', 'Brooks',        'manager'),
-          ('viewer@pryntis.io',  $3, 'Riley',  'Chen',          'viewer')`,
-        [adminHash, managerHash, viewerHash]
-      );
-      console.log('[initDb] 3 demo users seeded.');
+      console.log('[initDb] No data found — running full seed...');
+      await seed();
+      console.log('[initDb] Full seed complete.');
     }
 
     console.log('[initDb] Database ready.');
