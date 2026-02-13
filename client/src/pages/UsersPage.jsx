@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import Pagination from '../components/Pagination';
 
 export default function UsersPage() {
   const { user } = useAuth();
@@ -188,26 +189,7 @@ export default function UsersPage() {
               </tbody>
             </table>
           </div>
-          <div className="pagination">
-            <span>Showing {resultCount} results</span>
-            <div>
-              <button
-                className="btn btn-secondary btn-sm"
-                disabled={page <= 1}
-                onClick={() => setPage((p) => p - 1)}
-              >
-                Previous
-              </button>
-              <span style={{ margin: '0 12px' }}>Page {page}</span>
-              <button
-                className="btn btn-secondary btn-sm"
-                disabled={resultCount < limit}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          <Pagination page={page} setPage={setPage} resultCount={resultCount} limit={limit} />
         </>
       )}
 

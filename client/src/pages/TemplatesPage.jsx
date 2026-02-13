@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../services/api';
+import { formatDate } from '../utils/formatters';
 
 const CATEGORIES = ['Sync License', 'Publishing', 'Distribution', 'Recording Agreement', 'Cue Sheet', 'Split Sheet', 'NDA', 'Other'];
 const FILTER_OPTIONS = ['All', ...CATEGORIES];
@@ -148,11 +149,6 @@ export default function TemplatesPage() {
     if (!body) return '';
     const lines = body.split('\n').filter((l) => l.trim() !== '');
     return lines.slice(0, 3).join('\n');
-  };
-
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '';
-    return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
   const totalPages = Math.ceil(total / limit);

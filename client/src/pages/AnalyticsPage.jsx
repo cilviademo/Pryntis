@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ReactECharts from 'echarts-for-react';
 import api from '../services/api';
+import { capitalize, objToArray, formatCurrency } from '../utils/formatters';
+import ExportButton from '../components/ExportButton';
 
 const COLORS = ['#6366f1', '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
@@ -11,50 +13,12 @@ const chartTooltip = {
   textStyle: { color: '#e4e6ef' },
 };
 
-function capitalize(str) {
-  return str.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-function objToArray(obj) {
-  if (!obj) return [];
-  if (Array.isArray(obj)) return obj;
-  return Object.entries(obj).map(([name, count]) => ({
-    name: capitalize(name),
-    value: parseInt(count, 10),
-  }));
-}
-
-const formatCurrency = (val) => {
-  const num = typeof val === 'number' ? val : parseFloat(val) || 0;
-  return `$${num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-};
-
 export default function AnalyticsPage() {
   const [summary, setSummary] = useState(null);
   const [portAnalytics, setPortAnalytics] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  const handleExport = async (entity) => {
-    try {
-      const response = await fetch(`/api/v1/export/${entity}`, {
-        headers: { 'Authorization': `Bearer ${api.getToken()}` },
-      });
-      if (!response.ok) throw new Error('Export failed');
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `pryntis-${entity}-${new Date().toISOString().split('T')[0]}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Export failed:', err);
-    }
-  };
 
   useEffect(() => {
     async function load() {
@@ -171,10 +135,7 @@ export default function AnalyticsPage() {
       <div className="page-header">
         <h2>Analytics</h2>
         <div style={{ display: 'flex', gap: '8px' }}>
-          <button className="export-btn" onClick={() => handleExport('artists')}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Export CSV
-          </button>
+          <ExportButton entity="artists" />
         </div>
       </div>
 

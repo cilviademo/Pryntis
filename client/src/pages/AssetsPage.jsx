@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import useEscapeKey from '../utils/useEscapeKey';
 import api from '../services/api';
+import ExportButton from '../components/ExportButton';
+import Pagination from '../components/Pagination';
 
 const FILE_TYPES = ['recording', 'composition', 'master', 'sync', 'sample', 'stem', 'other'];
 const GENRES = ['Hip-Hop', 'R&B', 'Pop', 'Rock', 'Electronic', 'Jazz', 'Classical', 'Country', 'Latin', 'Afrobeats', 'Other'];
@@ -21,9 +23,8 @@ export default function AssetsPage() {
   const [resultCount, setResultCount] = useState(0);
   const limit = 20;
 
-  useEscapeKey(() => setShowModal(false), showModal);
-
   const [showModal, setShowModal] = useState(false);
+  useEscapeKey(() => setShowModal(false), showModal);
   const [editing, setEditing] = useState(null);
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -134,29 +135,7 @@ export default function AssetsPage() {
       <div className="page-header">
         <h2>Assets</h2>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <button
-            className="export-btn"
-            onClick={async () => {
-              try {
-                const response = await fetch('/api/v1/export/assets', {
-                  headers: { 'Authorization': `Bearer ${api.getToken()}` },
-                });
-                if (!response.ok) return;
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `pryntis-assets-${new Date().toISOString().split('T')[0]}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                window.URL.revokeObjectURL(url);
-              } catch (err) { console.error('Export failed:', err); }
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Export CSV
-          </button>
+          <ExportButton entity="assets" />
           {canEdit && (
             <button className="btn btn-primary" onClick={openCreate}>Add Asset</button>
           )}
@@ -235,26 +214,7 @@ export default function AssetsPage() {
               </tbody>
             </table>
           </div>
-          <div className="pagination">
-            <span>Showing {resultCount} results</span>
-            <div>
-              <button
-                className="btn btn-secondary btn-sm"
-                disabled={page <= 1}
-                onClick={() => setPage((p) => p - 1)}
-              >
-                Previous
-              </button>
-              <span style={{ margin: '0 12px' }}>Page {page}</span>
-              <button
-                className="btn btn-secondary btn-sm"
-                disabled={resultCount < limit}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          <Pagination page={page} setPage={setPage} resultCount={resultCount} limit={limit} />
         </>
       )}
 

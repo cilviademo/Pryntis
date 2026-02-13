@@ -4,26 +4,9 @@ import ReactECharts from 'echarts-for-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import InsightsPanel from '../components/InsightsPanel';
+import { capitalize, objToArray, formatCurrency } from '../utils/formatters';
 
 const CHART_COLORS = ['#6c63ff', '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
-
-function capitalize(str) {
-  return str.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-function objToArray(obj) {
-  if (!obj) return [];
-  if (Array.isArray(obj)) return obj;
-  return Object.entries(obj).map(([name, count]) => ({
-    name: capitalize(name),
-    value: parseInt(count, 10),
-  }));
-}
-
-const formatCurrency = (val) => {
-  const num = typeof val === 'number' ? val : parseFloat(val) || 0;
-  return `$${num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-};
 
 /* Health score dimension definitions */
 const HEALTH_DIMENSIONS = [
@@ -402,10 +385,8 @@ export default function DashboardPage() {
   } : null;
 
   /* ── Momentum bar click handler ────────────────────────────────── */
-  const onMomentumClick = (params) => {
-    if (params.componentType === 'series') {
-      console.log('Momentum chart clicked - month:', momentum[params.dataIndex]?.month);
-    }
+  const onMomentumClick = (_params) => {
+    // Placeholder for future momentum chart drill-down navigation
   };
 
   /* ── Health score drilldown helpers ────────────────────────────── */
