@@ -26,6 +26,8 @@ const activityRoutes = require('./routes/activityRoutes');
 const panelRoutes = require('./routes/panelRoutes');
 const portAnalyticsRoutes = require('./routes/portAnalyticsRoutes');
 const businessRoutes = require('./routes/businessRoutes');
+const searchRoutes = require('./routes/searchRoutes');
+const exportRoutes = require('./routes/exportRoutes');
 
 const app = express();
 
@@ -93,6 +95,8 @@ app.use('/api/v1/activity', activityRoutes);
 app.use('/api/v1/panel', panelRoutes);
 app.use('/api/v1/port/analytics', portAnalyticsRoutes);
 app.use('/api/v1/business', businessRoutes);
+app.use('/api/v1/search', searchRoutes);
+app.use('/api/v1/export', exportRoutes);
 
 // Health check — verifies DB connectivity
 app.get('/api/health', async (req, res) => {

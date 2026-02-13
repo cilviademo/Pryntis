@@ -115,6 +115,44 @@ async function ensureNewTables() {
         CREATE INDEX IF NOT EXISTS idx_templates_category ON templates(category);
       `,
     },
+    {
+      table: 'asset_versions',
+      sql: `
+        CREATE TABLE IF NOT EXISTS asset_versions (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          asset_id UUID NOT NULL REFERENCES assets(id) ON DELETE CASCADE,
+          version_number INTEGER NOT NULL DEFAULT 1,
+          title VARCHAR(255),
+          file_name VARCHAR(255),
+          storage_key VARCHAR(500),
+          status VARCHAR(50) DEFAULT 'draft',
+          notes TEXT,
+          uploaded_by UUID REFERENCES users(id) ON DELETE SET NULL,
+          parent_version_id UUID REFERENCES asset_versions(id),
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+        CREATE INDEX IF NOT EXISTS idx_asset_ver_asset ON asset_versions(asset_id);
+        CREATE INDEX IF NOT EXISTS idx_asset_ver_parent ON asset_versions(parent_version_id);
+      `,
+    },
+    {
+      table: 'entity_comments',
+      sql: `
+        CREATE TABLE IF NOT EXISTS entity_comments (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          entity_type VARCHAR(50) NOT NULL,
+          entity_id UUID NOT NULL,
+          user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          body TEXT NOT NULL,
+          mentions UUID[] DEFAULT '{}',
+          timestamp_ref DECIMAL(10,2),
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+        CREATE INDEX IF NOT EXISTS idx_ecomments_entity ON entity_comments(entity_type, entity_id);
+        CREATE INDEX IF NOT EXISTS idx_ecomments_user ON entity_comments(user_id);
+      `,
+    },
   ];
 
   for (const m of migrations) {

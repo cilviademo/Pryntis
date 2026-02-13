@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import GlobalSearch from './GlobalSearch';
 
 export default function Layout() {
   const { user, isAdmin, logout } = useAuth();
@@ -50,6 +51,10 @@ export default function Layout() {
           >
             &times;
           </button>
+        </div>
+
+        <div style={{ padding: '0 16px 12px' }}>
+          <GlobalSearch />
         </div>
 
         <nav className="sidebar-nav">

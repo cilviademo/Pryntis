@@ -34,6 +34,103 @@ const HEALTH_DIMENSIONS = [
   { key: 'ownership', label: 'Ownership', max: 15, missingAction: 'Complete ownership and split sheet documentation' },
 ];
 
+const KPI_TOOLTIPS = {
+  grossRevenue: {
+    title: 'Gross Revenue',
+    what: 'Total income earned across all artists from placements, sync fees, and other revenue sources.',
+    why: 'Primary indicator of label revenue generation and artist commercial performance.',
+    how: 'SUM of all revenue_events.amount across the portfolio.',
+  },
+  pipelineValue: {
+    title: 'Pipeline Value',
+    what: 'Weighted value of all active placements based on their probability of completion.',
+    why: 'Forward-looking revenue indicator that helps forecast income and plan cash flow.',
+    how: 'Pending placements * 25% + Confirmed * 60% + Completed * 100% of expected_value.',
+  },
+  payableNow: {
+    title: 'Payable Now',
+    what: 'Amount currently owed to artists who have fully recouped their expenses.',
+    why: 'Critical for cash management and artist relationship health.',
+    how: 'For each fully-recouped artist: amount_applied_to_recoupment - total_expenses.',
+  },
+  atRiskRevenue: {
+    title: 'At-Risk Revenue',
+    what: 'Revenue from pending placements that may not materialize.',
+    why: 'Helps quantify downside exposure and prioritize follow-ups on uncertain deals.',
+    how: 'SUM of expected_value * 25% for all placements with status = pending.',
+  },
+  totalArtists: {
+    title: 'Total Artists',
+    what: 'Number of active artists currently managed on the platform.',
+    why: 'Roster size indicator reflecting label growth and capacity.',
+    how: 'COUNT of artists where is_deleted = false.',
+  },
+  activeProjects: {
+    title: 'Active Projects',
+    what: 'Projects currently in progress across all artists.',
+    why: 'Measures production throughput and team workload.',
+    how: 'COUNT of projects where status = in_progress and is_deleted = false.',
+  },
+  totalAssets: {
+    title: 'Total Assets',
+    what: 'Total number of audio assets (beats, stems, mixes, masters, samples) in the catalog.',
+    why: 'Catalog depth indicates licensing potential and production output.',
+    how: 'COUNT of assets where is_deleted = false.',
+  },
+  pendingPlacements: {
+    title: 'Pending Placements',
+    what: 'Placement opportunities awaiting confirmation or completion.',
+    why: 'Leading indicator of near-term revenue opportunities requiring follow-up.',
+    how: 'COUNT of placements where status = pending and is_deleted = false.',
+  },
+};
+
+function KpiTooltip({ kpiKey }) {
+  const [show, setShow] = useState(false);
+  const tip = KPI_TOOLTIPS[kpiKey];
+  if (!tip) return null;
+
+  return (
+    <span
+      style={{ position: 'relative', display: 'inline-block', marginLeft: '6px', cursor: 'help' }}
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+      onClick={() => setShow(!show)}
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
+      </svg>
+      {show && (
+        <div style={{
+          position: 'absolute',
+          bottom: '100%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          marginBottom: '8px',
+          width: '280px',
+          padding: '12px 14px',
+          background: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
+          borderRadius: 'var(--radius)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+          zIndex: 100,
+          fontSize: '12px',
+          lineHeight: '1.5',
+          color: 'var(--color-text)',
+          pointerEvents: 'none',
+        }}>
+          <div style={{ fontWeight: 600, marginBottom: '6px', color: 'var(--color-primary)' }}>{tip.title}</div>
+          <div style={{ marginBottom: '4px' }}><strong style={{ color: 'var(--color-text-secondary)' }}>What:</strong> {tip.what}</div>
+          <div style={{ marginBottom: '4px' }}><strong style={{ color: 'var(--color-text-secondary)' }}>Why:</strong> {tip.why}</div>
+          <div><strong style={{ color: 'var(--color-text-secondary)' }}>How:</strong> {tip.how}</div>
+        </div>
+      )}
+    </span>
+  );
+}
+
 function getScoreBarColor(value, max) {
   if (value === max) return 'var(--color-success)';
   if (value > 0) return 'var(--color-warning)';
@@ -458,25 +555,25 @@ export default function DashboardPage() {
       <div className="summary-cards">
         <Link to="/artists" style={{ textDecoration: 'none', color: 'inherit' }}>
           <div className="summary-card" style={{ cursor: 'pointer' }}>
-            <div className="summary-card__label">Total Artists</div>
+            <div className="summary-card__label">Total Artists<KpiTooltip kpiKey="totalArtists" /></div>
             <div className="summary-card__value">{totalArtists}</div>
           </div>
         </Link>
         <Link to="/projects" style={{ textDecoration: 'none', color: 'inherit' }}>
           <div className="summary-card" style={{ cursor: 'pointer' }}>
-            <div className="summary-card__label">Active Projects</div>
+            <div className="summary-card__label">Active Projects<KpiTooltip kpiKey="activeProjects" /></div>
             <div className="summary-card__value">{activeProjects}</div>
           </div>
         </Link>
         <Link to="/port/assets" style={{ textDecoration: 'none', color: 'inherit' }}>
           <div className="summary-card" style={{ cursor: 'pointer' }}>
-            <div className="summary-card__label">Total Assets</div>
+            <div className="summary-card__label">Total Assets<KpiTooltip kpiKey="totalAssets" /></div>
             <div className="summary-card__value">{totalAssets}</div>
           </div>
         </Link>
         <Link to="/port/placements" style={{ textDecoration: 'none', color: 'inherit' }}>
           <div className="summary-card" style={{ cursor: 'pointer' }}>
-            <div className="summary-card__label">Pending Placements</div>
+            <div className="summary-card__label">Pending Placements<KpiTooltip kpiKey="pendingPlacements" /></div>
             <div className="summary-card__value">{pendingPlacements}</div>
           </div>
         </Link>
@@ -486,25 +583,48 @@ export default function DashboardPage() {
       {isElevated && (
         <div className="summary-cards mt-16">
           <div className="summary-card">
-            <div className="summary-card__label">Gross Revenue</div>
+            <div className="summary-card__label">Gross Revenue<KpiTooltip kpiKey="grossRevenue" /></div>
             <div className="summary-card__value">{formatCurrency(kpi.grossRevenue)}</div>
+            <div style={{ fontSize: '11px', color: 'var(--color-success)', marginTop: '4px' }}>High confidence</div>
           </div>
           <div className="summary-card">
-            <div className="summary-card__label">Pipeline Value</div>
+            <div className="summary-card__label">Pipeline Value<KpiTooltip kpiKey="pipelineValue" /></div>
             <div className="summary-card__value">{formatCurrency(kpi.pipelineValue)}</div>
+            <div style={{ fontSize: '11px', color: 'var(--color-warning)', marginTop: '4px' }}>Medium confidence</div>
           </div>
           <div className="summary-card">
-            <div className="summary-card__label">Payable Now</div>
+            <div className="summary-card__label">Payable Now<KpiTooltip kpiKey="payableNow" /></div>
             <div className="summary-card__value" style={{ color: kpi.payableNow > 0 ? '#22c55e' : 'inherit' }}>
               {formatCurrency(kpi.payableNow)}
             </div>
+            <div style={{ fontSize: '11px', color: 'var(--color-success)', marginTop: '4px' }}>High confidence</div>
           </div>
           <div className="summary-card">
-            <div className="summary-card__label">At-Risk</div>
+            <div className="summary-card__label">At-Risk<KpiTooltip kpiKey="atRiskRevenue" /></div>
             <div className="summary-card__value" style={{ color: kpi.atRiskRevenue > 0 ? '#ef4444' : 'inherit' }}>
               {formatCurrency(kpi.atRiskRevenue)}
             </div>
+            <div style={{ fontSize: '11px', color: 'var(--color-danger)', marginTop: '4px' }}>Low confidence</div>
           </div>
+        </div>
+      )}
+
+      {/* Quick Views */}
+      {isElevated && (
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', margin: '16px 0' }}>
+          <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: '32px' }}>Quick Views:</span>
+          <button className="btn btn-secondary btn-sm" onClick={() => {/* scroll to health scores, filter at-risk */}}>
+            At-Risk Artists
+          </button>
+          <button className="btn btn-secondary btn-sm" onClick={() => navigate('/business')}>
+            Unrecouped Exposure
+          </button>
+          <button className="btn btn-secondary btn-sm" onClick={() => navigate('/port/assets')}>
+            Metadata Gaps
+          </button>
+          <button className="btn btn-secondary btn-sm" onClick={() => navigate('/analytics')}>
+            Revenue Trends
+          </button>
         </div>
       )}
 
