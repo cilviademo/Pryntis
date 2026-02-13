@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pryntis Panel — Interactive Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Pryntis Panel — Self-Contained Demo
+   Exact replica of the live app theme
+   ============================================================ */
+
+:root {
+  --color-bg: #0c0e14;
+  --color-surface: #151820;
+  --color-surface-2: #1c2030;
+  --color-surface-hover: #222738;
+  --color-border: #2a2f42;
+  --color-text: #e8eaf0;
+  --color-text-secondary: #8890a8;
+  --color-text-muted: #5a6180;
+  --color-primary: #6366f1;
+  --color-primary-hover: #5558e0;
+  --color-primary-light: rgba(99, 102, 241, 0.12);
+  --color-success: #22c55e;
+  --color-success-light: rgba(34, 197, 94, 0.12);
+  --color-warning: #f59e0b;
+  --color-warning-light: rgba(245, 158, 11, 0.12);
+  --color-danger: #ef4444;
+  --color-danger-light: rgba(239, 68, 68, 0.12);
+  --color-info: #3b82f6;
+  --color-info-light: rgba(59, 130, 246, 0.12);
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: var(--font);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--color-primary); text-decoration: none; }
+a:hover { color: var(--color-primary-hover); }
+button { cursor: pointer; font-family: var(--font); }
+h1,h2,h3,h4,h5,h6 { line-height: 1.3; font-weight: 600; }
+::selection { background: var(--color-primary); color: #fff; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+
+/* LAYOUT */
+.layout { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 248px; background: var(--color-surface); border-right: 1px solid var(--color-border);
+  display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+}
+.sidebar-header { padding: 24px 20px 20px; border-bottom: 1px solid var(--color-border); }
+.sidebar-brand { font-size: 22px; font-weight: 700; color: var(--color-primary); letter-spacing: -0.5px; }
+.sidebar-subtitle { display: block; font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 2.5px; margin-top: 2px; }
+.sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; }
+.nav-section-label { font-size: 10px; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1.5px; padding: 16px 12px 6px; }
+.nav-section-label:first-child { padding-top: 4px; }
+.nav-link {
+  display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius-sm);
+  color: var(--color-text-secondary); font-size: 13.5px; font-weight: 500; transition: background 0.15s, color 0.15s;
+  text-decoration: none; border: none; background: none; width: 100%; text-align: left;
+}
+.nav-link:hover { background: var(--color-surface-hover); color: var(--color-text); }
+.nav-link.active { background: var(--color-primary-light); color: var(--color-primary); font-weight: 600; }
+.sidebar-footer { padding: 16px; border-top: 1px solid var(--color-border); }
+.user-details { display: flex; flex-direction: column; margin-bottom: 12px; }
+.user-name { font-size: 13px; font-weight: 600; color: var(--color-text); }
+.user-role-badge {
+  display: inline-block; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 2px 6px; border-radius: 4px; background: var(--color-primary-light); color: var(--color-primary);
+  width: fit-content; margin-top: 2px;
+}
+.logout-btn {
+  background: none; border: 1px solid var(--color-border); color: var(--color-text-secondary);
+  padding: 7px 12px; border-radius: var(--radius-sm); font-size: 12.5px; font-weight: 500; width: 100%;
+  transition: all 0.15s;
+}
+.logout-btn:hover { background: var(--color-danger-light); border-color: var(--color-danger); color: var(--color-danger); }
+
+.main-content { flex: 1; margin-left: 248px; padding: 32px; min-height: 100vh; }
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 16px; }
+.page-header h2 { font-size: 24px; font-weight: 700; }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 16px; border-radius: var(--radius); font-size: 13.5px; font-weight: 500;
+  border: none; transition: all 0.15s; white-space: nowrap;
+}
+.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary:hover { background: var(--color-primary-hover); }
+.btn-secondary { background: var(--color-surface-2); color: var(--color-text); border: 1px solid var(--color-border); }
+.btn-secondary:hover { background: var(--color-surface-hover); }
+.btn-sm { padding: 5px 10px; font-size: 12.5px; border-radius: var(--radius-sm); }
+
+/* SUMMARY CARDS */
+.summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.summary-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 20px; transition: border-color 0.15s; }
+.summary-card:hover { border-color: var(--color-text-muted); }
+.summary-card__label { font-size: 12.5px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 8px; }
+.summary-card__value { font-size: 28px; font-weight: 700; color: var(--color-text); letter-spacing: -0.5px; }
+
+/* DATA TABLE */
+.data-table-wrapper { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); overflow: hidden; }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th { text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid var(--color-border); background: var(--color-surface); white-space: nowrap; }
+.data-table td { padding: 11px 16px; font-size: 13.5px; border-bottom: 1px solid var(--color-border); color: var(--color-text); }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tbody tr { transition: background 0.1s; }
+.data-table tbody tr:hover td { background: var(--color-surface-hover); }
+.data-table a { color: var(--color-text); font-weight: 500; }
+.data-table a:hover { color: var(--color-primary); }
+
+/* BADGES */
+.badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 600; text-transform: capitalize; white-space: nowrap; }
+.badge--active, .badge--completed { background: var(--color-success-light); color: var(--color-success); }
+.badge--inactive, .badge--declined { background: var(--color-danger-light); color: var(--color-danger); }
+.badge--archived { background: rgba(90,97,128,0.15); color: var(--color-text-secondary); }
+.badge--draft, .badge--pending { background: var(--color-warning-light); color: var(--color-warning); }
+.badge--in_progress, .badge--scheduled { background: var(--color-info-light); color: var(--color-info); }
+.badge--high { background: var(--color-danger-light); color: var(--color-danger); }
+.badge--medium { background: var(--color-warning-light); color: var(--color-warning); }
+.badge--low { background: var(--color-info-light); color: var(--color-info); }
+
+/* FILTER BAR */
+.filter-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.filter-bar input, .filter-bar select {
+  padding: 8px 12px; background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius); color: var(--color-text); font-size: 13.5px; outline: none;
+}
+.filter-bar input { flex: 1; min-width: 200px; max-width: 320px; }
+.filter-bar input::placeholder { color: var(--color-text-muted); }
+.filter-bar input:focus, .filter-bar select:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-light); }
+.filter-bar select { cursor: pointer; }
+
+/* CARD & DETAIL */
+.card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
+.detail-section { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
+.detail-section h3 { font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--color-text); }
+
+/* PAGINATION */
+.pagination { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; font-size: 13px; color: var(--color-text-secondary); }
+
+/* CHART (CSS-only) */
+.chart-bars { display: flex; align-items: flex-end; gap: 16px; height: 200px; padding: 16px 0; }
+.chart-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
+.chart-bar { width: 100%; border-radius: 4px 4px 0 0; transition: opacity 0.2s; min-height: 4px; }
+.chart-bar:hover { opacity: 0.8; }
+.chart-bar-label { font-size: 11px; color: var(--color-text-muted); text-transform: capitalize; }
+.chart-bar-value { font-size: 12px; font-weight: 600; color: var(--color-text-secondary); }
+
+.chart-donut { display: flex; align-items: center; gap: 24px; padding: 16px 0; }
+.donut-ring { width: 140px; height: 140px; border-radius: 50%; position: relative; flex-shrink: 0; }
+.donut-ring::after {
+  content: ''; position: absolute; top: 30px; left: 30px; right: 30px; bottom: 30px;
+  background: var(--color-surface); border-radius: 50%;
+}
+.donut-legend { display: flex; flex-direction: column; gap: 8px; }
+.donut-legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--color-text-secondary); }
+.donut-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* KANBAN */
+.kanban-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.kanban-col { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 16px; min-height: 200px; }
+.kanban-col-header { font-size: 12px; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px; display: flex; justify-content: space-between; }
+.kanban-col-count { background: var(--color-surface-2); padding: 1px 8px; border-radius: 10px; font-size: 11px; }
+.kanban-card { background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 8px; }
+.kanban-card-title { font-size: 13px; font-weight: 500; color: var(--color-text); margin-bottom: 4px; }
+.kanban-card-sub { font-size: 11px; color: var(--color-text-muted); }
+
+/* PAGE SECTIONS */
+.page-section { display: none; }
+.page-section.active { display: block; }
+
+/* TOAST DEMO */
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast { padding: 12px 20px; border-radius: var(--radius); font-size: 14px; font-weight: 500; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.4); animation: toast-in 0.25s ease-out; pointer-events: auto; }
+.toast--success { background: var(--color-success); }
+@keyframes toast-in { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+
+/* DEMO BANNER */
+.demo-banner {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  background: linear-gradient(135deg, var(--color-primary), #8b5cf6);
+  color: #fff; text-align: center; padding: 10px 24px; font-size: 13px; font-weight: 500;
+}
+.demo-banner a { color: #fff; text-decoration: underline; }
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main-content { margin-left: 0; padding: 20px; }
+  .summary-cards { grid-template-columns: repeat(2, 1fr); }
+  .kanban-board { grid-template-columns: 1fr 1fr; }
+  .chart-grid-3 { grid-template-columns: 1fr !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1 class="sidebar-brand">Pryntis</h1>
+      <span class="sidebar-subtitle">Panel</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Core</div>
+      <button class="nav-link active" onclick="showPage('dashboard')">Dashboard</button>
+      <button class="nav-link" onclick="showPage('artists')">Artists</button>
+      <button class="nav-link" onclick="showPage('projects')">Projects</button>
+
+      <div class="nav-section-label">Pass</div>
+      <button class="nav-link" onclick="showPage('subscriptions')">Subscriptions</button>
+
+      <div class="nav-section-label">Port</div>
+      <button class="nav-link" onclick="showPage('assets')">Assets</button>
+      <button class="nav-link" onclick="showPage('placements')">Placements</button>
+
+      <div class="nav-section-label">Ops</div>
+      <button class="nav-link" onclick="showPage('tasks')">Tasks</button>
+      <button class="nav-link" onclick="showPage('analytics')">Analytics</button>
+
+      <div class="nav-section-label">Admin</div>
+      <button class="nav-link" onclick="showPage('users')">Users</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-details">
+        <span class="user-name">Marcus Admin</span>
+        <span class="user-role-badge">admin</span>
+      </div>
+      <button class="logout-btn">Log out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content" style="padding-bottom: 60px;">
+
+    <!-- ====== DASHBOARD ====== -->
+    <div id="page-dashboard" class="page-section active">
+      <div class="page-header"><h2>Dashboard</h2></div>
+
+      <div class="summary-cards">
+        <div class="summary-card">
+          <div class="summary-card__label">Total Artists</div>
+          <div class="summary-card__value">35</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card__label">Active Projects</div>
+          <div class="summary-card__value">12</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card__label">Total Assets</div>
+          <div class="summary-card__value">89</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card__label">Pending Placements</div>
+          <div class="summary-card__value">7</div>
+        </div>
+      </div>
+
+      <div class="chart-grid-3" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+        <!-- Bar Chart -->
+        <div class="card">
+          <h3 style="margin-bottom: 16px;">Projects by Status</h3>
+          <div class="chart-bars">
+            <div class="chart-bar-col">
+              <div class="chart-bar-value">4</div>
+              <div class="chart-bar" style="height: 33%; background: var(--color-warning);"></div>
+              <div class="chart-bar-label">draft</div>
+            </div>
+            <div class="chart-bar-col">
+              <div class="chart-bar-value">12</div>
+              <div class="chart-bar" style="height: 100%; background: var(--color-info);"></div>
+              <div class="chart-bar-label">in progress</div>
+            </div>
+            <div class="chart-bar-col">
+              <div class="chart-bar-value">8</div>
+              <div class="chart-bar" style="height: 67%; background: var(--color-success);"></div>
+              <div class="chart-bar-label">completed</div>
+            </div>
+            <div class="chart-bar-col">
+              <div class="chart-bar-value">3</div>
+              <div class="chart-bar" style="height: 25%; background: var(--color-text-muted);"></div>
+              <div class="chart-bar-label">archived</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Donut: Artists -->
+        <div class="card">
+          <h3 style="margin-bottom: 16px;">Artists by Status</h3>
+          <div class="chart-donut">
+            <div class="donut-ring" style="background: conic-gradient(var(--color-success) 0deg 257deg, var(--color-danger) 257deg 309deg, var(--color-text-muted) 309deg 360deg);"></div>
+            <div class="donut-legend">
+              <div class="donut-legend-item"><div class="donut-dot" style="background:var(--color-success)"></div>Active (25)</div>
+              <div class="donut-legend-item"><div class="donut-dot" style="background:var(--color-danger)"></div>Inactive (5)</div>
+              <div class="donut-legend-item"><div class="donut-dot" style="background:var(--color-text-muted)"></div>Archived (5)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Donut: Subscriptions -->
+        <div class="card">
+          <h3 style="margin-bottom: 16px;">Subscription Distribution</h3>
+          <div class="chart-donut">
+            <div class="donut-ring" style="background: conic-gradient(#6c63ff 0deg 144deg, var(--color-info) 144deg 252deg, var(--color-success) 252deg 324deg, var(--color-warning) 324deg 360deg);"></div>
+            <div class="donut-legend">
+              <div class="donut-legend-item"><div class="donut-dot" style="background:#6c63ff"></div>Free (12)</div>
+              <div class="donut-legend-item"><div class="donut-dot" style="background:var(--color-info)"></div>Pro (9)</div>
+              <div class="donut-legend-item"><div class="donut-dot" style="background:var(--color-success)"></div>Premium (6)</div>
+              <div class="donut-legend-item"><div class="donut-dot" style="background:var(--color-warning)"></div>Enterprise (3)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+        <div class="detail-section">
+          <h3>Recent Activity</h3>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead><tr><th>Event</th><th>Summary</th><th>When</th></tr></thead>
+              <tbody>
+                <tr><td><span class="badge badge--active">artist created</span></td><td>New artist "MVRK" added to roster</td><td>2/13/2026</td></tr>
+                <tr><td><span class="badge badge--in_progress">project updated</span></td><td>Midnight Sessions moved to in-progress</td><td>2/12/2026</td></tr>
+                <tr><td><span class="badge badge--active">asset published</span></td><td>Neon Dreams cover art uploaded</td><td>2/12/2026</td></tr>
+                <tr><td><span class="badge badge--pending">placement pending</span></td><td>Spotify editorial submission for Wave</td><td>2/11/2026</td></tr>
+                <tr><td><span class="badge badge--active">subscription created</span></td><td>New Pro subscriber: Jordan Riley</td><td>2/11/2026</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="detail-section">
+          <h3>Next Actions</h3>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead><tr><th>Task</th><th>Priority</th><th>Due</th></tr></thead>
+              <tbody>
+                <tr><td>Review MVRK contract</td><td><span class="badge badge--high">high</span></td><td>2/14/2026</td></tr>
+                <tr><td>Finalize cover art</td><td><span class="badge badge--medium">medium</span></td><td>2/15/2026</td></tr>
+                <tr><td>Submit to playlists</td><td><span class="badge badge--high">high</span></td><td>2/16/2026</td></tr>
+                <tr><td>Update artist bios</td><td><span class="badge badge--low">low</span></td><td>2/20/2026</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== ARTISTS ====== -->
+    <div id="page-artists" class="page-section">
+      <div class="page-header">
+        <h2>Artists</h2>
+        <button class="btn btn-primary" onclick="showToast('Demo mode — Artist creation disabled')">Add Artist</button>
+      </div>
+      <div class="filter-bar">
+        <input placeholder="Search artists..." />
+        <select><option>All Statuses</option><option>Active</option><option>Inactive</option><option>Archived</option></select>
+        <select><option>All Genres</option><option>Hip-Hop</option><option>R&B</option><option>Pop</option><option>Electronic</option><option>Jazz</option></select>
+      </div>
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Stage Name</th><th>Genre</th><th>Status</th><th>Email</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td><a href="#">Marcus Williams</a></td><td>MVRK</td><td>Hip-Hop</td><td><span class="badge badge--active">active</span></td><td>mvrk@pryntis.io</td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+            <tr><td><a href="#">Aria Chen</a></td><td>ARIA</td><td>R&B</td><td><span class="badge badge--active">active</span></td><td>aria@pryntis.io</td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+            <tr><td><a href="#">Jordan Riley</a></td><td>J.RILEY</td><td>Pop</td><td><span class="badge badge--active">active</span></td><td>jriley@pryntis.io</td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+            <tr><td><a href="#">Kai Nakamura</a></td><td>KAIZEN</td><td>Electronic</td><td><span class="badge badge--in_progress">in progress</span></td><td>kai@pryntis.io</td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+            <tr><td><a href="#">Elena Vasquez</a></td><td>LENA V</td><td>Latin</td><td><span class="badge badge--active">active</span></td><td>elena@pryntis.io</td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+            <tr><td><a href="#">Devon Clarke</a></td><td>DEVO</td><td>Jazz</td><td><span class="badge badge--inactive">inactive</span></td><td>devon@pryntis.io</td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+            <tr><td><a href="#">Simone Okafor</a></td><td>SIMI</td><td>Afrobeats</td><td><span class="badge badge--active">active</span></td><td>simi@pryntis.io</td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination"><span>Showing 7 results</span><div><button class="btn btn-secondary btn-sm" disabled>Previous</button><span style="margin:0 12px">Page 1</span><button class="btn btn-secondary btn-sm">Next</button></div></div>
+    </div>
+
+    <!-- ====== PROJECTS ====== -->
+    <div id="page-projects" class="page-section">
+      <div class="page-header">
+        <h2>Projects</h2>
+        <button class="btn btn-primary" onclick="showToast('Demo mode — Project creation disabled')">Add Project</button>
+      </div>
+      <div class="filter-bar">
+        <input placeholder="Search projects..." />
+        <select><option>All Statuses</option><option>Draft</option><option>In Progress</option><option>Completed</option></select>
+        <select><option>Recently Updated</option><option>Recently Created</option><option>Title A-Z</option></select>
+      </div>
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead><tr><th>Title</th><th>Artist</th><th>Status</th><th>Start Date</th><th>Target</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td><a href="#">Midnight Sessions EP</a></td><td><a href="#">MVRK</a></td><td><span class="badge badge--in_progress">in progress</span></td><td>1/15/2026</td><td>3/1/2026</td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+            <tr><td><a href="#">Neon Dreams Album</a></td><td><a href="#">ARIA</a></td><td><span class="badge badge--in_progress">in progress</span></td><td>12/1/2025</td><td>4/15/2026</td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+            <tr><td><a href="#">Summer Vibes Single</a></td><td><a href="#">J.RILEY</a></td><td><span class="badge badge--completed">completed</span></td><td>11/10/2025</td><td>1/20/2026</td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+            <tr><td><a href="#">Synth Wave Collection</a></td><td><a href="#">KAIZEN</a></td><td><span class="badge badge--draft">draft</span></td><td>--</td><td>5/1/2026</td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+            <tr><td><a href="#">Fuego Mixtape</a></td><td><a href="#">LENA V</a></td><td><span class="badge badge--in_progress">in progress</span></td><td>2/1/2026</td><td>4/30/2026</td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+            <tr><td><a href="#">Blue Note Sessions</a></td><td><a href="#">DEVO</a></td><td><span class="badge badge--archived">archived</span></td><td>6/1/2025</td><td>9/1/2025</td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination"><span>Showing 6 results</span><div><button class="btn btn-secondary btn-sm" disabled>Previous</button><span style="margin:0 12px">Page 1</span><button class="btn btn-secondary btn-sm">Next</button></div></div>
+    </div>
+
+    <!-- ====== SUBSCRIPTIONS ====== -->
+    <div id="page-subscriptions" class="page-section">
+      <div class="page-header"><h2>Subscriptions</h2><button class="btn btn-primary">Add Subscription</button></div>
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead><tr><th>Subscriber</th><th>Tier</th><th>Status</th><th>Start Date</th><th>End Date</th></tr></thead>
+          <tbody>
+            <tr><td>Jordan Riley</td><td><span class="badge badge--active">Pro</span></td><td><span class="badge badge--active">active</span></td><td>1/1/2026</td><td>1/1/2027</td></tr>
+            <tr><td>Marcus Williams</td><td><span class="badge badge--in_progress">Premium</span></td><td><span class="badge badge--active">active</span></td><td>12/15/2025</td><td>12/15/2026</td></tr>
+            <tr><td>Kai Nakamura</td><td><span class="badge badge--draft">Free</span></td><td><span class="badge badge--active">active</span></td><td>2/1/2026</td><td>--</td></tr>
+            <tr><td>Elena Vasquez</td><td><span class="badge badge--active">Pro</span></td><td><span class="badge badge--pending">pending</span></td><td>2/10/2026</td><td>2/10/2027</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ====== ASSETS ====== -->
+    <div id="page-assets" class="page-section">
+      <div class="page-header"><h2>Assets</h2><button class="btn btn-primary">Add Asset</button></div>
+      <div class="filter-bar">
+        <input placeholder="Search assets..." />
+        <select><option>All Types</option><option>master</option><option>cover_art</option><option>music_video</option><option>press_photo</option></select>
+      </div>
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead><tr><th>Title</th><th>Type</th><th>Artist</th><th>Status</th><th>Format</th></tr></thead>
+          <tbody>
+            <tr><td><a href="#">Midnight Sessions Master</a></td><td>master</td><td>MVRK</td><td><span class="badge badge--active">published</span></td><td>WAV</td></tr>
+            <tr><td><a href="#">Neon Dreams Cover Art</a></td><td>cover_art</td><td>ARIA</td><td><span class="badge badge--active">published</span></td><td>PNG</td></tr>
+            <tr><td><a href="#">Summer Vibes MV</a></td><td>music_video</td><td>J.RILEY</td><td><span class="badge badge--completed">completed</span></td><td>MP4</td></tr>
+            <tr><td><a href="#">MVRK Press Photo Set</a></td><td>press_photo</td><td>MVRK</td><td><span class="badge badge--draft">draft</span></td><td>JPG</td></tr>
+            <tr><td><a href="#">Fuego Single Master</a></td><td>master</td><td>LENA V</td><td><span class="badge badge--in_progress">processing</span></td><td>FLAC</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ====== PLACEMENTS ====== -->
+    <div id="page-placements" class="page-section">
+      <div class="page-header"><h2>Placements</h2><button class="btn btn-primary">Add Placement</button></div>
+      <div class="kanban-board">
+        <div class="kanban-col">
+          <div class="kanban-col-header">Pending <span class="kanban-col-count">3</span></div>
+          <div class="kanban-card"><div class="kanban-card-title">Spotify Editorial — Wave</div><div class="kanban-card-sub">MVRK &bull; Submitted 2/11</div></div>
+          <div class="kanban-card"><div class="kanban-card-title">Apple Music Feature</div><div class="kanban-card-sub">ARIA &bull; Submitted 2/10</div></div>
+          <div class="kanban-card"><div class="kanban-card-title">TikTok Sound Push</div><div class="kanban-card-sub">J.RILEY &bull; Submitted 2/9</div></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-col-header">Scheduled <span class="kanban-col-count">2</span></div>
+          <div class="kanban-card"><div class="kanban-card-title">YouTube Music Premiere</div><div class="kanban-card-sub">KAIZEN &bull; Mar 1</div></div>
+          <div class="kanban-card"><div class="kanban-card-title">SoundCloud Feature</div><div class="kanban-card-sub">DEVO &bull; Feb 28</div></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-col-header">Confirmed <span class="kanban-col-count">2</span></div>
+          <div class="kanban-card"><div class="kanban-card-title">Spotify RapCaviar</div><div class="kanban-card-sub">MVRK &bull; Feb 20</div></div>
+          <div class="kanban-card"><div class="kanban-card-title">Tidal Rising Artist</div><div class="kanban-card-sub">LENA V &bull; Feb 18</div></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-col-header">Completed <span class="kanban-col-count">2</span></div>
+          <div class="kanban-card"><div class="kanban-card-title">Deezer Playlist Add</div><div class="kanban-card-sub">SIMI &bull; Jan 28</div></div>
+          <div class="kanban-card"><div class="kanban-card-title">Amazon Music Editorial</div><div class="kanban-card-sub">ARIA &bull; Jan 15</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== TASKS ====== -->
+    <div id="page-tasks" class="page-section">
+      <div class="page-header"><h2>Tasks</h2><button class="btn btn-primary">Add Task</button></div>
+      <div class="filter-bar">
+        <input placeholder="Search tasks..." />
+        <select><option>All Statuses</option><option>Open</option><option>In Progress</option><option>Completed</option></select>
+        <select><option>All Priorities</option><option>High</option><option>Medium</option><option>Low</option></select>
+      </div>
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead><tr><th>Task</th><th>Assigned To</th><th>Priority</th><th>Status</th><th>Due Date</th></tr></thead>
+          <tbody>
+            <tr><td>Review MVRK contract terms</td><td>Marcus Admin</td><td><span class="badge badge--high">high</span></td><td><span class="badge badge--draft">open</span></td><td>2/14/2026</td></tr>
+            <tr><td>Finalize Neon Dreams cover art</td><td>Sarah Manager</td><td><span class="badge badge--medium">medium</span></td><td><span class="badge badge--in_progress">in progress</span></td><td>2/15/2026</td></tr>
+            <tr><td>Submit Summer Vibes to playlists</td><td>Marcus Admin</td><td><span class="badge badge--high">high</span></td><td><span class="badge badge--draft">open</span></td><td>2/16/2026</td></tr>
+            <tr><td>Update all artist bios for Q1</td><td>Alex Viewer</td><td><span class="badge badge--low">low</span></td><td><span class="badge badge--draft">open</span></td><td>2/20/2026</td></tr>
+            <tr><td>Prepare Q1 royalty reports</td><td>Sarah Manager</td><td><span class="badge badge--medium">medium</span></td><td><span class="badge badge--in_progress">in progress</span></td><td>2/28/2026</td></tr>
+            <tr><td>Onboard new artist DEVO</td><td>Marcus Admin</td><td><span class="badge badge--medium">medium</span></td><td><span class="badge badge--active">completed</span></td><td>2/5/2026</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ====== ANALYTICS ====== -->
+    <div id="page-analytics" class="page-section">
+      <div class="page-header"><h2>Analytics</h2></div>
+      <div class="summary-cards">
+        <div class="summary-card"><div class="summary-card__label">Avg. Project Duration</div><div class="summary-card__value">47d</div></div>
+        <div class="summary-card"><div class="summary-card__label">Placement Success Rate</div><div class="summary-card__value">68%</div></div>
+        <div class="summary-card"><div class="summary-card__label">Active Subscribers</div><div class="summary-card__value">30</div></div>
+        <div class="summary-card"><div class="summary-card__label">Tasks Completed (MTD)</div><div class="summary-card__value">24</div></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div class="card">
+          <h3 style="margin-bottom: 16px;">Monthly Placements</h3>
+          <div class="chart-bars">
+            <div class="chart-bar-col"><div class="chart-bar-value">5</div><div class="chart-bar" style="height:42%;background:var(--color-primary)"></div><div class="chart-bar-label">Oct</div></div>
+            <div class="chart-bar-col"><div class="chart-bar-value">8</div><div class="chart-bar" style="height:67%;background:var(--color-primary)"></div><div class="chart-bar-label">Nov</div></div>
+            <div class="chart-bar-col"><div class="chart-bar-value">6</div><div class="chart-bar" style="height:50%;background:var(--color-primary)"></div><div class="chart-bar-label">Dec</div></div>
+            <div class="chart-bar-col"><div class="chart-bar-value">12</div><div class="chart-bar" style="height:100%;background:var(--color-primary)"></div><div class="chart-bar-label">Jan</div></div>
+            <div class="chart-bar-col"><div class="chart-bar-value">9</div><div class="chart-bar" style="height:75%;background:var(--color-primary)"></div><div class="chart-bar-label">Feb</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom: 16px;">Revenue by Tier</h3>
+          <div class="chart-donut">
+            <div class="donut-ring" style="background: conic-gradient(var(--color-success) 0deg 180deg, var(--color-info) 180deg 288deg, var(--color-warning) 288deg 342deg, var(--color-text-muted) 342deg 360deg);"></div>
+            <div class="donut-legend">
+              <div class="donut-legend-item"><div class="donut-dot" style="background:var(--color-success)"></div>Premium ($4,200)</div>
+              <div class="donut-legend-item"><div class="donut-dot" style="background:var(--color-info)"></div>Pro ($2,520)</div>
+              <div class="donut-legend-item"><div class="donut-dot" style="background:var(--color-warning)"></div>Enterprise ($1,260)</div>
+              <div class="donut-legend-item"><div class="donut-dot" style="background:var(--color-text-muted)"></div>Free ($0)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== USERS ====== -->
+    <div id="page-users" class="page-section">
+      <div class="page-header"><h2>Users</h2><button class="btn btn-primary">Add User</button></div>
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td>Marcus Admin</td><td>admin@pryntis.io</td><td><span class="badge" style="background:var(--color-primary-light);color:var(--color-primary)">admin</span></td><td><span class="badge badge--active">active</span></td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+            <tr><td>Sarah Manager</td><td>manager@pryntis.io</td><td><span class="badge" style="background:var(--color-info-light);color:var(--color-info)">manager</span></td><td><span class="badge badge--active">active</span></td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+            <tr><td>Alex Viewer</td><td>viewer@pryntis.io</td><td><span class="badge" style="background:rgba(90,97,128,0.15);color:var(--color-text-secondary)">viewer</span></td><td><span class="badge badge--active">active</span></td><td><button class="btn btn-secondary btn-sm">Edit</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- Demo banner -->
+<div class="demo-banner">
+  This is a static demo of <strong>Pryntis Panel</strong> — no server required. The live app has full CRUD, auth, real-time data, and PostgreSQL.
+</div>
+
+<script>
+// Page navigation
+function showPage(page) {
+  document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Toast notifications
+function showToast(msg) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast toast--success';
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
+}
+</script>
+
+</body>
+</html>

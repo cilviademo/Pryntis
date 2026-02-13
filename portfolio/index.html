@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pryntis Panel — Portfolio Showcase</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0e14;
+  --surface: #151820;
+  --border: #2a2f42;
+  --text: #e8eaf0;
+  --text-secondary: #8890a8;
+  --text-muted: #5a6180;
+  --primary: #6366f1;
+  --primary-hover: #5558e0;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+  --danger: #ef4444;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+a { color: var(--primary); text-decoration: none; }
+a:hover { color: var(--primary-hover); }
+::selection { background: var(--primary); color: #fff; }
+
+/* HERO */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 60px 24px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.15) 0%, transparent 60%);
+}
+.hero-badge {
+  display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1.5px; color: var(--primary);
+  background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.25); margin-bottom: 24px;
+}
+.hero h1 { font-size: clamp(40px, 6vw, 72px); font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; }
+.hero h1 span { color: var(--primary); }
+.hero-sub { font-size: 18px; color: var(--text-secondary); max-width: 600px; margin: 0 auto 40px; }
+.hero-actions { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px;
+  border-radius: 10px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s;
+}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+.btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-outline:hover { border-color: var(--text-muted); background: var(--surface); }
+
+/* SECTION */
+.section { padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
+.section-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
+  color: var(--primary); margin-bottom: 12px;
+}
+.section h2 { font-size: 32px; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.5px; }
+.section-sub { font-size: 16px; color: var(--text-secondary); max-width: 600px; margin-bottom: 40px; }
+
+/* FEATURE GRID */
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.feature-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.feature-card:hover { border-color: var(--text-muted); transform: translateY(-2px); }
+.feature-icon { font-size: 28px; margin-bottom: 16px; }
+.feature-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+.feature-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+/* TECH STACK */
+.tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.tech-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px;
+  display: flex; align-items: center; gap: 16px;
+}
+.tech-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.tech-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.tech-card p { font-size: 12px; color: var(--text-muted); }
+
+/* ARCHITECTURE */
+.arch-diagram {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 40px; display: flex; justify-content: center; align-items: center; gap: 32px; flex-wrap: wrap;
+}
+.arch-box {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px 28px;
+  text-align: center; min-width: 160px;
+}
+.arch-box-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 6px; }
+.arch-box-value { font-size: 16px; font-weight: 600; }
+.arch-arrow { font-size: 24px; color: var(--text-muted); }
+
+/* METRICS */
+.metric-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px; }
+.metric {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 24px; text-align: center;
+}
+.metric-value { font-size: 36px; font-weight: 800; letter-spacing: -1px; color: var(--text); }
+.metric-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
+/* DEMO SCREENSHOT PLACEHOLDER */
+.screenshot-placeholder {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 60px 24px; text-align: center; color: var(--text-muted); font-size: 14px;
+  margin-bottom: 24px;
+}
+
+/* FOOTER */
+.footer {
+  text-align: center; padding: 40px 24px; border-top: 1px solid var(--border);
+  color: var(--text-muted); font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .metric-row { grid-template-columns: 1fr 1fr; }
+  .arch-diagram { flex-direction: column; }
+  .arch-arrow { transform: rotate(90deg); }
+}
+</style>
+</head>
+<body>
+
+<!-- ====== HERO ====== -->
+<section class="hero">
+  <div class="hero-badge">Full-Stack Capstone Project</div>
+  <h1><span>Pryntis</span> Panel</h1>
+  <p class="hero-sub">
+    A production-grade administrative dashboard for music production operations.
+    Built with React, Express, and PostgreSQL.
+  </p>
+  <div class="hero-actions">
+    <a href="../demo/index.html" class="btn btn-primary">View Live Demo</a>
+    <a href="#features" class="btn btn-outline">Explore Features</a>
+  </div>
+</section>
+
+<!-- ====== METRICS ====== -->
+<div class="section">
+  <div class="metric-row">
+    <div class="metric"><div class="metric-value">12</div><div class="metric-label">Database Tables</div></div>
+    <div class="metric"><div class="metric-value">38</div><div class="metric-label">API Endpoints</div></div>
+    <div class="metric"><div class="metric-value">18</div><div class="metric-label">React Pages</div></div>
+    <div class="metric"><div class="metric-value">38</div><div class="metric-label">Tests Passing</div></div>
+  </div>
+</div>
+
+<!-- ====== FEATURES ====== -->
+<div id="features" class="section">
+  <div class="section-label">Features</div>
+  <h2>What It Does</h2>
+  <p class="section-sub">Four integrated modules managing the full lifecycle of music operations — from artist onboarding to playlist placement.</p>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon" style="color:var(--primary)">&#9881;</div>
+      <h3>Core Module</h3>
+      <p>Artist roster management and project tracking with full CRUD, search (full-text tsvector), filtering, pagination, and role-based access control.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="color:var(--success)">&#9733;</div>
+      <h3>Pass Module</h3>
+      <p>Subscription tier management with Stripe-ready architecture. Fan subscriptions, tier definitions, and subscriber analytics.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="color:var(--info)">&#9654;</div>
+      <h3>Port Module</h3>
+      <p>Digital asset portfolio and distribution placement tracking. Kanban board for placement status, asset metadata management.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="color:var(--warning)">&#9888;</div>
+      <h3>Ops Module</h3>
+      <p>Task management and KPI analytics. ECharts-powered dashboards, performance metrics, and operational reporting.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="color:var(--danger)">&#128274;</div>
+      <h3>Auth &amp; RBAC</h3>
+      <p>JWT authentication with session persistence, role-based access (admin/manager/viewer), protected routes, and secure password hashing with bcrypt.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="color:var(--text-secondary)">&#9889;</div>
+      <h3>Production Hardening</h3>
+      <p>Error boundaries, toast notifications, search debounce, DB-aware health checks, graceful shutdown, response-time monitoring.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ====== ARCHITECTURE ====== -->
+<div class="section">
+  <div class="section-label">Architecture</div>
+  <h2>How It's Built</h2>
+  <p class="section-sub">Clean separation of concerns with a REST API backend and React SPA frontend.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-box">
+      <div class="arch-box-label">Frontend</div>
+      <div class="arch-box-value">React + Vite</div>
+    </div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-box">
+      <div class="arch-box-label">API</div>
+      <div class="arch-box-value">Express.js</div>
+    </div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-box">
+      <div class="arch-box-label">Database</div>
+      <div class="arch-box-value">PostgreSQL 16</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== TECH STACK ====== -->
+<div class="section">
+  <div class="section-label">Tech Stack</div>
+  <h2>Technologies Used</h2>
+  <p class="section-sub">Modern, industry-standard tools chosen for reliability and developer experience.</p>
+
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-dot" style="background:#61dafb"></div>
+      <div><h4>React 18</h4><p>Component-based UI with hooks, context, and React Router</p></div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-dot" style="background:#646cff"></div>
+      <div><h4>Vite</h4><p>Fast build tool with HMR and optimized production bundles</p></div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-dot" style="background:#68a063"></div>
+      <div><h4>Node.js + Express</h4><p>RESTful API with middleware, validation, and error handling</p></div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-dot" style="background:#336791"></div>
+      <div><h4>PostgreSQL 16</h4><p>Relational DB with full-text search, UUIDs, and migrations</p></div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-dot" style="background:#f59e0b"></div>
+      <div><h4>JWT Authentication</h4><p>Stateless auth with bcrypt password hashing</p></div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-dot" style="background:#e44d26"></div>
+      <div><h4>ECharts</h4><p>Interactive data visualizations for analytics dashboards</p></div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-dot" style="background:#2496ed"></div>
+      <div><h4>Docker</h4><p>Containerized development and production deployment</p></div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-dot" style="background:#c21325"></div>
+      <div><h4>Jest + Supertest</h4><p>38 integration tests covering all API endpoints</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== DB SCHEMA ====== -->
+<div class="section">
+  <div class="section-label">Database</div>
+  <h2>Schema Design</h2>
+  <p class="section-sub">12 normalized tables with proper foreign keys, indexes, and constraints.</p>
+
+  <div class="tech-grid">
+    <div class="tech-card"><div class="tech-dot" style="background:var(--primary)"></div><div><h4>users</h4><p>Auth, roles, profile data</p></div></div>
+    <div class="tech-card"><div class="tech-dot" style="background:var(--success)"></div><div><h4>artists</h4><p>Roster with tsvector search</p></div></div>
+    <div class="tech-card"><div class="tech-dot" style="background:var(--info)"></div><div><h4>projects</h4><p>Linked to artists, status tracking</p></div></div>
+    <div class="tech-card"><div class="tech-dot" style="background:var(--warning)"></div><div><h4>assets</h4><p>Digital files with metadata</p></div></div>
+    <div class="tech-card"><div class="tech-dot" style="background:var(--danger)"></div><div><h4>placements</h4><p>Distribution channel tracking</p></div></div>
+    <div class="tech-card"><div class="tech-dot" style="background:#8b5cf6"></div><div><h4>subscription_tiers</h4><p>Tier definitions and pricing</p></div></div>
+    <div class="tech-card"><div class="tech-dot" style="background:#06b6d4"></div><div><h4>subscriptions</h4><p>Fan subscriptions lifecycle</p></div></div>
+    <div class="tech-card"><div class="tech-dot" style="background:#ec4899"></div><div><h4>tasks</h4><p>Ops task management</p></div></div>
+  </div>
+</div>
+
+<!-- ====== CTA ====== -->
+<div class="section" style="text-align: center;">
+  <h2>See It In Action</h2>
+  <p class="section-sub" style="margin-left:auto; margin-right:auto;">
+    Open the interactive demo to explore every page — no installation required.
+  </p>
+  <div class="hero-actions" style="justify-content: center;">
+    <a href="../demo/index.html" class="btn btn-primary">Open Interactive Demo</a>
+  </div>
+</div>
+
+<!-- ====== FOOTER ====== -->
+<footer class="footer">
+  Pryntis Panel &mdash; Full-Stack Capstone Project &mdash; 2026
+</footer>
+
+</body>
+</html>
