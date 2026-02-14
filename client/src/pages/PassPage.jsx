@@ -123,10 +123,10 @@ const IconPackage = () => (
    Tier color map (preserved from original)
    ============================================================ */
 const TIER_COLORS = {
-  Free: '#6b7280',
-  Basic: '#3b82f6',
-  Pro: '#8b5cf6',
-  Enterprise: '#f59e0b',
+  Free: '#5a6180',
+  Basic: '#0066FF',
+  Pro: '#6A00FF',
+  Enterprise: '#FFB000',
 };
 
 /* ============================================================

@@ -3,13 +3,13 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
 const EVENT_TYPES = [
-  { key: 'mixing', label: 'Mixing Session', color: '#6366f1' },
-  { key: 'mastering', label: 'Mastering Session', color: '#8b5cf6' },
-  { key: 'meeting', label: 'Artist Meeting', color: '#3b82f6' },
-  { key: 'release', label: 'Release Deadline', color: '#ef4444' },
-  { key: 'metadata', label: 'Metadata/Rights Deadline', color: '#f59e0b' },
-  { key: 'followup', label: 'Placement Follow-up', color: '#22c55e' },
-  { key: 'legal', label: 'Legal/Template Review', color: '#06b6d4' },
+  { key: 'mixing', label: 'Mixing Session', color: '#0066FF' },
+  { key: 'mastering', label: 'Mastering Session', color: '#6A00FF' },
+  { key: 'meeting', label: 'Artist Meeting', color: '#0066FF' },
+  { key: 'release', label: 'Release Deadline', color: '#E10600' },
+  { key: 'metadata', label: 'Metadata/Rights Deadline', color: '#FFB000' },
+  { key: 'followup', label: 'Placement Follow-up', color: '#00FF84' },
+  { key: 'legal', label: 'Legal/Template Review', color: '#00FF84' },
 ];
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
