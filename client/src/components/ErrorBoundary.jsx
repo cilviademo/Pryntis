@@ -19,13 +19,13 @@ export default class ErrorBoundary extends React.Component {
           padding: '40px', textAlign: 'center',
         }}>
           <h1 style={{ fontSize: '24px', marginBottom: '12px' }}>Something went wrong</h1>
-          <p style={{ color: '#8890a8', marginBottom: '24px', maxWidth: '480px' }}>
+          <p style={{ color: '#929ab4', marginBottom: '24px', maxWidth: '480px' }}>
             {this.state.error?.message || 'An unexpected error occurred.'}
           </p>
           <button
             onClick={() => window.location.reload()}
             style={{
-              padding: '10px 24px', background: '#6366f1', color: '#fff', border: 'none',
+              padding: '10px 24px', background: '#0066FF', color: '#fff', border: 'none',
               borderRadius: '8px', cursor: 'pointer', fontSize: '14px',
             }}
           >

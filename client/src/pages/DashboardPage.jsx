@@ -98,7 +98,7 @@ function KpiTooltip({ kpiKey }) {
           background: 'var(--color-surface)',
           border: '1px solid var(--color-border)',
           borderRadius: 'var(--radius)',
-          boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
           zIndex: 100,
           fontSize: '12px',
           lineHeight: '1.5',
@@ -197,8 +197,8 @@ export default function DashboardPage() {
 
   const chartTooltip = {
     backgroundColor: '#1C2228',
-    borderColor: 'rgba(255,255,255,0.05)',
-    textStyle: { color: '#F4F4F2' },
+    borderColor: 'rgba(255,255,255,0.07)',
+    textStyle: { color: '#F4F4F2', fontSize: 12 },
   };
 
   /* ── Projects by Status bar chart ────────────────────────────────── */
@@ -209,14 +209,14 @@ export default function DashboardPage() {
     xAxis: {
       type: 'category',
       data: projectStatusArr.map((d) => d.name),
-      axisLabel: { color: '#5a6180', fontSize: 12 },
-      axisLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+      axisLabel: { color: '#5f6780', fontSize: 12 },
+      axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     yAxis: {
       type: 'value',
       minInterval: 1,
-      axisLabel: { color: '#5a6180', fontSize: 12 },
-      splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+      axisLabel: { color: '#5f6780', fontSize: 12 },
+      splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     series: [{
       type: 'bar',
@@ -238,14 +238,14 @@ export default function DashboardPage() {
     xAxis: {
       type: 'category',
       data: placementStatusArr.map((d) => d.name),
-      axisLabel: { color: '#5a6180', fontSize: 12 },
-      axisLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+      axisLabel: { color: '#5f6780', fontSize: 12 },
+      axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     yAxis: {
       type: 'value',
       minInterval: 1,
-      axisLabel: { color: '#5a6180', fontSize: 12 },
-      splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+      axisLabel: { color: '#5f6780', fontSize: 12 },
+      splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     series: [{
       type: 'bar',
@@ -275,14 +275,14 @@ export default function DashboardPage() {
     grid: { left: 100, right: 40, top: 10, bottom: 10, containLabel: false },
     xAxis: {
       type: 'value',
-      axisLabel: { color: '#5a6180', formatter: (v) => `$${(v / 1000).toFixed(0)}k` },
-      splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+      axisLabel: { color: '#5f6780', formatter: (v) => `$${(v / 1000).toFixed(0)}k` },
+      splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     yAxis: {
       type: 'category',
       data: recoupData.map((d) => d.name),
-      axisLabel: { color: '#5a6180', fontSize: 13 },
-      axisLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+      axisLabel: { color: '#5f6780', fontSize: 13 },
+      axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     series: [{
       type: 'bar',
@@ -308,14 +308,14 @@ export default function DashboardPage() {
     xAxis: {
       type: 'category',
       data: throughputData.map((d) => d.month),
-      axisLabel: { color: '#5a6180', fontSize: 11, rotate: 45 },
-      axisLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+      axisLabel: { color: '#5f6780', fontSize: 11, rotate: 45 },
+      axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     yAxis: {
       type: 'value',
       minInterval: 1,
-      axisLabel: { color: '#5a6180', fontSize: 12 },
-      splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+      axisLabel: { color: '#5f6780', fontSize: 12 },
+      splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     series: [{
       type: 'line',
@@ -323,7 +323,7 @@ export default function DashboardPage() {
       smooth: true,
       lineStyle: { color: '#0066FF', width: 2 },
       itemStyle: { color: '#0066FF' },
-      areaStyle: { color: 'rgba(108, 99, 255, 0.1)' },
+      areaStyle: { color: 'rgba(0, 102, 255, 0.08)' },
     }],
   } : null;
 
@@ -331,7 +331,7 @@ export default function DashboardPage() {
   const artistPieOption = artistStatusArr.length > 0 ? {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'item', ...chartTooltip },
-    legend: { bottom: 0, textStyle: { color: '#5a6180', fontSize: 12 } },
+    legend: { bottom: 0, textStyle: { color: '#5f6780', fontSize: 12 } },
     series: [{
       type: 'pie',
       radius: ['40%', '70%'],
@@ -348,7 +348,7 @@ export default function DashboardPage() {
   const subscriptionPieOption = subscriptionData.length > 0 ? {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'item', ...chartTooltip },
-    legend: { bottom: 0, textStyle: { color: '#5a6180', fontSize: 12 } },
+    legend: { bottom: 0, textStyle: { color: '#5f6780', fontSize: 12 } },
     series: [{
       type: 'pie',
       radius: ['40%', '70%'],
@@ -365,17 +365,17 @@ export default function DashboardPage() {
   const momentumOption = momentum.length > 0 ? {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', ...chartTooltip },
-    legend: { bottom: 0, textStyle: { color: '#5a6180', fontSize: 11 } },
+    legend: { bottom: 0, textStyle: { color: '#5f6780', fontSize: 11 } },
     grid: { left: '3%', right: '4%', bottom: '40px', top: '10px', containLabel: true },
     xAxis: {
       type: 'category',
       data: momentum.map((d) => d.month),
-      axisLabel: { color: '#5a6180', fontSize: 11, rotate: 30 },
-      axisLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+      axisLabel: { color: '#5f6780', fontSize: 11, rotate: 30 },
+      axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     yAxis: [
-      { type: 'value', name: 'Count', axisLabel: { color: '#5a6180', fontSize: 11 }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
-      { type: 'value', name: 'Revenue', axisLabel: { color: '#5a6180', fontSize: 11, formatter: (v) => `$${(v / 1000).toFixed(0)}k` }, splitLine: { show: false } },
+      { type: 'value', name: 'Count', axisLabel: { color: '#5f6780', fontSize: 11 }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } } },
+      { type: 'value', name: 'Revenue', axisLabel: { color: '#5f6780', fontSize: 11, formatter: (v) => `$${(v / 1000).toFixed(0)}k` }, splitLine: { show: false } },
     ],
     series: [
       { name: 'Assets', type: 'bar', data: momentum.map((d) => d.new_assets || 0), itemStyle: { color: '#0066FF' }, barWidth: '20%' },

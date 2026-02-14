@@ -1047,8 +1047,8 @@ export default function PassPage() {
 
           {/* Analog Modeling Coming Soon Banner */}
           <div style={{
-            background: 'linear-gradient(135deg, rgba(108, 99, 255, 0.15), rgba(59, 130, 246, 0.15))',
-            border: '1px solid rgba(108, 99, 255, 0.3)',
+            background: 'linear-gradient(135deg, rgba(0, 102, 255, 0.10), rgba(106, 0, 255, 0.08))',
+            border: '1px solid rgba(0, 102, 255, 0.15)',
             borderRadius: 'var(--radius)',
             padding: '20px 24px',
             marginBottom: '20px',

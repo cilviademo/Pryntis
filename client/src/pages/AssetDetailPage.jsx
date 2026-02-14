@@ -214,39 +214,39 @@ export default function AssetDetailPage() {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
-      backgroundColor: '#1a1d27',
-      borderColor: '#2d3143',
-      textStyle: { color: '#e4e6ef' },
+      backgroundColor: '#1C2228',
+      borderColor: 'rgba(255,255,255,0.07)',
+      textStyle: { color: '#F4F4F2' },
     },
     grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
     xAxis: {
       type: 'category',
       data: usageRecords.map((r) => r.period || r.date || ''),
-      axisLabel: { color: '#8890a8', fontSize: 11 },
-      axisLine: { lineStyle: { color: '#2d3143' } },
+      axisLabel: { color: '#5f6780', fontSize: 11 },
+      axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     yAxis: {
       type: 'value',
       minInterval: 1,
-      axisLabel: { color: '#8890a8', fontSize: 11 },
-      splitLine: { lineStyle: { color: '#2d3143' } },
+      axisLabel: { color: '#5f6780', fontSize: 11 },
+      splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     series: [{
       type: 'line',
       data: usageRecords.map((r) => r.count || r.plays || r.streams || 0),
       smooth: true,
-      lineStyle: { color: '#6c63ff', width: 2 },
+      lineStyle: { color: '#0066FF', width: 2 },
       areaStyle: {
         color: {
           type: 'linear',
           x: 0, y: 0, x2: 0, y2: 1,
           colorStops: [
-            { offset: 0, color: 'rgba(108, 99, 255, 0.3)' },
-            { offset: 1, color: 'rgba(108, 99, 255, 0.02)' },
+            { offset: 0, color: 'rgba(0, 102, 255, 0.2)' },
+            { offset: 1, color: 'rgba(0, 102, 255, 0.02)' },
           ],
         },
       },
-      itemStyle: { color: '#6c63ff' },
+      itemStyle: { color: '#0066FF' },
     }],
   } : null;
 
@@ -317,9 +317,9 @@ export default function AssetDetailPage() {
       backgroundColor: 'transparent',
       tooltip: {
         trigger: 'item',
-        backgroundColor: '#1a1d27',
-        borderColor: '#2d3143',
-        textStyle: { color: '#e4e6ef' },
+        backgroundColor: '#1C2228',
+        borderColor: 'rgba(255,255,255,0.07)',
+        textStyle: { color: '#F4F4F2' },
       },
       series: [{
         type: 'sankey',
@@ -329,8 +329,8 @@ export default function AssetDetailPage() {
         data: nodes,
         links: links,
         lineStyle: { color: 'gradient', curveness: 0.5 },
-        itemStyle: { borderWidth: 1, borderColor: '#2d3143' },
-        label: { color: '#e4e6ef', fontSize: 12 },
+        itemStyle: { borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)' },
+        label: { color: '#F4F4F2', fontSize: 12 },
       }],
     };
   };

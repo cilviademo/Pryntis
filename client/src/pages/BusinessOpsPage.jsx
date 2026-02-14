@@ -6,7 +6,7 @@ import api from '../services/api';
 import { capitalize, formatCurrency } from '../utils/formatters';
 import ExportButton from '../components/ExportButton';
 
-const CHART_COLORS = ['#6c63ff', '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'];
+const CHART_COLORS = ['#0066FF', '#6A00FF', '#00FF84', '#FFB000', '#E10600', '#0066FF'];
 
 export default function BusinessOpsPage() {
   const { user } = useAuth();
@@ -80,31 +80,31 @@ export default function BusinessOpsPage() {
   const ledgerOption = {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis' },
-    legend: { data: ['Revenue', 'Expenses'], textStyle: { color: '#94a3b8' } },
+    legend: { data: ['Revenue', 'Expenses'], textStyle: { color: '#5f6780' } },
     grid: { left: 80, right: 20, top: 40, bottom: 60 },
     xAxis: {
       type: 'category',
       data: ledgerChartData.map((r) => r.stage_name || r.name),
-      axisLabel: { color: '#94a3b8', rotate: 30 },
-      axisLine: { lineStyle: { color: '#334155' } },
+      axisLabel: { color: '#5f6780', rotate: 30 },
+      axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: '#94a3b8', formatter: (v) => `$${(v / 1000).toFixed(0)}k` },
-      splitLine: { lineStyle: { color: '#1e293b' } },
+      axisLabel: { color: '#5f6780', formatter: (v) => `$${(v / 1000).toFixed(0)}k` },
+      splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     series: [
       {
         name: 'Revenue',
         type: 'bar',
         data: ledgerChartData.map((r) => r.total_revenue),
-        itemStyle: { color: '#22c55e' },
+        itemStyle: { color: '#00FF84' },
       },
       {
         name: 'Expenses',
         type: 'bar',
         data: ledgerChartData.map((r) => r.total_expenses),
-        itemStyle: { color: '#ef4444' },
+        itemStyle: { color: '#E10600' },
       },
     ],
   };
@@ -116,7 +116,7 @@ export default function BusinessOpsPage() {
   const pointsPieOption = {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'item', formatter: '{b}: {c} pts ({d}%)' },
-    legend: { bottom: 0, textStyle: { color: '#94a3b8' } },
+    legend: { bottom: 0, textStyle: { color: '#5f6780' } },
     series: [{
       type: 'pie',
       radius: ['40%', '70%'],
@@ -200,7 +200,7 @@ export default function BusinessOpsPage() {
                     <td>{r.stage_name || r.name}</td>
                     <td className="text-right">{formatCurrency(r.total_revenue)}</td>
                     <td className="text-right">{formatCurrency(r.total_expenses)}</td>
-                    <td className="text-right" style={{ color: r.net >= 0 ? '#22c55e' : '#ef4444' }}>
+                    <td className="text-right" style={{ color: r.net >= 0 ? '#00FF84' : '#E10600' }}>
                       {formatCurrency(r.net)}
                     </td>
                     <td className="text-center">
