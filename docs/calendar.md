@@ -8,7 +8,7 @@ Pryntis includes an Outlook-style calendar for scheduling sessions, deadlines, m
 - **Event CRUD** with modal form
 - **Event types**: session, deadline, meeting, release, task (color-coded)
 - **Conflict detection**: prevents double-booking assigned users
-- **Upcoming events panel**: next 7 days at a glance
+- **Upcoming events panel**: next 7 days overview
 - **Linked entities**: events can reference artists, projects, or assets
 - **RBAC**: viewers read-only, engineers and above can create/edit
 

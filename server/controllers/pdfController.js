@@ -9,7 +9,7 @@ const { AppError } = require('../middleware/errorHandler');
  * using PDFKit. All documents follow a consistent Pryntis brand layout.
  */
 
-// ── Shared PDF helpers ──────────────────────────────────────────
+// Shared PDF helpers
 
 const COLORS = {
   primary: '#1a1a2e',
@@ -155,7 +155,7 @@ function drawTable(doc, columns, rows, startX, startY) {
   return y;
 }
 
-// ── Controller ──────────────────────────────────────────────────
+// Controller
 
 const pdfController = {
   /**
@@ -287,7 +287,7 @@ const pdfController = {
       const { artistId } = req.params;
       const { period } = req.query; // e.g. "2025-Q1"
 
-      // ── Fetch artist ────────────────────────────────────────────
+      // Fetch artist
       const { rows: artistRows } = await db.query(
         'SELECT id, name, stage_name, email, genre, status FROM artists WHERE id = $1 AND is_deleted = false',
         [artistId]
@@ -300,7 +300,7 @@ const pdfController = {
       const artist = artistRows[0];
       const displayName = artist.stage_name || artist.name;
 
-      // ── Parse period for date filtering ──────────────────────────
+      // Parse period for date filtering
       let dateFilter = '';
       let dateParams = [artistId];
       let periodLabel = 'All Time';
@@ -334,7 +334,7 @@ const pdfController = {
         periodLabel = `Q${quarter} ${year}`;
       }
 
-      // ── Fetch revenue events ─────────────────────────────────────
+      // Fetch revenue events
       const revenueQuery = `
         SELECT
           re.event_date,
@@ -347,7 +347,7 @@ const pdfController = {
       `;
       const { rows: revenueRows } = await db.query(revenueQuery, dateParams);
 
-      // ── Fetch recoupable expenses ────────────────────────────────
+      // Fetch recoupable expenses
       let expenseDateFilter = '';
       let expenseParams = [artistId];
 
@@ -368,7 +368,7 @@ const pdfController = {
       `;
       const { rows: expenseRows } = await db.query(expenseQuery, expenseParams);
 
-      // ── Compute totals ───────────────────────────────────────────
+      // Compute totals
       const grossRevenue = revenueRows.reduce(
         (sum, r) => sum + parseFloat(r.amount || 0),
         0
@@ -379,7 +379,7 @@ const pdfController = {
       );
       const netPayable = grossRevenue - totalExpenses;
 
-      // ── Sanitize filename ────────────────────────────────────────
+      // Sanitize filename
       const safeName = displayName
         .replace(/[^a-zA-Z0-9_\- ]/g, '')
         .replace(/\s+/g, '-')
@@ -387,7 +387,7 @@ const pdfController = {
 
       const periodSlug = period || 'all-time';
 
-      // ── Generate PDF ─────────────────────────────────────────────
+      // Generate PDF
       const doc = new PDFDocument({
         size: 'LETTER',
         margins: { top: 50, bottom: 50, left: 50, right: 50 },
@@ -414,7 +414,7 @@ const pdfController = {
         `Period: ${periodLabel}  |  Generated: ${new Date().toLocaleDateString('en-US')}`
       );
 
-      // ── Artist info ──────────────────────────────────────────────
+      // Artist info
       doc
         .font('Helvetica')
         .fontSize(10)
@@ -427,7 +427,7 @@ const pdfController = {
 
       doc.moveDown(1.5);
 
-      // ── Revenue table ────────────────────────────────────────────
+      // Revenue table
       doc
         .font('Helvetica-Bold')
         .fontSize(14)
@@ -463,7 +463,7 @@ const pdfController = {
 
       doc.moveDown(1);
 
-      // ── Expenses table ───────────────────────────────────────────
+      // Expenses table
       doc
         .font('Helvetica-Bold')
         .fontSize(14)
@@ -499,7 +499,7 @@ const pdfController = {
 
       doc.moveDown(1.5);
 
-      // ── Summary ──────────────────────────────────────────────────
+      // Summary
       // Page break guard for summary block
       if (doc.y > doc.page.height - 160) {
         drawFooter(doc);

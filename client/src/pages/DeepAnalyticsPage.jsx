@@ -412,7 +412,7 @@ export default function DeepAnalyticsPage() {
               </p>
               <div className="chart-grid">
                 {healthScores.map((artist, i) => (
-                  <div key={i} className="card" style={{ cursor: 'pointer' }} onClick={() => window.location.pathname = `/artists/${artist.id}`}>
+                  <div key={i} className="card clickable" style={{ cursor: 'pointer' }} onClick={() => window.location.pathname = `/artists/${artist.id}`}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                       <h3 style={{ margin: 0, fontSize: '14px' }}>{artist.stage_name || artist.name}</h3>
                       <span className="badge" style={{

@@ -3,10 +3,8 @@ const { AppError } = require('../middleware/errorHandler');
 const { success } = require('../utils/response');
 
 const analyticsController = {
-  // ════════════════════════════════════════════════════════════════════
   // PLACEMENT ANALYTICS
   // GET /api/v1/port/analytics/placements
-  // ════════════════════════════════════════════════════════════════════
 
   async getPlacementAnalytics(req, res, next) {
     try {
@@ -41,7 +39,7 @@ const analyticsController = {
       const whereClause = `WHERE ${conditions.join(' AND ')}`;
       const joinClause = 'JOIN assets a ON a.id = pl.asset_id';
 
-      // ── Totals ──────────────────────────────────────────────────────
+      // Totals
       const { rows: totalRows } = await db.query(
         `SELECT COUNT(*) AS count,
                 COALESCE(SUM(pl.expected_value), 0) AS total_value
@@ -56,7 +54,7 @@ const analyticsController = {
         total_value: parseFloat(totalRows[0].total_value),
       };
 
-      // ── By status ───────────────────────────────────────────────────
+      // By status
       const { rows: byStatus } = await db.query(
         `SELECT pl.status,
                 COUNT(*) AS count,
@@ -75,7 +73,7 @@ const analyticsController = {
         total_value: parseFloat(r.total_value),
       }));
 
-      // ── By type ─────────────────────────────────────────────────────
+      // By type
       const { rows: byType } = await db.query(
         `SELECT pl.placement_type,
                 COUNT(*) AS count,
@@ -94,7 +92,7 @@ const analyticsController = {
         total_value: parseFloat(r.total_value),
       }));
 
-      // ── Monthly values (last 12 months) ─────────────────────────────
+      // Monthly values (last 12 months)
       const { rows: monthly } = await db.query(
         `SELECT TO_CHAR(DATE_TRUNC('month', pl.placement_date), 'YYYY-MM') AS month,
                 COUNT(*) AS count,
@@ -114,7 +112,7 @@ const analyticsController = {
         value: parseFloat(r.value),
       }));
 
-      // ── Top 5 artists by placement value ────────────────────────────
+      // Top 5 artists by placement value
       const { rows: topArtists } = await db.query(
         `SELECT a.artist_id,
                 art.name AS artist_name,
@@ -152,21 +150,19 @@ const analyticsController = {
     }
   },
 
-  // ════════════════════════════════════════════════════════════════════
   // ASSET ANALYTICS
   // GET /api/v1/port/analytics/assets
-  // ════════════════════════════════════════════════════════════════════
 
   async getAssetAnalytics(req, res, next) {
     try {
-      // ── Total count ─────────────────────────────────────────────────
+      // Total count
       const { rows: totalRows } = await db.query(
         `SELECT COUNT(*) AS count FROM assets WHERE is_deleted = false`
       );
 
       const total_count = parseInt(totalRows[0].count, 10);
 
-      // ── By file_type ────────────────────────────────────────────────
+      // By file_type
       const { rows: byFileType } = await db.query(
         `SELECT file_type,
                 COUNT(*) AS count
@@ -181,7 +177,7 @@ const analyticsController = {
         count: parseInt(r.count, 10),
       }));
 
-      // ── By genre ────────────────────────────────────────────────────
+      // By genre
       const { rows: byGenre } = await db.query(
         `SELECT COALESCE(genre, 'unspecified') AS genre,
                 COUNT(*) AS count
@@ -196,7 +192,7 @@ const analyticsController = {
         count: parseInt(r.count, 10),
       }));
 
-      // ── Monthly new assets (last 12 months) ─────────────────────────
+      // Monthly new assets (last 12 months)
       const { rows: monthly } = await db.query(
         `SELECT TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM') AS month,
                 COUNT(*) AS count
@@ -212,7 +208,7 @@ const analyticsController = {
         count: parseInt(r.count, 10),
       }));
 
-      // ── Assets with most placements (top 10) ────────────────────────
+      // Assets with most placements (top 10)
       const { rows: topAssets } = await db.query(
         `SELECT a.id AS asset_id,
                 a.title,
@@ -252,21 +248,19 @@ const analyticsController = {
     }
   },
 
-  // ════════════════════════════════════════════════════════════════════
   // REVENUE ANALYTICS
   // GET /api/v1/port/analytics/revenue
-  // ════════════════════════════════════════════════════════════════════
 
   async getRevenueAnalytics(req, res, next) {
     try {
-      // ── Total revenue ───────────────────────────────────────────────
+      // Total revenue
       const { rows: totalRows } = await db.query(
         `SELECT COALESCE(SUM(amount), 0) AS total_revenue FROM revenue_events`
       );
 
       const total_revenue = parseFloat(totalRows[0].total_revenue);
 
-      // ── Monthly revenue (last 12 months) ────────────────────────────
+      // Monthly revenue (last 12 months)
       const { rows: monthly } = await db.query(
         `SELECT TO_CHAR(DATE_TRUNC('month', event_date), 'YYYY-MM') AS month,
                 COALESCE(SUM(amount), 0) AS revenue
@@ -281,7 +275,7 @@ const analyticsController = {
         revenue: parseFloat(r.revenue),
       }));
 
-      // ── Revenue by source type ──────────────────────────────────────
+      // Revenue by source type
       const { rows: bySource } = await db.query(
         `SELECT COALESCE(source, 'unspecified') AS source,
                 COUNT(*) AS event_count,
@@ -297,7 +291,7 @@ const analyticsController = {
         total_amount: parseFloat(r.total_amount),
       }));
 
-      // ── Top 5 earning artists ───────────────────────────────────────
+      // Top 5 earning artists
       const { rows: topArtists } = await db.query(
         `SELECT re.artist_id,
                 art.name AS artist_name,
@@ -319,7 +313,7 @@ const analyticsController = {
         total_earned: parseFloat(r.total_earned),
       }));
 
-      // ── Revenue vs expenses comparison ──────────────────────────────
+      // Revenue vs expenses comparison
       const { rows: expenseRows } = await db.query(
         `SELECT COALESCE(SUM(amount), 0) AS total_expenses FROM recoupable_expenses`
       );
@@ -344,14 +338,12 @@ const analyticsController = {
     }
   },
 
-  // ════════════════════════════════════════════════════════════════════
   // DELIVERY TRACKING
   // GET /api/v1/port/analytics/deliveries
-  // ════════════════════════════════════════════════════════════════════
 
   async getDeliveryTracking(req, res, next) {
     try {
-      // ── Projects by status ──────────────────────────────────────────
+      // Projects by status
       const { rows: projectsByStatus } = await db.query(
         `SELECT status,
                 COUNT(*) AS count
@@ -366,7 +358,7 @@ const analyticsController = {
         count: parseInt(r.count, 10),
       }));
 
-      // ── Tasks by status ─────────────────────────────────────────────
+      // Tasks by status
       const { rows: tasksByStatus } = await db.query(
         `SELECT status,
                 COUNT(*) AS count
@@ -380,7 +372,7 @@ const analyticsController = {
         count: parseInt(r.count, 10),
       }));
 
-      // ── Average project duration for completed projects ─────────────
+      // Average project duration for completed projects
       // Duration = difference between start_date and the date the project
       // was marked completed (approximated by updated_at for status = 'completed')
       const { rows: avgDurationRows } = await db.query(
@@ -396,7 +388,7 @@ const analyticsController = {
 
       const avg_project_duration_days = parseFloat(avgDurationRows[0].avg_days);
 
-      // ── Overdue tasks count ─────────────────────────────────────────
+      // Overdue tasks count
       const { rows: overdueRows } = await db.query(
         `SELECT COUNT(*) AS count
          FROM tasks
@@ -417,10 +409,8 @@ const analyticsController = {
     }
   },
 
-  // ════════════════════════════════════════════════════════════════════
   // ADVANCED ANALYTICS — COVERAGE MATRIX
   // GET /api/v1/port/analytics/coverage
-  // ════════════════════════════════════════════════════════════════════
   async getCoverageMatrix(req, res, next) {
     try {
       // Per-artist metadata completeness
@@ -478,10 +468,8 @@ const analyticsController = {
     }
   },
 
-  // ════════════════════════════════════════════════════════════════════
   // ADVANCED ANALYTICS — CROSS-MODULE INSIGHTS
   // GET /api/v1/port/analytics/insights
-  // ════════════════════════════════════════════════════════════════════
   async getCrossModuleInsights(req, res, next) {
     try {
       // Revenue waterfall: gross → expenses → recouped → net

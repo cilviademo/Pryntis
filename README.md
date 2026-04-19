@@ -47,7 +47,7 @@ server/                 Express API
   utils/               listQuery (FTS + pagination), response helpers
 database/               SQL schema + seed data
   schema.sql           27 tables, 14 enums, FTS triggers, GIN indexes
-  seed.sql             Comprehensive seed data (all modules)
+  seed.sql             Full seed data (all modules)
 docs/                   Documentation suite
   architecture.md      System architecture
   database-schema.md   Full schema reference

@@ -103,7 +103,7 @@ function generateActions(breakdown) {
 }
 
 const healthController = {
-  // ── Health Scores ──────────────────────────────────────────────────
+  // Health Scores
   // GET /api/v1/panel/health
   async getHealthScores(req, res, next) {
     try {
@@ -286,7 +286,7 @@ const healthController = {
     }
   },
 
-  // ── Momentum Trends ────────────────────────────────────────────────
+  // Momentum Trends
   // GET /api/v1/panel/momentum
   async getMomentumTrends(req, res, next) {
     try {
@@ -356,7 +356,7 @@ const healthController = {
     }
   },
 
-  // ── Next Actions ───────────────────────────────────────────────────
+  // Next Actions
   // GET /api/v1/panel/actions
   async getNextActions(req, res, next) {
     try {

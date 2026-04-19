@@ -153,7 +153,7 @@ export default function BusinessOpsPage() {
         ))}
       </div>
 
-      {/* ── LEDGER TAB ─────────────────────────────────────────── */}
+      {/* LEDGER TAB */}
       {activeTab === 'ledger' && (
         <div>
           <div className="summary-cards mb-16">
@@ -222,7 +222,7 @@ export default function BusinessOpsPage() {
         </div>
       )}
 
-      {/* ── RECOUPMENT TAB ─────────────────────────────────────── */}
+      {/* RECOUPMENT TAB */}
       {activeTab === 'recoup' && (
         <div>
           <p className="mb-16">Select an artist to view detailed recoupment breakdown.</p>
@@ -231,7 +231,8 @@ export default function BusinessOpsPage() {
             {ledger.filter((r) => r.total_expenses > 0).map((r) => (
               <div
                 key={r.id}
-                className={`card card--compact${recoupDetail?.artist?.id === r.id ? ' card--border-top' : ''}`}
+                className={`card card--compact clickable${recoupDetail?.artist?.id === r.id ? ' card--border-top' : ''}`}
+                style={{ cursor: 'pointer' }}
                 onClick={() => loadRecoupDetail(r.id)}
                 role="button"
                 tabIndex={0}
@@ -319,7 +320,7 @@ export default function BusinessOpsPage() {
         </div>
       )}
 
-      {/* ── PRODUCER POINTS TAB ────────────────────────────────── */}
+      {/* PRODUCER POINTS TAB */}
       {activeTab === 'points' && (
         <div>
           {writerPoints.length > 0 && (
@@ -363,7 +364,7 @@ export default function BusinessOpsPage() {
         </div>
       )}
 
-      {/* ── CONFLICTS TAB ──────────────────────────────────────── */}
+      {/* CONFLICTS TAB */}
       {activeTab === 'conflicts' && (
         <div>
           {conflicts.length === 0 ? (
@@ -412,7 +413,7 @@ export default function BusinessOpsPage() {
         </div>
       )}
 
-      {/* ── APPROVALS TAB ──────────────────────────────────────── */}
+      {/* APPROVALS TAB */}
       {activeTab === 'approvals' && approvals && (
         <div>
           <div className="summary-cards mb-16">

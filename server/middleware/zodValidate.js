@@ -22,7 +22,7 @@ function zodValidate(schema, source = 'body') {
   };
 }
 
-// ── Reusable schema fragments ───────────────────────────────────────────
+// Reusable schema fragments
 
 const uuidParam = z.object({
   id: z.string().uuid('Invalid ID format'),
@@ -33,7 +33,7 @@ const paginationQuery = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(25),
 }).passthrough();
 
-// ── Auth schemas ────────────────────────────────────────────────────────
+// Auth schemas
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email').max(255),
@@ -48,7 +48,7 @@ const registerSchema = z.object({
   role: z.enum(['owner', 'admin', 'manager', 'audio_engineer', 'contributor', 'viewer']).optional(),
 });
 
-// ── Media upload schemas ────────────────────────────────────────────────
+// Media upload schemas
 
 const uploadMediaSchema = z.object({
   owner_type: z.enum(['artist', 'project', 'asset', 'template']),

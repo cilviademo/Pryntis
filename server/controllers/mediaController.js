@@ -22,9 +22,9 @@ function providerName() {
 }
 
 const mediaController = {
-  // ──────────────────────────────────────────────────────────────────
+  // ─
   // POST /api/v1/media/upload
-  // ──────────────────────────────────────────────────────────────────
+  // ─
   async uploadMedia(req, res, next) {
     try {
       if (!req.file) {
@@ -86,9 +86,9 @@ const mediaController = {
     }
   },
 
-  // ──────────────────────────────────────────────────────────────────
+  // ─
   // GET /api/v1/media/:id/stream
-  // ──────────────────────────────────────────────────────────────────
+  // ─
   async streamMedia(req, res, next) {
     try {
       const { rows } = await db.query(
@@ -104,7 +104,7 @@ const mediaController = {
       const storage = getStorageProvider();
       const fileSize = Number(media.size_bytes);
 
-      // ── HTTP Range handling ───────────────────────────────────────
+      // HTTP Range handling
       const rangeHeader = req.headers.range;
 
       if (rangeHeader) {
@@ -150,9 +150,9 @@ const mediaController = {
     }
   },
 
-  // ──────────────────────────────────────────────────────────────────
+  // ─
   // GET /api/v1/media?owner_type=&owner_id=
-  // ──────────────────────────────────────────────────────────────────
+  // ─
   async listMedia(req, res, next) {
     try {
       const { owner_type, owner_id } = req.query;
@@ -193,9 +193,9 @@ const mediaController = {
     }
   },
 
-  // ──────────────────────────────────────────────────────────────────
+  // ─
   // POST /api/v1/media/:id/new-version
-  // ──────────────────────────────────────────────────────────────────
+  // ─
   async uploadNewVersion(req, res, next) {
     const client = await db.pool.connect();
     try {
@@ -280,9 +280,9 @@ const mediaController = {
     }
   },
 
-  // ──────────────────────────────────────────────────────────────────
+  // ─
   // PUT /api/v1/media/:id/set-current
-  // ──────────────────────────────────────────────────────────────────
+  // ─
   async setCurrentVersion(req, res, next) {
     const client = await db.pool.connect();
     try {

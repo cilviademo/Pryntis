@@ -2,7 +2,7 @@ const db = require('../config/db');
 const { AppError } = require('../middleware/errorHandler');
 const { success } = require('../utils/response');
 
-// ── Internal helper ─────────────────────────────────────────────────
+// Internal helper
 // Exported so other controllers (e.g. calendarController) can create
 // notifications without going through HTTP.
 
@@ -35,7 +35,7 @@ async function createNotification(userId, type, title, body, linkUrl) {
   return rows[0];
 }
 
-// ── Route handlers ──────────────────────────────────────────────────
+// Route handlers
 
 const notificationController = {
   // GET /api/v1/notifications?unread_only=true

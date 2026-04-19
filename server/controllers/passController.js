@@ -23,7 +23,7 @@ async function audit(userId, action, entityType, entityId, details = {}) {
 }
 
 const passController = {
-  // ── Subscription Tiers ────────────────────────────────────────────
+  // Subscription Tiers
 
   // GET /api/v1/passes/tiers
   async listTiers(req, res, next) {
@@ -119,7 +119,7 @@ const passController = {
     }
   },
 
-  // ── Artist Subscriptions ──────────────────────────────────────────
+  // Artist Subscriptions
 
   // GET /api/v1/passes/subscriptions
   async listSubscriptions(req, res, next) {
@@ -251,7 +251,7 @@ const passController = {
     }
   },
 
-  // ── Tier Limits ───────────────────────────────────────────────────
+  // Tier Limits
 
   // GET /api/v1/passes/limits/:artistId — returns usage vs limits
   async getArtistLimits(req, res, next) {

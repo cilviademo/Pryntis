@@ -49,7 +49,7 @@ async function listQuery(db, tableName, opts = {}) {
     selectColumns = '*',
   } = opts;
 
-  // ── Sanitise inputs ──────────────────────────────────────────────
+  // Sanitise inputs
   const limit = Math.max(1, Math.min(Number(rawLimit) || 25, 100));
   const currentPage = Math.max(1, Number(page) || 1);
   const offset = (currentPage - 1) * limit;
@@ -58,7 +58,7 @@ async function listQuery(db, tableName, opts = {}) {
   // Whitelist sortBy to prevent injection — allow only word chars and dots
   const safeSortBy = /^[\w.]+$/.test(sortBy) ? sortBy : 'created_at';
 
-  // ── Build WHERE clauses ──────────────────────────────────────────
+  // Build WHERE clauses
   const conditions = [];
   const params = [];
   let paramIndex = 1;
@@ -105,7 +105,7 @@ async function listQuery(db, tableName, opts = {}) {
     ? `WHERE ${conditions.join(' AND ')}`
     : '';
 
-  // ── Build SELECT for ts_rank when searching ──────────────────────
+  // Build SELECT for ts_rank when searching
   let selectClause = selectColumns;
   let orderClause = `ORDER BY ${safeSortBy} ${sortDirection}`;
 
@@ -116,12 +116,12 @@ async function listQuery(db, tableName, opts = {}) {
     orderClause = `ORDER BY search_rank DESC, ${safeSortBy} ${sortDirection}`;
   }
 
-  // ── Count query ──────────────────────────────────────────────────
+  // Count query
   const countSql = `SELECT COUNT(*) AS total FROM ${tableName} ${whereClause}`;
   const countResult = await db.query(countSql, params);
   const total = parseInt(countResult.rows[0].total, 10);
 
-  // ── Data query ───────────────────────────────────────────────────
+  // Data query
   const dataSql = [
     `SELECT ${selectClause} FROM ${tableName}`,
     whereClause,
@@ -132,7 +132,7 @@ async function listQuery(db, tableName, opts = {}) {
   const dataParams = [...params, limit, offset];
   const dataResult = await db.query(dataSql, dataParams);
 
-  // ── Return standardised result ───────────────────────────────────
+  // Return standardised result
   const totalPages = Math.ceil(total / limit);
 
   return {

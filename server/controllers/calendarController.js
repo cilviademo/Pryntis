@@ -128,7 +128,7 @@ const calendarController = {
 
       const safeEventType = VALID_EVENT_TYPES.includes(event_type) ? event_type : 'meeting';
 
-      // ── Conflict detection ────────────────────────────────────────
+      // Conflict detection
       if (assigned_to) {
         const conflict = await detectConflict(assigned_to, start_at, end_at);
         if (conflict) {
@@ -146,7 +146,7 @@ const calendarController = {
         }
       }
 
-      // ── Insert event ──────────────────────────────────────────────
+      // Insert event
       const { rows } = await db.query(
         `INSERT INTO calendar_events
            (title, description, event_type, start_at, end_at, timezone,
@@ -167,7 +167,7 @@ const calendarController = {
         ]
       );
 
-      // ── Notify assigned user (if different from creator) ──────────
+      // Notify assigned user (if different from creator)
       if (assigned_to && assigned_to !== req.user.id) {
         // Fire-and-forget; don't let a notification failure break event creation
         createNotification(
@@ -232,7 +232,7 @@ const calendarController = {
         throw new AppError('start_at must be before end_at', 400, 'VALIDATION_ERROR');
       }
 
-      // ── Re-run conflict detection when times or assignee changed ──
+      // Re-run conflict detection when times or assignee changed
       const timesChanged = req.body.start_at !== undefined || req.body.end_at !== undefined || req.body.assigned_to !== undefined;
       if (timesChanged && effectiveAssigned) {
         const conflict = await detectConflict(

@@ -3,7 +3,7 @@ const { AppError } = require('../middleware/errorHandler');
 const { success } = require('../utils/response');
 
 const businessOpsController = {
-  // ── Artist Ledger ──────────────────────────────────────────────────
+  // Artist Ledger
   // GET /api/v1/business/ledger
   // Per-artist financial summary: revenue, expenses, net, recoupment status
   async getLedger(req, res, next) {
@@ -86,7 +86,7 @@ const businessOpsController = {
     }
   },
 
-  // ── Recoupment Detail ──────────────────────────────────────────────
+  // Recoupment Detail
   // GET /api/v1/business/recoup/:artistId
   // Detailed recoupment breakdown for a single artist
   async getRecoupDetail(req, res, next) {
@@ -153,7 +153,7 @@ const businessOpsController = {
     }
   },
 
-  // ── Producer Points (Ownership Summary) ────────────────────────────
+  // Producer Points (Ownership Summary)
   // GET /api/v1/business/producer-points
   // Aggregated ownership percentages per owner across all assets
   async getProducerPoints(req, res, next) {
@@ -209,7 +209,7 @@ const businessOpsController = {
     }
   },
 
-  // ── Ownership Conflicts ────────────────────────────────────────────
+  // Ownership Conflicts
   // GET /api/v1/business/ownership-conflicts
   // Find assets where ownership splits exceed 100% for any type
   async getOwnershipConflicts(req, res, next) {
@@ -254,7 +254,7 @@ const businessOpsController = {
     }
   },
 
-  // ── Pending Approvals ──────────────────────────────────────────────
+  // Pending Approvals
   // GET /api/v1/business/approvals
   // Aggregates items needing attention: open urgent/high tasks,
   // pending placements, expiring subscriptions

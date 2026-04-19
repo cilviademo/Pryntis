@@ -3,9 +3,7 @@ const { AppError } = require('../middleware/errorHandler');
 const { success, created } = require('../utils/response');
 
 const portController = {
-  // ════════════════════════════════════════════════════════════════════
   // ASSETS
-  // ════════════════════════════════════════════════════════════════════
 
   // GET /api/v1/port/assets
   async listAssets(req, res, next) {
@@ -263,9 +261,7 @@ const portController = {
     }
   },
 
-  // ════════════════════════════════════════════════════════════════════
   // ASSET TAGS
-  // ════════════════════════════════════════════════════════════════════
 
   // POST /api/v1/port/assets/:id/tags — bulk add
   async addTags(req, res, next) {
@@ -328,9 +324,7 @@ const portController = {
     }
   },
 
-  // ════════════════════════════════════════════════════════════════════
   // PLACEMENTS
-  // ════════════════════════════════════════════════════════════════════
 
   // GET /api/v1/port/placements
   async listPlacements(req, res, next) {
@@ -448,9 +442,7 @@ const portController = {
     }
   },
 
-  // ════════════════════════════════════════════════════════════════════
   // OWNERSHIP RECORDS
-  // ════════════════════════════════════════════════════════════════════
 
   // GET /api/v1/port/assets/:id/ownership
   async listOwnership(req, res, next) {
@@ -577,9 +569,7 @@ const portController = {
     }
   },
 
-  // ════════════════════════════════════════════════════════════════════
   // USAGE RECORDS
-  // ════════════════════════════════════════════════════════════════════
 
   // GET /api/v1/port/assets/:id/usage
   async listUsage(req, res, next) {

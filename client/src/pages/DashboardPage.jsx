@@ -736,7 +736,7 @@ export default function DashboardPage() {
                     return (
                       <tr
                         key={item.id}
-                        style={{ cursor: activityLink ? 'pointer' : 'default' }}
+                        className={activityLink ? 'clickable-row' : ''}
                         onClick={() => activityLink && navigate(activityLink)}
                       >
                         <td>
@@ -783,7 +783,7 @@ export default function DashboardPage() {
                   {tasks.map((task) => (
                     <tr
                       key={task.id}
-                      style={{ cursor: 'pointer' }}
+                      className="clickable-row"
                       onClick={() => navigate('/tasks')}
                     >
                       <td>{task.title}</td>
@@ -830,7 +830,7 @@ export default function DashboardPage() {
                       return (
                         <tr
                           key={h.id || h.artist_id}
-                          style={{ cursor: 'pointer' }}
+                          className="clickable-row"
                           onClick={() => setSelectedArtist(h)}
                         >
                           <td>

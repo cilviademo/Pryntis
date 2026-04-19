@@ -11,7 +11,7 @@ function parseDuplicateDetail(detail) {
 }
 
 function errorHandler(err, req, res, _next) {
-  // ── Handle Postgres duplicate-key errors (code 23505) ──────────
+  // Handle Postgres duplicate-key errors (code 23505)
   if (err.code === '23505') {
     const field = parseDuplicateDetail(err.detail);
     const message = field
@@ -28,7 +28,7 @@ function errorHandler(err, req, res, _next) {
     });
   }
 
-  // ── Handle AppError and generic errors ─────────────────────────
+  // Handle AppError and generic errors
   const statusCode = err.statusCode || 500;
   const code = err.code || 'INTERNAL_ERROR';
 

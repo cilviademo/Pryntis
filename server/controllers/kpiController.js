@@ -95,7 +95,7 @@ const kpiController = {
     }
   },
 
-  // ── Revenue Events ────────────────────────────────────────────────
+  // Revenue Events
 
   // GET /api/v1/kpi/artists/:artistId/revenue
   async listRevenueEvents(req, res, next) {
@@ -167,7 +167,7 @@ const kpiController = {
     }
   },
 
-  // ── Recoupable Expenses ───────────────────────────────────────────
+  // Recoupable Expenses
 
   // GET /api/v1/kpi/artists/:artistId/expenses
   async listExpenses(req, res, next) {

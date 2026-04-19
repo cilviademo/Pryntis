@@ -147,7 +147,7 @@ export default function ContactsPage() {
               </thead>
               <tbody>
                 {contacts.map((c) => (
-                  <tr key={c.id} onClick={() => setSelected(c)} style={{ cursor: 'pointer' }}>
+                  <tr key={c.id} className="clickable-row" onClick={() => setSelected(c)}>
                     <td style={{ fontWeight: 600 }}>{c.name}</td>
                     <td>{c.organization || '--'}</td>
                     <td><span className="badge badge--active">{c.role || '--'}</span></td>

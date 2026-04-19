@@ -1185,7 +1185,7 @@ async function seed() {
   // ============================================
   const templateData = [
 
-    // ── 1. Producer Agreement (Single Track) ──────────────────────────
+    // 1. Producer Agreement (Single Track)
     ['Producer Agreement (Single Track)', 'Legal',
 `PRODUCER AGREEMENT -- SINGLE TRACK
 ========================================================
@@ -1271,7 +1271,7 @@ ___________________________  Date: ____/____/________
 ___________________________  Date: ____/____/________
 [ARTIST LEGAL NAME]`, null],
 
-    // ── 2. Split Sheet (Songwriting + Master) ─────────────────────────
+    // 2. Split Sheet (Songwriting + Master)
     ['Split Sheet (Songwriting + Master)', 'Legal',
 `SPLIT SHEET -- SONGWRITING AND MASTER RECORDING
 ========================================================
@@ -1342,7 +1342,7 @@ Print Name: _______________  PRO: _________  IPI: _____________
 ___________________________  Date: ____/____/________
 Print Name: _______________  PRO: _________  IPI: _____________`, null],
 
-    // ── 3. Work-for-Hire Agreement (Engineer/Producer) ────────────────
+    // 3. Work-for-Hire Agreement (Engineer/Producer)
     ['Work-for-Hire Agreement (Engineer/Producer)', 'Legal',
 `WORK-FOR-HIRE AGREEMENT
 ========================================================
@@ -1429,7 +1429,7 @@ ___________________________  Date: ____/____/________
 ___________________________  Date: ____/____/________
 [ENGINEER NAME]`, null],
 
-    // ── 4. Master Recording License (Non-exclusive) ───────────────────
+    // 4. Master Recording License (Non-exclusive)
     ['Master Recording License (Non-exclusive)', 'Legal',
 `MASTER RECORDING LICENSE AGREEMENT (NON-EXCLUSIVE)
 ========================================================
@@ -1514,7 +1514,7 @@ ___________________________  Date: ____/____/________
 ___________________________  Date: ____/____/________
 [LICENSEE] -- Licensee`, null],
 
-    // ── 5. Sync License One-Pager ─────────────────────────────────────
+    // 5. Sync License One-Pager
     ['Sync License One-Pager', 'Sync',
 `SYNC LICENSE -- QUICK TERMS SUMMARY
 ========================================================
@@ -1592,7 +1592,7 @@ Licensor (Master)
 ___________________________  Date: ____/____/________
 Licensee`, null],
 
-    // ── 6. Cue Sheet Template ─────────────────────────────────────────
+    // 6. Cue Sheet Template
     ['Cue Sheet Template', 'Sync',
 `CUE SHEET -- FILM / TELEVISION / STREAMING
 ========================================================
@@ -1656,7 +1656,7 @@ Prepared by: ___________________  Date: ____/____/________
 Music Supervisor: _______________  Date: ____/____/________
 Contact Email: _________________  Phone: _________________`, null],
 
-    // ── 7. ISRC/UPC Metadata SOP ─────────────────────────────────────
+    // 7. ISRC/UPC Metadata SOP
     ['ISRC/UPC Metadata SOP', 'Metadata',
 `ISRC / UPC ASSIGNMENT -- STANDARD OPERATING PROCEDURE
 ========================================================
@@ -1738,7 +1738,7 @@ COMMON ERRORS TO AVOID
 - Forgetting to embed ISRC in the BWF header of the audio file
 - Assigning UPC before tracklist is finalized (leads to re-assignment)`, null],
 
-    // ── 8. Release Checklist SOP (DSP Delivery) ──────────────────────
+    // 8. Release Checklist SOP (DSP Delivery)
     ['Release Checklist SOP (DSP Delivery)', 'Ops',
 `RELEASE CHECKLIST -- DSP DELIVERY SOP
 ========================================================
@@ -1818,7 +1818,7 @@ POST-RELEASE MONITORING (T+1 to T+4 WEEKS)
 - [ ] File cue sheets if sync placements occur
 - [ ] Log first-week revenue and compare to projections`, null],
 
-    // ── 9. Royalty Statement Explanation (Artist-friendly) ────────────
+    // 9. Royalty Statement Explanation (Artist-friendly)
     ['Royalty Statement Explanation (Artist-friendly)', 'Royalties',
 `UNDERSTANDING YOUR ROYALTY STATEMENT
 ========================================================
@@ -1895,7 +1895,7 @@ NOTES FOR MANAGERS
 - Keep a log of questions and resolutions for audit purposes.
 - Retain all statements for a minimum of 7 years (standard audit window).`, null],
 
-    // ── 10. Sample Clearance Request Email + SOP ──────────────────────
+    // 10. Sample Clearance Request Email + SOP
     ['Sample Clearance Request Email + SOP', 'Legal',
 `SAMPLE CLEARANCE REQUEST -- EMAIL TEMPLATE AND SOP
 ========================================================
@@ -1985,7 +1985,7 @@ Master clearance:     [ ] Obtained  [ ] Pending  [ ] Denied
 Terms agreed:         ________________________
 Fee paid:             $__________  Date: ____/____/________`, null],
 
-    // ── 11. Distributor Setup SOP ─────────────────────────────────────
+    // 11. Distributor Setup SOP
     ['Distributor Setup SOP', 'Ops',
 `DISTRIBUTOR SETUP -- STANDARD OPERATING PROCEDURE
 ========================================================
@@ -2059,7 +2059,7 @@ STEP 7: REPORTING ACCESS
 - [ ] Schedule monthly report review with finance team
 - [ ] Export and archive reports quarterly for audit trail`, null],
 
-    // ── 12. PRO Registration SOP (BMI/ASCAP) ─────────────────────────
+    // 12. PRO Registration SOP (BMI/ASCAP)
     ['PRO Registration SOP (BMI/ASCAP)', 'Royalties',
 `PRO REGISTRATION -- STANDARD OPERATING PROCEDURE
 ========================================================
@@ -2143,7 +2143,7 @@ REVENUE COLLECTION TIMELINE
 - Statement periods are typically quarterly (Jan-Mar, Apr-Jun, etc.).
 - Payments arrive approximately 5-9 months after the statement period.`, null],
 
-    // ── 13. Publishing Admin Setup SOP ────────────────────────────────
+    // 13. Publishing Admin Setup SOP
     ['Publishing Admin Setup SOP', 'Royalties',
 `PUBLISHING ADMINISTRATION SETUP -- SOP
 ========================================================
@@ -2230,7 +2230,7 @@ EXPECTED TIMELINES
 - Full pipeline established: approximately 12-18 months
 - Revenue is typically paid quarterly, 60-90 days after period close.`, null],
 
-    // ── 14. YouTube Content ID / Claims SOP ───────────────────────────
+    // 14. YouTube Content ID / Claims SOP
     ['YouTube Content ID / Claims SOP', 'Ops',
 `YOUTUBE CONTENT ID / CLAIMS -- STANDARD OPERATING PROCEDURE
 ========================================================
@@ -2321,7 +2321,7 @@ COMMON ISSUES
 - Low match confidence leading to false positives -- review manually.
 - Creator counter-notifications -- escalate to legal within 10 days.`, null],
 
-    // ── 15. Catalog Audit SOP (Quarterly) ─────────────────────────────
+    // 15. Catalog Audit SOP (Quarterly)
     ['Catalog Audit SOP (Quarterly)', 'Ops',
 `CATALOG AUDIT -- QUARTERLY STANDARD OPERATING PROCEDURE
 ========================================================
@@ -2421,7 +2421,7 @@ Approved by (Head of Catalog): ______  Date: ____/____/________
 
 Next audit scheduled: ____/____/________`, null],
 
-    // ── 16. Artist Onboarding Checklist ──────────────────────────────────
+    // 16. Artist Onboarding Checklist
     ['Artist Onboarding Checklist', 'Ops',
 `ARTIST ONBOARDING CHECKLIST
 ========================================================
@@ -2483,7 +2483,7 @@ SIGN-OFF
 Onboarding completed by: _______________  Date: ____/____/________
 Artist confirmation: ___________________  Date: ____/____/________`, null],
 
-    // ── 17. Mechanical License Request Template ──────────────────────────
+    // 17. Mechanical License Request Template
     ['Mechanical License Request Template', 'Legal',
 `MECHANICAL LICENSE REQUEST
 ========================================================
@@ -2543,7 +2543,7 @@ ___________________________
 [PHONE]
 [EMAIL]`, null],
 
-    // ── 18. Distribution Partner Evaluation SOP ──────────────────────────
+    // 18. Distribution Partner Evaluation SOP
     ['Distribution Partner Evaluation SOP', 'Ops',
 `DISTRIBUTION PARTNER EVALUATION -- STANDARD OPERATING PROCEDURE
 ========================================================
@@ -2614,7 +2614,7 @@ Onboarding Checklist:
 - [ ] Royalty reporting format confirmed and mapped
 - [ ] Internal team trained on new workflow`, null],
 
-    // ── 19. Revenue Reconciliation SOP ───────────────────────────────────
+    // 19. Revenue Reconciliation SOP
     ['Revenue Reconciliation SOP (Monthly)', 'Royalties',
 `REVENUE RECONCILIATION -- MONTHLY STANDARD OPERATING PROCEDURE
 ========================================================
@@ -2679,7 +2679,7 @@ Reconciliation performed by: _______________  Date: ____/____/________
 Reviewed by: _____________________________  Date: ____/____/________
 Posted to ledger: [ ] Yes  Date: ____/____/________`, null],
 
-    // ── 20. Session Musician Agreement ───────────────────────────────────
+    // 20. Session Musician Agreement
     ['Session Musician Agreement', 'Legal',
 `SESSION MUSICIAN AGREEMENT
 ========================================================
@@ -2752,7 +2752,7 @@ ___________________________  Date: ____/____/________
 ___________________________  Date: ____/____/________
 [MUSICIAN NAME]`, null],
 
-    // ── 21. Content Takedown / DMCA Notice Template ─────────────────────
+    // 21. Content Takedown / DMCA Notice Template
     ['Content Takedown / DMCA Notice Template', 'Legal',
 `DMCA TAKEDOWN NOTICE
 ========================================================

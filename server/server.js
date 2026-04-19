@@ -41,7 +41,7 @@ const app = express();
 
 const isProd = config.nodeEnv === 'production';
 
-// ── CORS Lockdown ───────────────────────────────────────────────
+// CORS Lockdown
 const allowedOrigins = (process.env.CORS_ORIGINS || '')
   .split(',')
   .map((o) => o.trim())
@@ -64,7 +64,7 @@ app.use(cors({
   maxAge: 86400,
 }));
 
-// ── Helmet — secure HTTP headers with CSP ───────────────────────
+// Helmet — secure HTTP headers with CSP
 const supersetOrigin = process.env.SUPERSET_URL || '';
 const frameSources = ["'self'"];
 if (supersetOrigin) frameSources.push(supersetOrigin);
@@ -89,13 +89,13 @@ app.use(helmet({
   hsts: isProd ? { maxAge: 31536000, includeSubDomains: true } : false,
 }));
 
-// ── Additional security headers ─────────────────────────────────
+// Additional security headers
 app.use(securityHeaders);
 
-// ── Compression ─────────────────────────────────────────────────
+// Compression
 app.use(compression());
 
-// ── Rate Limiters ───────────────────────────────────────────────
+// Rate Limiters
 const apiLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 300,
@@ -132,7 +132,7 @@ const uploadLimiter = rateLimit({
   },
 });
 
-// ── Global middleware ───────────────────────────────────────────
+// Global middleware
 app.use(responseTime);
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));

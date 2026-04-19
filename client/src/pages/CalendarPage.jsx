@@ -426,7 +426,8 @@ export default function CalendarPage() {
               return (
                 <div
                   key={ev.id}
-                  style={{ flexShrink: 0, padding: '8px 12px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderLeft: `3px solid ${et.color}`, borderRadius: 'var(--radius-sm)', cursor: 'pointer', minWidth: '180px' }}
+                  className="clickable"
+                  style={{ flexShrink: 0, padding: '8px 12px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderLeft: `3px solid ${et.color}`, borderRadius: 'var(--radius-sm)', cursor: 'pointer', minWidth: '180px', transition: 'box-shadow 150ms ease, border-color 150ms ease' }}
                   onClick={() => setSelectedEvent(ev)}
                 >
                   <div style={{ fontSize: '12px', fontWeight: 600 }}>{ev.title.length > 25 ? ev.title.slice(0, 23) + '...' : ev.title}</div>

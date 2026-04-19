@@ -10,7 +10,7 @@ const router = express.Router();
 
 const { AppError } = require('../middleware/errorHandler');
 
-// ── Multer configuration ─────────────────────────────────────────────
+// Multer configuration
 // Use memory storage so the buffer is available on req.file.buffer for
 // checksum computation and storage-provider upload.
 const MAX_UPLOAD_BYTES = parseInt(process.env.MAX_UPLOAD_MB || '100', 10) * 1024 * 1024;
@@ -45,7 +45,7 @@ const upload = multer({
 // All routes require authentication
 router.use(authenticate);
 
-// ── Routes ───────────────────────────────────────────────────────────
+// Routes
 
 // Upload a new media file
 router.post(

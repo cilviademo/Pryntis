@@ -263,7 +263,7 @@ export default function PlacementsPage() {
                   pipelineGroups[status].map((p) => (
                     <div
                       key={p.id}
-                      className="card"
+                      className={`card${canEdit ? ' clickable' : ''}`}
                       style={{ cursor: canEdit ? 'pointer' : 'default' }}
                       onClick={() => canEdit && openEdit(p)}
                     >
