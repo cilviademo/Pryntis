@@ -37,7 +37,7 @@ export default function AudioPlayer({ src, title }) {
       const x = i * (barWidth + gap);
       const isFilled = (i / barCount) <= progress;
 
-      ctx.fillStyle = isFilled ? 'var(--color-primary, #D4A843)' : 'var(--color-border, #1a1a2a)';
+      ctx.fillStyle = isFilled ? 'var(--color-primary, #7C3AED)' : 'var(--color-border, #1a1a2a)';
       ctx.fillRect(x, (h - barH) / 2, barWidth, barH);
     }
 

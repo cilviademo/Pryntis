@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import ReactECharts from 'echarts-for-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -12,8 +12,9 @@ const AUDIO_TYPES = ['beat', 'stem', 'mix', 'master', 'sample', 'audio'];
 
 export default function AssetDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
-  const canEdit = user?.role === 'admin' || user?.role === 'manager';
+  const canEdit = user?.role === 'owner' || user?.role === 'admin' || user?.role === 'manager';
 
   const [asset, setAsset] = useState(null);
   const [placements, setPlacements] = useState([]);
@@ -235,18 +236,18 @@ export default function AssetDetailPage() {
       type: 'line',
       data: usageRecords.map((r) => r.count || r.plays || r.streams || 0),
       smooth: true,
-      lineStyle: { color: '#D4A843', width: 2 },
+      lineStyle: { color: '#7C3AED', width: 2 },
       areaStyle: {
         color: {
           type: 'linear',
           x: 0, y: 0, x2: 0, y2: 1,
           colorStops: [
-            { offset: 0, color: 'rgba(0, 102, 255, 0.2)' },
-            { offset: 1, color: 'rgba(0, 102, 255, 0.02)' },
+            { offset: 0, color: 'rgba(124, 58, 237, 0.2)' },
+            { offset: 1, color: 'rgba(124, 58, 237, 0.02)' },
           ],
         },
       },
-      itemStyle: { color: '#D4A843' },
+      itemStyle: { color: '#7C3AED' },
     }],
   } : null;
 
@@ -566,11 +567,10 @@ export default function AssetDetailPage() {
     <div>
       <div className="page-header">
         <div>
-          <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
-            <Link to="/assets">Assets</Link>
-            <span style={{ margin: '0 6px' }}>/</span>
-            <span>{asset.title}</span>
-          </div>
+          <button className="btn btn-secondary btn-sm back-btn" onClick={() => navigate('/port/assets')} style={{ marginBottom: '8px' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '4px', verticalAlign: 'middle' }}><polyline points="15 18 9 12 15 6" /></svg>
+            Back to Assets
+          </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <h2>{asset.title}</h2>
             {/* Rights Status Badge */}

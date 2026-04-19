@@ -6,7 +6,7 @@ import api from '../services/api';
 import InsightsPanel from '../components/InsightsPanel';
 import { capitalize, objToArray, formatCurrency } from '../utils/formatters';
 
-const CHART_COLORS = ['#D4A843', '#4ECDC4', '#FF6B6B', '#34D399', '#FBBF24', '#9a9bb8', '#E8B84D'];
+const CHART_COLORS = ['#7C3AED', '#4ECDC4', '#FF6B6B', '#34D399', '#FBBF24', '#9a9bb8', '#8B5CF6'];
 
 /* Health score dimension definitions — 6 weighted dimensions (sum = 100) */
 const HEALTH_DIMENSIONS = [
@@ -262,7 +262,7 @@ export default function DashboardPage() {
   const recoupData = [
     { name: 'Recouped', value: parseFloat(kpi.recoupedAmount) || 0, color: '#34D399' },
     { name: 'Unrecouped', value: parseFloat(kpi.unrecoupedBalance) || 0, color: '#EF4444' },
-    { name: 'Payable', value: parseFloat(kpi.payableNow) || 0, color: '#D4A843' },
+    { name: 'Payable', value: parseFloat(kpi.payableNow) || 0, color: '#7C3AED' },
   ];
   const hasRecoupData = recoupData.some((d) => d.value > 0);
   const recoupOption = isElevated && hasRecoupData ? {
@@ -321,9 +321,9 @@ export default function DashboardPage() {
       type: 'line',
       data: throughputData.map((d) => d.count),
       smooth: true,
-      lineStyle: { color: '#D4A843', width: 2 },
-      itemStyle: { color: '#D4A843' },
-      areaStyle: { color: 'rgba(0, 102, 255, 0.08)' },
+      lineStyle: { color: '#7C3AED', width: 2 },
+      itemStyle: { color: '#7C3AED' },
+      areaStyle: { color: 'rgba(124, 58, 237, 0.08)' },
     }],
   } : null;
 
@@ -378,8 +378,8 @@ export default function DashboardPage() {
       { type: 'value', name: 'Revenue', axisLabel: { color: '#5c5e78', fontSize: 11, formatter: (v) => `$${(v / 1000).toFixed(0)}k` }, splitLine: { show: false } },
     ],
     series: [
-      { name: 'Assets', type: 'bar', data: momentum.map((d) => d.new_assets || 0), itemStyle: { color: '#D4A843' }, barWidth: '20%' },
-      { name: 'Placements', type: 'bar', data: momentum.map((d) => d.new_placements || 0), itemStyle: { color: '#D4A843' }, barWidth: '20%' },
+      { name: 'Assets', type: 'bar', data: momentum.map((d) => d.new_assets || 0), itemStyle: { color: '#7C3AED' }, barWidth: '20%' },
+      { name: 'Placements', type: 'bar', data: momentum.map((d) => d.new_placements || 0), itemStyle: { color: '#7C3AED' }, barWidth: '20%' },
       { name: 'Projects', type: 'bar', data: momentum.map((d) => d.new_projects || 0), itemStyle: { color: '#34D399' }, barWidth: '20%' },
       { name: 'Revenue', type: 'line', yAxisIndex: 1, data: momentum.map((d) => d.revenue || 0), smooth: true, lineStyle: { color: '#FBBF24', width: 2 }, itemStyle: { color: '#FBBF24' } },
     ],

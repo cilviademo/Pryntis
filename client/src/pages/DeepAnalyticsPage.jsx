@@ -4,7 +4,7 @@ import ReactECharts from 'echarts-for-react';
 import api from '../services/api';
 import { formatCurrency, capitalize } from '../utils/formatters';
 
-const COLORS = ['#D4A843', '#4ECDC4', '#FF6B6B', '#34D399', '#FBBF24', '#9a9bb8', '#E8B84D'];
+const COLORS = ['#7C3AED', '#4ECDC4', '#FF6B6B', '#34D399', '#FBBF24', '#9a9bb8', '#8B5CF6'];
 const chartTooltip = {
   backgroundColor: '#1a1a2a',
   borderColor: 'rgba(212,168,67,0.15)',
@@ -83,7 +83,7 @@ export default function DeepAnalyticsPage() {
         { value: wf.gross_revenue || 0, itemStyle: { color: '#22c55e' } },
         { value: -(wf.total_expenses || 0), itemStyle: { color: '#ef4444' } },
         { value: wf.applied_to_recoupment || 0, itemStyle: { color: '#FBBF24' } },
-        { value: wf.net_payable || 0, itemStyle: { color: '#D4A843' } },
+        { value: wf.net_payable || 0, itemStyle: { color: '#7C3AED' } },
       ],
       barWidth: '50%',
       itemStyle: { borderRadius: [4, 4, 0, 0] },
@@ -146,7 +146,7 @@ export default function DeepAnalyticsPage() {
       {
         name: 'Total Revenue', type: 'bar',
         data: tierRev.map((t) => t.total_revenue),
-        itemStyle: { color: '#D4A843', borderRadius: [4, 4, 0, 0] },
+        itemStyle: { color: '#7C3AED', borderRadius: [4, 4, 0, 0] },
       },
       {
         name: 'Avg per Artist', type: 'bar',
@@ -225,8 +225,8 @@ export default function DeepAnalyticsPage() {
           value: values,
           name: artist.stage_name || artist.name,
           areaStyle: { color: 'rgba(212, 168, 67, 0.15)' },
-          lineStyle: { color: '#D4A843', width: 2 },
-          itemStyle: { color: '#D4A843' },
+          lineStyle: { color: '#7C3AED', width: 2 },
+          itemStyle: { color: '#7C3AED' },
         }],
       }],
     };

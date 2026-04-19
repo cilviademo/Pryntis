@@ -6,7 +6,7 @@ import api from '../services/api';
 import { capitalize, formatCurrency } from '../utils/formatters';
 import ExportButton from '../components/ExportButton';
 
-const CHART_COLORS = ['#D4A843', '#4ECDC4', '#34D399', '#FBBF24', '#EF4444', '#D4A843'];
+const CHART_COLORS = ['#7C3AED', '#4ECDC4', '#34D399', '#FBBF24', '#EF4444', '#7C3AED'];
 
 export default function BusinessOpsPage() {
   const { user } = useAuth();

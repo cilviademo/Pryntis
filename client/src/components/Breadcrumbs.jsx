@@ -20,6 +20,12 @@ const ROUTE_LABELS = {
   admin: 'Admin',
 };
 
+/**
+ * Virtual segments are path prefixes that group routes but have no
+ * standalone page. Clicking them should not navigate anywhere.
+ */
+const VIRTUAL_SEGMENTS = new Set(['port', 'admin', 'pass']);
+
 function isUuid(segment) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(segment);
 }
@@ -30,17 +36,18 @@ export default function Breadcrumbs() {
 
   if (segments.length === 0) return null;
 
-  const crumbs = [{ label: 'Dashboard', path: '/' }];
+  const crumbs = [{ label: 'Dashboard', path: '/', isLink: true }];
   let currentPath = '';
 
   segments.forEach((seg) => {
     currentPath += `/${seg}`;
     if (isUuid(seg)) {
-      crumbs.push({ label: 'Detail', path: currentPath });
+      crumbs.push({ label: 'Detail', path: currentPath, isLink: false });
     } else {
       crumbs.push({
         label: ROUTE_LABELS[seg] || seg.charAt(0).toUpperCase() + seg.slice(1),
         path: currentPath,
+        isLink: !VIRTUAL_SEGMENTS.has(seg),
       });
     }
   });
@@ -68,13 +75,15 @@ export default function Breadcrumbs() {
             )}
             {isLast ? (
               <span style={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}>{crumb.label}</span>
-            ) : (
+            ) : crumb.isLink ? (
               <Link
                 to={crumb.path}
                 style={{ color: 'var(--color-text-muted)', textDecoration: 'none' }}
               >
                 {crumb.label}
               </Link>
+            ) : (
+              <span style={{ color: 'var(--color-text-muted)' }}>{crumb.label}</span>
             )}
           </span>
         );

@@ -120,7 +120,7 @@ const IconPackage = () => (
 /* Tier color map (preserved from original) */
 const TIER_COLORS = {
   Free: '#5a6180',
-  Basic: '#D4A843',
+  Basic: '#7C3AED',
   Pro: '#4ECDC4',
   Enterprise: '#FBBF24',
 };
@@ -1009,8 +1009,8 @@ export default function PassPage() {
 
           {/* Analog Modeling Coming Soon Banner */}
           <div style={{
-            background: 'linear-gradient(135deg, rgba(0, 102, 255, 0.10), rgba(106, 0, 255, 0.08))',
-            border: '1px solid rgba(0, 102, 255, 0.15)',
+            background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.10), rgba(139, 92, 246, 0.08))',
+            border: '1px solid rgba(124, 58, 237, 0.15)',
             borderRadius: 'var(--radius)',
             padding: '20px 24px',
             marginBottom: '20px',

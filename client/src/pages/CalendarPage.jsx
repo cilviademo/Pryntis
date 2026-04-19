@@ -3,9 +3,9 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
 const EVENT_TYPES = [
-  { key: 'mixing', label: 'Mixing Session', color: '#D4A843' },
+  { key: 'mixing', label: 'Mixing Session', color: '#7C3AED' },
   { key: 'mastering', label: 'Mastering Session', color: '#4ECDC4' },
-  { key: 'meeting', label: 'Artist Meeting', color: '#D4A843' },
+  { key: 'meeting', label: 'Artist Meeting', color: '#7C3AED' },
   { key: 'release', label: 'Release Deadline', color: '#EF4444' },
   { key: 'metadata', label: 'Metadata/Rights Deadline', color: '#FBBF24' },
   { key: 'followup', label: 'Placement Follow-up', color: '#34D399' },
