@@ -69,6 +69,7 @@ function AppRoutes() {
       >
         {/* Dashboard — always accessible */}
         <Route index element={<DashboardPage />} />
+        <Route path="dashboard" element={<Navigate to="/" replace />} />
 
         {/* CORE */}
         <Route path="artists" element={<RoleRoute pageKey="artists"><ArtistsPage /></RoleRoute>} />

@@ -27,7 +27,7 @@ export default function UsersPage() {
   // Redirect non-admin users
   useEffect(() => {
     if (user && !isAdmin) {
-      navigate('/dashboard');
+      navigate('/');
     }
   }, [user, isAdmin, navigate]);
 
@@ -101,8 +101,8 @@ export default function UsersPage() {
     setError('');
     try {
       await startImpersonation(targetUser.id);
-      // Navigate to dashboard so the impersonated user lands on their home view
-      navigate('/dashboard');
+      // Navigate to dashboard (index route '/') so the impersonated user lands on their home view
+      navigate('/');
     } catch (err) {
       setError(err.message || 'Impersonation failed');
     } finally {

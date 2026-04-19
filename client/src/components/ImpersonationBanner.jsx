@@ -16,7 +16,7 @@ export default function ImpersonationBanner() {
   const handleExit = async () => {
     try {
       await exitImpersonation();
-      navigate('/admin/users');
+      navigate('/users');
     } catch (err) {
       console.error('Failed to exit impersonation:', err);
     }
