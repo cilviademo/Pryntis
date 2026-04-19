@@ -430,17 +430,12 @@ const analyticsController = {
            ar.name AS artist_name,
            ar.stage_name,
            COUNT(a.id) AS total_assets,
-           COUNT(CASE WHEN a.isrc IS NOT NULL AND a.isrc != '' THEN 1 END) AS has_isrc,
-           COUNT(CASE WHEN a.iswc IS NOT NULL AND a.iswc != '' THEN 1 END) AS has_iswc,
+           COUNT(CASE WHEN a.file_name IS NOT NULL AND a.file_name != '' THEN 1 END) AS has_file,
+           COUNT(CASE WHEN a.storage_key IS NOT NULL AND a.storage_key != '' THEN 1 END) AS has_storage,
            COUNT(CASE WHEN a.genre IS NOT NULL AND a.genre != '' THEN 1 END) AS has_genre,
            COUNT(CASE WHEN a.bpm IS NOT NULL THEN 1 END) AS has_bpm,
            COUNT(CASE WHEN a.key_signature IS NOT NULL AND a.key_signature != '' THEN 1 END) AS has_key,
-           COUNT(CASE WHEN a.duration IS NOT NULL THEN 1 END) AS has_duration,
-           COALESCE((
-             SELECT COUNT(*) FROM ownership_records o
-             WHERE o.asset_id = ANY(ARRAY_AGG(a.id))
-               AND o.ipi_number IS NOT NULL AND o.ipi_number != ''
-           ), 0) AS has_ipi
+           COUNT(CASE WHEN a.duration_seconds IS NOT NULL THEN 1 END) AS has_duration
          FROM artists ar
          LEFT JOIN assets a ON a.artist_id = ar.id AND a.is_deleted = false
          WHERE ar.is_deleted = false
@@ -456,8 +451,8 @@ const analyticsController = {
           artist_name: r.artist_name,
           stage_name: r.stage_name,
           total_assets: parseInt(r.total_assets, 10),
-          isrc_pct: Math.round((parseInt(r.has_isrc, 10) / total) * 100),
-          iswc_pct: Math.round((parseInt(r.has_iswc, 10) / total) * 100),
+          file_pct: Math.round((parseInt(r.has_file, 10) / total) * 100),
+          storage_pct: Math.round((parseInt(r.has_storage, 10) / total) * 100),
           genre_pct: Math.round((parseInt(r.has_genre, 10) / total) * 100),
           bpm_pct: Math.round((parseInt(r.has_bpm, 10) / total) * 100),
           key_pct: Math.round((parseInt(r.has_key, 10) / total) * 100),
@@ -469,7 +464,7 @@ const analyticsController = {
       const totalAssets = coverage.reduce((s, c) => s + c.total_assets, 0);
       const avgCoverage = coverage.length > 0
         ? Math.round(coverage.reduce((s, c) => {
-            const fields = [c.isrc_pct, c.iswc_pct, c.genre_pct, c.bpm_pct, c.key_pct, c.duration_pct];
+            const fields = [c.file_pct, c.storage_pct, c.genre_pct, c.bpm_pct, c.key_pct, c.duration_pct];
             return s + (fields.reduce((a, b) => a + b, 0) / fields.length);
           }, 0) / coverage.length)
         : 0;

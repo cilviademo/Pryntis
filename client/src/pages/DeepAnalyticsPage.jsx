@@ -178,8 +178,8 @@ export default function DeepAnalyticsPage() {
   } : null;
 
   // Coverage heatmap fields
-  const coverageFields = ['isrc_pct', 'iswc_pct', 'genre_pct', 'bpm_pct', 'key_pct', 'duration_pct'];
-  const coverageLabels = ['ISRC', 'ISWC', 'Genre', 'BPM', 'Key', 'Duration'];
+  const coverageFields = ['file_pct', 'storage_pct', 'genre_pct', 'bpm_pct', 'key_pct', 'duration_pct'];
+  const coverageLabels = ['File Name', 'Storage', 'Genre', 'BPM', 'Key', 'Duration'];
 
   const getCoverageColor = (pct) => {
     if (pct >= 80) return '#22c55e';
@@ -190,22 +190,22 @@ export default function DeepAnalyticsPage() {
 
   // Health radar option builder
   const buildRadarOption = (artist) => {
-    const dims = artist.dimensions || {};
+    const bd = artist.breakdown || {};
     const indicators = [
-      { name: 'Revenue', max: 100 },
-      { name: 'Metadata', max: 100 },
-      { name: 'Catalog', max: 100 },
-      { name: 'Engagement', max: 100 },
-      { name: 'Pipeline', max: 100 },
-      { name: 'Compliance', max: 100 },
+      { name: 'Momentum', max: bd.momentum?.max || 25 },
+      { name: 'Delivery', max: bd.delivery?.max || 20 },
+      { name: 'Revenue', max: bd.revenue?.max || 20 },
+      { name: 'Audience', max: bd.audience?.max || 15 },
+      { name: 'Engagement', max: bd.engagement?.max || 10 },
+      { name: 'Compliance', max: bd.compliance?.max || 10 },
     ];
     const values = [
-      dims.revenue_score || 0,
-      dims.metadata_score || 0,
-      dims.catalog_score || 0,
-      dims.engagement_score || 0,
-      dims.pipeline_score || 0,
-      dims.compliance_score || 0,
+      bd.momentum?.score || 0,
+      bd.delivery?.score || 0,
+      bd.revenue?.score || 0,
+      bd.audience?.score || 0,
+      bd.engagement?.score || 0,
+      bd.compliance?.score || 0,
     ];
     return {
       backgroundColor: 'transparent',
@@ -222,7 +222,7 @@ export default function DeepAnalyticsPage() {
         type: 'radar',
         data: [{
           value: values,
-          name: artist.stage_name || artist.artist_name,
+          name: artist.stage_name || artist.name,
           areaStyle: { color: 'rgba(0, 102, 255, 0.15)' },
           lineStyle: { color: '#0066FF', width: 2 },
           itemStyle: { color: '#0066FF' },
@@ -412,14 +412,14 @@ export default function DeepAnalyticsPage() {
               </p>
               <div className="chart-grid">
                 {healthScores.map((artist, i) => (
-                  <div key={i} className="card" style={{ cursor: 'pointer' }} onClick={() => window.location.pathname = `/artists/${artist.artist_id}`}>
+                  <div key={i} className="card" style={{ cursor: 'pointer' }} onClick={() => window.location.pathname = `/artists/${artist.id}`}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                      <h3 style={{ margin: 0, fontSize: '14px' }}>{artist.stage_name || artist.artist_name}</h3>
+                      <h3 style={{ margin: 0, fontSize: '14px' }}>{artist.stage_name || artist.name}</h3>
                       <span className="badge" style={{
-                        background: artist.overall_score >= 70 ? 'rgba(34,197,94,0.15)' : artist.overall_score >= 40 ? 'rgba(255,176,0,0.15)' : 'rgba(239,68,68,0.15)',
-                        color: artist.overall_score >= 70 ? '#22c55e' : artist.overall_score >= 40 ? '#FFB000' : '#ef4444',
+                        background: artist.health_score >= 70 ? 'rgba(34,197,94,0.15)' : artist.health_score >= 40 ? 'rgba(255,176,0,0.15)' : 'rgba(239,68,68,0.15)',
+                        color: artist.health_score >= 70 ? '#22c55e' : artist.health_score >= 40 ? '#FFB000' : '#ef4444',
                       }}>
-                        {Math.round(artist.overall_score)}/100
+                        {Math.round(artist.health_score)}/100
                       </span>
                     </div>
                     <ReactECharts option={buildRadarOption(artist)} style={{ height: 240 }} />
