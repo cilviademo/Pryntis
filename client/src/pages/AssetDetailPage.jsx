@@ -40,14 +40,14 @@ export default function AssetDetailPage() {
     setLoading(true);
     setError('');
     try {
-      const data = await api.get(`/assets/${id}`);
+      const data = await api.get(`/port/assets/${id}`);
       setAsset(data);
 
       // Load related data in parallel -- these may 404
       const promises = [
-        api.get(`/placements?asset_id=${id}`).catch(() => []),
-        api.get(`/assets/${id}/ownership`).catch(() => []),
-        api.get(`/assets/${id}/usage`).catch(() => []),
+        api.get(`/port/placements?asset_id=${id}`).catch(() => []),
+        api.get(`/port/assets/${id}/ownership`).catch(() => []),
+        api.get(`/port/assets/${id}/usage`).catch(() => []),
       ];
       const [p, o, u] = await Promise.all(promises);
       setPlacements(Array.isArray(p) ? p : []);
@@ -78,9 +78,9 @@ export default function AssetDetailPage() {
     if (!newTag.trim()) return;
     setAddingTag(true);
     try {
-      await api.post(`/assets/${id}/tags`, { tag: newTag.trim() });
+      await api.post(`/port/assets/${id}/tags`, { tag: newTag.trim() });
       setNewTag('');
-      const data = await api.get(`/assets/${id}`);
+      const data = await api.get(`/port/assets/${id}`);
       setAsset(data);
     } catch (err) {
       console.error('Failed to add tag:', err);
@@ -91,8 +91,8 @@ export default function AssetDetailPage() {
 
   const handleRemoveTag = async (tagId) => {
     try {
-      await api.del(`/assets/${id}/tags/${tagId}`);
-      const data = await api.get(`/assets/${id}`);
+      await api.del(`/port/assets/${id}/tags/${tagId}`);
+      const data = await api.get(`/port/assets/${id}`);
       setAsset(data);
     } catch (err) {
       console.error('Failed to remove tag:', err);

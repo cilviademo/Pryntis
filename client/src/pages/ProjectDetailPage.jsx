@@ -22,7 +22,7 @@ export default function ProjectDetailPage() {
         setProject(data);
 
         try {
-          const a = await api.get(`/assets?project_id=${id}`);
+          const a = await api.get(`/port/assets?project_id=${id}`);
           setAssets(Array.isArray(a) ? a : []);
         } catch { /* no assets */ }
       } catch (err) {
