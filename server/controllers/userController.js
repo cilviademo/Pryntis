@@ -4,10 +4,10 @@ const { success } = require('../utils/response');
 const { safeUser } = require('../utils/serializers');
 
 const userController = {
-  // GET /api/v1/users — admin only
+  // GET /api/v1/users — admin/owner only
   async list(req, res, next) {
     try {
-      if (req.user.role !== 'admin') {
+      if (req.user.role !== 'admin' && req.user.role !== 'owner') {
         throw new AppError('Only admins can list users', 403, 'FORBIDDEN');
       }
 
@@ -59,10 +59,10 @@ const userController = {
     }
   },
 
-  // PUT /api/v1/users/:id — admin can change role, is_active
+  // PUT /api/v1/users/:id — admin/owner can change role, is_active
   async update(req, res, next) {
     try {
-      if (req.user.role !== 'admin') {
+      if (req.user.role !== 'admin' && req.user.role !== 'owner') {
         throw new AppError('Only admins can update users', 403, 'FORBIDDEN');
       }
 
@@ -100,10 +100,10 @@ const userController = {
     }
   },
 
-  // POST /api/v1/users/:id/deactivate — admin only
+  // POST /api/v1/users/:id/deactivate — admin/owner only
   async deactivate(req, res, next) {
     try {
-      if (req.user.role !== 'admin') {
+      if (req.user.role !== 'admin' && req.user.role !== 'owner') {
         throw new AppError('Only admins can deactivate users', 403, 'FORBIDDEN');
       }
 

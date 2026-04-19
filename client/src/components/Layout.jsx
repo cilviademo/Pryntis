@@ -8,7 +8,7 @@ import ImpersonationBanner from './ImpersonationBanner';
 import Breadcrumbs from './Breadcrumbs';
 
 export default function Layout() {
-  const { user, isAdmin, logout } = useAuth();
+  const { user, isAdmin, isImpersonating, canAccessPage, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,6 +22,33 @@ export default function Layout() {
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  /**
+   * Helper: only render a nav link if the current effective role can access it.
+   * Admin/owner always see everything (canAccessPage returns true for '*').
+   */
+  const navLink = (to, label, pageKey) => {
+    if (!canAccessPage(pageKey)) return null;
+    return (
+      <NavLink to={to} className="nav-link">
+        {label}
+      </NavLink>
+    );
+  };
+
+  /**
+   * Helper: render a section label only if at least one child link is visible.
+   */
+  const navSection = (label, links) => {
+    const visibleLinks = links.filter(Boolean);
+    if (visibleLinks.length === 0) return null;
+    return (
+      <>
+        <div className="nav-section-label">{label}</div>
+        {visibleLinks}
+      </>
+    );
   };
 
   return (
@@ -48,7 +75,7 @@ export default function Layout() {
         <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
       )}
 
-      <aside className={`sidebar${sidebarOpen ? ' sidebar--open' : ''}`}>
+      <aside className={`sidebar${sidebarOpen ? ' sidebar--open' : ''}${isImpersonating ? ' sidebar--impersonating' : ''}`}>
         <div className="sidebar-header">
           <h1 className="sidebar-brand">Pryntis</h1>
           <span className="sidebar-subtitle">Panel</span>
@@ -66,69 +93,40 @@ export default function Layout() {
         </div>
 
         <nav className="sidebar-nav">
-          {/* CORE */}
-          <div className="nav-section-label">Core</div>
-          <NavLink to="/" end className="nav-link">
-            Dashboard
-          </NavLink>
-          <NavLink to="/artists" className="nav-link">
-            Artists
-          </NavLink>
-          <NavLink to="/projects" className="nav-link">
-            Projects
-          </NavLink>
+          {/* CORE — dashboard always visible, artists/projects role-gated */}
+          {navSection('Core', [
+            navLink('/', 'Dashboard', 'dashboard'),
+            navLink('/artists', 'Artists', 'artists'),
+            navLink('/projects', 'Projects', 'projects'),
+          ])}
 
           {/* PASS */}
-          <div className="nav-section-label">Pass</div>
-          <NavLink to="/pass" className="nav-link">
-            Subscriptions
-          </NavLink>
+          {navSection('Pass', [
+            navLink('/pass', 'Subscriptions', 'subscriptions'),
+          ])}
 
           {/* PORT */}
-          <div className="nav-section-label">Port</div>
-          <NavLink to="/port/assets" className="nav-link">
-            Assets
-          </NavLink>
-          <NavLink to="/port/placements" className="nav-link">
-            Placements
-          </NavLink>
-          <NavLink to="/port/contacts" className="nav-link">
-            Contacts
-          </NavLink>
-          <NavLink to="/port/templates" className="nav-link">
-            Templates
-          </NavLink>
+          {navSection('Port', [
+            navLink('/port/assets', 'Assets', 'assets'),
+            navLink('/port/placements', 'Placements', 'placements'),
+            navLink('/port/contacts', 'Contacts', 'contacts'),
+            navLink('/port/templates', 'Templates', 'templates'),
+          ])}
 
           {/* OPS */}
-          <div className="nav-section-label">Ops</div>
-          <NavLink to="/tasks" className="nav-link">
-            Tasks
-          </NavLink>
-          <NavLink to="/analytics" className="nav-link">
-            Analytics
-          </NavLink>
-          <NavLink to="/business" className="nav-link">
-            Business Ops
-          </NavLink>
-          <NavLink to="/calendar" className="nav-link">
-            Calendar
-          </NavLink>
-          <NavLink to="/settings" className="nav-link">
-            Settings
-          </NavLink>
+          {navSection('Ops', [
+            navLink('/tasks', 'Tasks', 'tasks'),
+            navLink('/analytics', 'Analytics', 'analytics'),
+            navLink('/business', 'Business Ops', 'business-ops'),
+            navLink('/calendar', 'Calendar', 'calendar'),
+            navLink('/settings', 'Settings', 'settings'),
+          ])}
 
-          {/* ADMIN */}
-          {isAdmin && (
-            <>
-              <div className="nav-section-label">Admin</div>
-              <NavLink to="/users" className="nav-link">
-                Users
-              </NavLink>
-              <NavLink to="/admin/analytics" className="nav-link">
-                Deep Analytics
-              </NavLink>
-            </>
-          )}
+          {/* ADMIN — only visible when effective role is admin/owner */}
+          {isAdmin && navSection('Admin', [
+            <NavLink key="users" to="/users" className="nav-link">Users</NavLink>,
+            <NavLink key="deep" to="/admin/analytics" className="nav-link">Deep Analytics</NavLink>,
+          ])}
         </nav>
 
         <div style={{ padding: '8px 16px 0' }}>
@@ -142,6 +140,9 @@ export default function Layout() {
                 {user?.first_name} {user?.last_name}
               </span>
               <span className={`badge badge--${user?.role}`}>{(user?.role || '').replace(/_/g, ' ')}</span>
+              {isImpersonating && (
+                <span className="impersonation-tag">impersonated</span>
+              )}
             </div>
           </div>
           <button

@@ -6,7 +6,7 @@ import api from '../services/api';
 import InsightsPanel from '../components/InsightsPanel';
 import { capitalize, objToArray, formatCurrency } from '../utils/formatters';
 
-const CHART_COLORS = ['#0066FF', '#6A00FF', '#00FF84', '#FFB000', '#E10600', '#0066FF', '#00FF84'];
+const CHART_COLORS = ['#D4A843', '#4ECDC4', '#FF6B6B', '#34D399', '#FBBF24', '#9a9bb8', '#E8B84D'];
 
 /* Health score dimension definitions — 6 weighted dimensions (sum = 100) */
 const HEALTH_DIMENSIONS = [
@@ -196,9 +196,9 @@ export default function DashboardPage() {
   }));
 
   const chartTooltip = {
-    backgroundColor: '#1C2228',
+    backgroundColor: '#1a1a2a',
     borderColor: 'rgba(255,255,255,0.07)',
-    textStyle: { color: '#F4F4F2', fontSize: 12 },
+    textStyle: { color: '#F0EDE8', fontSize: 12 },
   };
 
   /* ── Projects by Status bar chart ────────────────────────────────── */
@@ -209,13 +209,13 @@ export default function DashboardPage() {
     xAxis: {
       type: 'category',
       data: projectStatusArr.map((d) => d.name),
-      axisLabel: { color: '#5f6780', fontSize: 12 },
+      axisLabel: { color: '#5c5e78', fontSize: 12 },
       axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     yAxis: {
       type: 'value',
       minInterval: 1,
-      axisLabel: { color: '#5f6780', fontSize: 12 },
+      axisLabel: { color: '#5c5e78', fontSize: 12 },
       splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     series: [{
@@ -238,13 +238,13 @@ export default function DashboardPage() {
     xAxis: {
       type: 'category',
       data: placementStatusArr.map((d) => d.name),
-      axisLabel: { color: '#5f6780', fontSize: 12 },
+      axisLabel: { color: '#5c5e78', fontSize: 12 },
       axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     yAxis: {
       type: 'value',
       minInterval: 1,
-      axisLabel: { color: '#5f6780', fontSize: 12 },
+      axisLabel: { color: '#5c5e78', fontSize: 12 },
       splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     series: [{
@@ -260,9 +260,9 @@ export default function DashboardPage() {
 
   /* ── Recoup horizontal bar chart (FIX: was stacked single-category) ── */
   const recoupData = [
-    { name: 'Recouped', value: parseFloat(kpi.recoupedAmount) || 0, color: '#00FF84' },
-    { name: 'Unrecouped', value: parseFloat(kpi.unrecoupedBalance) || 0, color: '#E10600' },
-    { name: 'Payable', value: parseFloat(kpi.payableNow) || 0, color: '#0066FF' },
+    { name: 'Recouped', value: parseFloat(kpi.recoupedAmount) || 0, color: '#34D399' },
+    { name: 'Unrecouped', value: parseFloat(kpi.unrecoupedBalance) || 0, color: '#EF4444' },
+    { name: 'Payable', value: parseFloat(kpi.payableNow) || 0, color: '#D4A843' },
   ];
   const hasRecoupData = recoupData.some((d) => d.value > 0);
   const recoupOption = isElevated && hasRecoupData ? {
@@ -275,13 +275,13 @@ export default function DashboardPage() {
     grid: { left: 100, right: 40, top: 10, bottom: 10, containLabel: false },
     xAxis: {
       type: 'value',
-      axisLabel: { color: '#5f6780', formatter: (v) => `$${(v / 1000).toFixed(0)}k` },
+      axisLabel: { color: '#5c5e78', formatter: (v) => `$${(v / 1000).toFixed(0)}k` },
       splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     yAxis: {
       type: 'category',
       data: recoupData.map((d) => d.name),
-      axisLabel: { color: '#5f6780', fontSize: 13 },
+      axisLabel: { color: '#5c5e78', fontSize: 13 },
       axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     series: [{
@@ -293,7 +293,7 @@ export default function DashboardPage() {
         show: true,
         position: 'right',
         formatter: (p) => formatCurrency(p.value),
-        color: '#F4F4F2',
+        color: '#F0EDE8',
         fontSize: 12,
       },
     }],
@@ -308,21 +308,21 @@ export default function DashboardPage() {
     xAxis: {
       type: 'category',
       data: throughputData.map((d) => d.month),
-      axisLabel: { color: '#5f6780', fontSize: 11, rotate: 45 },
+      axisLabel: { color: '#5c5e78', fontSize: 11, rotate: 45 },
       axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     yAxis: {
       type: 'value',
       minInterval: 1,
-      axisLabel: { color: '#5f6780', fontSize: 12 },
+      axisLabel: { color: '#5c5e78', fontSize: 12 },
       splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     series: [{
       type: 'line',
       data: throughputData.map((d) => d.count),
       smooth: true,
-      lineStyle: { color: '#0066FF', width: 2 },
-      itemStyle: { color: '#0066FF' },
+      lineStyle: { color: '#D4A843', width: 2 },
+      itemStyle: { color: '#D4A843' },
       areaStyle: { color: 'rgba(0, 102, 255, 0.08)' },
     }],
   } : null;
@@ -331,7 +331,7 @@ export default function DashboardPage() {
   const artistPieOption = artistStatusArr.length > 0 ? {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'item', ...chartTooltip },
-    legend: { bottom: 0, textStyle: { color: '#5f6780', fontSize: 12 } },
+    legend: { bottom: 0, textStyle: { color: '#5c5e78', fontSize: 12 } },
     series: [{
       type: 'pie',
       radius: ['40%', '70%'],
@@ -339,7 +339,7 @@ export default function DashboardPage() {
       avoidLabelOverlap: true,
       itemStyle: { borderRadius: 6, borderColor: '#0B0D10', borderWidth: 2 },
       label: { show: false },
-      emphasis: { label: { show: true, fontSize: 14, fontWeight: 'bold', color: '#F4F4F2' } },
+      emphasis: { label: { show: true, fontSize: 14, fontWeight: 'bold', color: '#F0EDE8' } },
       data: artistStatusArr.map((d, i) => ({ ...d, itemStyle: { color: CHART_COLORS[i % CHART_COLORS.length] } })),
     }],
   } : null;
@@ -348,7 +348,7 @@ export default function DashboardPage() {
   const subscriptionPieOption = subscriptionData.length > 0 ? {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'item', ...chartTooltip },
-    legend: { bottom: 0, textStyle: { color: '#5f6780', fontSize: 12 } },
+    legend: { bottom: 0, textStyle: { color: '#5c5e78', fontSize: 12 } },
     series: [{
       type: 'pie',
       radius: ['40%', '70%'],
@@ -356,7 +356,7 @@ export default function DashboardPage() {
       avoidLabelOverlap: true,
       itemStyle: { borderRadius: 6, borderColor: '#0B0D10', borderWidth: 2 },
       label: { show: false },
-      emphasis: { label: { show: true, fontSize: 14, fontWeight: 'bold', color: '#F4F4F2' } },
+      emphasis: { label: { show: true, fontSize: 14, fontWeight: 'bold', color: '#F0EDE8' } },
       data: subscriptionData.map((d, i) => ({ ...d, itemStyle: { color: CHART_COLORS[i % CHART_COLORS.length] } })),
     }],
   } : null;
@@ -365,23 +365,23 @@ export default function DashboardPage() {
   const momentumOption = momentum.length > 0 ? {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', ...chartTooltip },
-    legend: { bottom: 0, textStyle: { color: '#5f6780', fontSize: 11 } },
+    legend: { bottom: 0, textStyle: { color: '#5c5e78', fontSize: 11 } },
     grid: { left: '3%', right: '4%', bottom: '40px', top: '10px', containLabel: true },
     xAxis: {
       type: 'category',
       data: momentum.map((d) => d.month),
-      axisLabel: { color: '#5f6780', fontSize: 11, rotate: 30 },
+      axisLabel: { color: '#5c5e78', fontSize: 11, rotate: 30 },
       axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     yAxis: [
-      { type: 'value', name: 'Count', axisLabel: { color: '#5f6780', fontSize: 11 }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } } },
-      { type: 'value', name: 'Revenue', axisLabel: { color: '#5f6780', fontSize: 11, formatter: (v) => `$${(v / 1000).toFixed(0)}k` }, splitLine: { show: false } },
+      { type: 'value', name: 'Count', axisLabel: { color: '#5c5e78', fontSize: 11 }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } } },
+      { type: 'value', name: 'Revenue', axisLabel: { color: '#5c5e78', fontSize: 11, formatter: (v) => `$${(v / 1000).toFixed(0)}k` }, splitLine: { show: false } },
     ],
     series: [
-      { name: 'Assets', type: 'bar', data: momentum.map((d) => d.new_assets || 0), itemStyle: { color: '#0066FF' }, barWidth: '20%' },
-      { name: 'Placements', type: 'bar', data: momentum.map((d) => d.new_placements || 0), itemStyle: { color: '#0066FF' }, barWidth: '20%' },
-      { name: 'Projects', type: 'bar', data: momentum.map((d) => d.new_projects || 0), itemStyle: { color: '#00FF84' }, barWidth: '20%' },
-      { name: 'Revenue', type: 'line', yAxisIndex: 1, data: momentum.map((d) => d.revenue || 0), smooth: true, lineStyle: { color: '#FFB000', width: 2 }, itemStyle: { color: '#FFB000' } },
+      { name: 'Assets', type: 'bar', data: momentum.map((d) => d.new_assets || 0), itemStyle: { color: '#D4A843' }, barWidth: '20%' },
+      { name: 'Placements', type: 'bar', data: momentum.map((d) => d.new_placements || 0), itemStyle: { color: '#D4A843' }, barWidth: '20%' },
+      { name: 'Projects', type: 'bar', data: momentum.map((d) => d.new_projects || 0), itemStyle: { color: '#34D399' }, barWidth: '20%' },
+      { name: 'Revenue', type: 'line', yAxisIndex: 1, data: momentum.map((d) => d.revenue || 0), smooth: true, lineStyle: { color: '#FBBF24', width: 2 }, itemStyle: { color: '#FBBF24' } },
     ],
   } : null;
 
@@ -590,14 +590,14 @@ export default function DashboardPage() {
           </div>
           <div className="summary-card">
             <div className="summary-card__label">Payable Now<KpiTooltip kpiKey="payableNow" /></div>
-            <div className="summary-card__value" style={{ color: kpi.payableNow > 0 ? '#00FF84' : 'inherit' }}>
+            <div className="summary-card__value" style={{ color: kpi.payableNow > 0 ? '#34D399' : 'inherit' }}>
               {formatCurrency(kpi.payableNow)}
             </div>
             <div style={{ fontSize: '11px', color: 'var(--color-success)', marginTop: '4px' }}>High confidence</div>
           </div>
           <div className="summary-card">
             <div className="summary-card__label">At-Risk<KpiTooltip kpiKey="atRiskRevenue" /></div>
-            <div className="summary-card__value" style={{ color: kpi.atRiskRevenue > 0 ? '#E10600' : 'inherit' }}>
+            <div className="summary-card__value" style={{ color: kpi.atRiskRevenue > 0 ? '#EF4444' : 'inherit' }}>
               {formatCurrency(kpi.atRiskRevenue)}
             </div>
             <div style={{ fontSize: '11px', color: 'var(--color-danger)', marginTop: '4px' }}>Low confidence</div>

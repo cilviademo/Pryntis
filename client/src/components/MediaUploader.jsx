@@ -45,7 +45,7 @@ export default function MediaUploader({ ownerType, ownerId, onUploadComplete }) 
     setProgress(0);
 
     try {
-      const token = localStorage.getItem('pryntis_token');
+      const token = sessionStorage.getItem('pryntis_token');
       const xhr = new XMLHttpRequest();
 
       await new Promise((resolve, reject) => {

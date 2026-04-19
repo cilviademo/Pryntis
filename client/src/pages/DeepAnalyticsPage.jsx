@@ -4,11 +4,11 @@ import ReactECharts from 'echarts-for-react';
 import api from '../services/api';
 import { formatCurrency, capitalize } from '../utils/formatters';
 
-const COLORS = ['#0066FF', '#6A00FF', '#00FF84', '#FFB000', '#E10600', '#00BFFF', '#FF6B6B'];
+const COLORS = ['#D4A843', '#4ECDC4', '#FF6B6B', '#34D399', '#FBBF24', '#9a9bb8', '#E8B84D'];
 const chartTooltip = {
-  backgroundColor: '#1C2228',
-  borderColor: 'rgba(255,255,255,0.07)',
-  textStyle: { color: '#F4F4F2', fontSize: 12 },
+  backgroundColor: '#1a1a2a',
+  borderColor: 'rgba(212,168,67,0.15)',
+  textStyle: { color: '#F0EDE8', fontSize: 12 },
 };
 
 export default function DeepAnalyticsPage() {
@@ -68,12 +68,12 @@ export default function DeepAnalyticsPage() {
     xAxis: {
       type: 'category',
       data: ['Gross Revenue', 'Expenses', 'Applied to Recoup', 'Net Payable'],
-      axisLabel: { color: '#5f6780', fontSize: 11 },
+      axisLabel: { color: '#5c5e78', fontSize: 11 },
       axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: '#5f6780', formatter: (v) => `$${(v / 1000).toFixed(0)}k` },
+      axisLabel: { color: '#5c5e78', formatter: (v) => `$${(v / 1000).toFixed(0)}k` },
       splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     series: [{
@@ -82,8 +82,8 @@ export default function DeepAnalyticsPage() {
       data: [
         { value: wf.gross_revenue || 0, itemStyle: { color: '#22c55e' } },
         { value: -(wf.total_expenses || 0), itemStyle: { color: '#ef4444' } },
-        { value: wf.applied_to_recoupment || 0, itemStyle: { color: '#FFB000' } },
-        { value: wf.net_payable || 0, itemStyle: { color: '#0066FF' } },
+        { value: wf.applied_to_recoupment || 0, itemStyle: { color: '#FBBF24' } },
+        { value: wf.net_payable || 0, itemStyle: { color: '#D4A843' } },
       ],
       barWidth: '50%',
       itemStyle: { borderRadius: [4, 4, 0, 0] },
@@ -94,17 +94,17 @@ export default function DeepAnalyticsPage() {
   const monthlyOption = monthlyComp.length > 0 ? {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', ...chartTooltip, formatter: (p) => p.map((s) => `${s.seriesName}: ${formatCurrency(s.value)}`).join('<br/>') },
-    legend: { data: ['Revenue', 'Expenses'], textStyle: { color: '#5f6780' }, bottom: 0 },
+    legend: { data: ['Revenue', 'Expenses'], textStyle: { color: '#5c5e78' }, bottom: 0 },
     grid: { left: '3%', right: '4%', bottom: '12%', containLabel: true },
     xAxis: {
       type: 'category',
       data: monthlyComp.map((d) => d.month),
-      axisLabel: { color: '#5f6780', fontSize: 11, rotate: 30 },
+      axisLabel: { color: '#5c5e78', fontSize: 11, rotate: 30 },
       axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: '#5f6780', formatter: (v) => `$${(v / 1000).toFixed(0)}k` },
+      axisLabel: { color: '#5c5e78', formatter: (v) => `$${(v / 1000).toFixed(0)}k` },
       splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     series: [
@@ -129,29 +129,29 @@ export default function DeepAnalyticsPage() {
   const tierOption = tierRev.length > 0 ? {
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', ...chartTooltip },
-    legend: { data: ['Total Revenue', 'Avg per Artist'], textStyle: { color: '#5f6780' }, bottom: 0 },
+    legend: { data: ['Total Revenue', 'Avg per Artist'], textStyle: { color: '#5c5e78' }, bottom: 0 },
     grid: { left: '3%', right: '4%', bottom: '12%', containLabel: true },
     xAxis: {
       type: 'category',
       data: tierRev.map((t) => t.tier_name),
-      axisLabel: { color: '#5f6780', fontSize: 12 },
+      axisLabel: { color: '#5c5e78', fontSize: 12 },
       axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     yAxis: {
       type: 'value',
-      axisLabel: { color: '#5f6780', formatter: (v) => `$${(v / 1000).toFixed(0)}k` },
+      axisLabel: { color: '#5c5e78', formatter: (v) => `$${(v / 1000).toFixed(0)}k` },
       splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     series: [
       {
         name: 'Total Revenue', type: 'bar',
         data: tierRev.map((t) => t.total_revenue),
-        itemStyle: { color: '#0066FF', borderRadius: [4, 4, 0, 0] },
+        itemStyle: { color: '#D4A843', borderRadius: [4, 4, 0, 0] },
       },
       {
         name: 'Avg per Artist', type: 'bar',
         data: tierRev.map((t) => t.avg_revenue),
-        itemStyle: { color: '#6A00FF', borderRadius: [4, 4, 0, 0] },
+        itemStyle: { color: '#4ECDC4', borderRadius: [4, 4, 0, 0] },
       },
     ],
   } : null;
@@ -184,7 +184,7 @@ export default function DeepAnalyticsPage() {
 
   const getCoverageColor = (pct) => {
     if (pct >= 80) return '#22c55e';
-    if (pct >= 50) return '#FFB000';
+    if (pct >= 50) return '#FBBF24';
     if (pct >= 25) return '#f97316';
     return '#ef4444';
   };
@@ -214,7 +214,7 @@ export default function DeepAnalyticsPage() {
       radar: {
         indicator: indicators,
         shape: 'polygon',
-        axisName: { color: '#5f6780', fontSize: 11 },
+        axisName: { color: '#5c5e78', fontSize: 11 },
         splitArea: { areaStyle: { color: ['rgba(255,255,255,0.02)', 'rgba(255,255,255,0.04)'] } },
         splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
         axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
@@ -224,9 +224,9 @@ export default function DeepAnalyticsPage() {
         data: [{
           value: values,
           name: artist.stage_name || artist.name,
-          areaStyle: { color: 'rgba(0, 102, 255, 0.15)' },
-          lineStyle: { color: '#0066FF', width: 2 },
-          itemStyle: { color: '#0066FF' },
+          areaStyle: { color: 'rgba(212, 168, 67, 0.15)' },
+          lineStyle: { color: '#D4A843', width: 2 },
+          itemStyle: { color: '#D4A843' },
         }],
       }],
     };
@@ -255,7 +255,7 @@ export default function DeepAnalyticsPage() {
         </div>
         <div className="summary-card">
           <div className="summary-card__label">Metadata Coverage</div>
-          <div className="summary-card__value" style={{ color: (covSummary.avg_coverage_pct || 0) >= 70 ? '#22c55e' : '#FFB000' }}>
+          <div className="summary-card__value" style={{ color: (covSummary.avg_coverage_pct || 0) >= 70 ? '#22c55e' : '#FBBF24' }}>
             {covSummary.avg_coverage_pct || 0}%
           </div>
         </div>
@@ -341,7 +341,7 @@ export default function DeepAnalyticsPage() {
               <div className="summary-card__label">Total Assets Tracked</div>
             </div>
             <div className="summary-card text-center">
-              <div className="summary-card__value" style={{ color: (covSummary.avg_coverage_pct || 0) >= 70 ? '#22c55e' : '#FFB000' }}>
+              <div className="summary-card__value" style={{ color: (covSummary.avg_coverage_pct || 0) >= 70 ? '#22c55e' : '#FBBF24' }}>
                 {covSummary.avg_coverage_pct || 0}%
               </div>
               <div className="summary-card__label">Avg. Coverage Score</div>
@@ -355,7 +355,7 @@ export default function DeepAnalyticsPage() {
                 Percentage of assets per artist with each metadata field populated.
                 <span style={{ marginLeft: '12px' }}>
                   <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '2px', background: '#22c55e', marginRight: '4px' }}></span>80%+
-                  <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '2px', background: '#FFB000', marginLeft: '8px', marginRight: '4px' }}></span>50-79%
+                  <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '2px', background: '#FBBF24', marginLeft: '8px', marginRight: '4px' }}></span>50-79%
                   <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '2px', background: '#f97316', marginLeft: '8px', marginRight: '4px' }}></span>25-49%
                   <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '2px', background: '#ef4444', marginLeft: '8px', marginRight: '4px' }}></span>&lt;25%
                 </span>
@@ -418,7 +418,7 @@ export default function DeepAnalyticsPage() {
                       <h3 style={{ margin: 0, fontSize: '14px' }}>{artist.stage_name || artist.name}</h3>
                       <span className="badge" style={{
                         background: artist.health_score >= 70 ? 'rgba(34,197,94,0.15)' : artist.health_score >= 40 ? 'rgba(255,176,0,0.15)' : 'rgba(239,68,68,0.15)',
-                        color: artist.health_score >= 70 ? '#22c55e' : artist.health_score >= 40 ? '#FFB000' : '#ef4444',
+                        color: artist.health_score >= 70 ? '#22c55e' : artist.health_score >= 40 ? '#FBBF24' : '#ef4444',
                       }}>
                         {Math.round(artist.health_score)}/100
                       </span>

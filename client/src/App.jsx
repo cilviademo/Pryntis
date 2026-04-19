@@ -38,6 +38,18 @@ function AdminRoute({ children }) {
   return children;
 }
 
+/**
+ * Role-gated route — redirects to dashboard if the current effective role
+ * does not have access to the given page key.
+ */
+function RoleRoute({ pageKey, children }) {
+  const { canAccessPage } = useAuth();
+  if (!canAccessPage(pageKey)) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+}
+
 function AppRoutes() {
   const { isAuthenticated, loading } = useAuth();
 
@@ -55,11 +67,34 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
+        {/* Dashboard — always accessible */}
         <Route index element={<DashboardPage />} />
-        <Route path="artists" element={<ArtistsPage />} />
-        <Route path="artists/:id" element={<ArtistDetailPage />} />
-        <Route path="projects" element={<ProjectsPage />} />
-        <Route path="projects/:id" element={<ProjectDetailPage />} />
+
+        {/* CORE */}
+        <Route path="artists" element={<RoleRoute pageKey="artists"><ArtistsPage /></RoleRoute>} />
+        <Route path="artists/:id" element={<RoleRoute pageKey="artists"><ArtistDetailPage /></RoleRoute>} />
+        <Route path="projects" element={<RoleRoute pageKey="projects"><ProjectsPage /></RoleRoute>} />
+        <Route path="projects/:id" element={<RoleRoute pageKey="projects"><ProjectDetailPage /></RoleRoute>} />
+
+        {/* PASS */}
+        <Route path="pass" element={<RoleRoute pageKey="subscriptions"><PassPage /></RoleRoute>} />
+        <Route path="pass/*" element={<RoleRoute pageKey="subscriptions"><PassPage /></RoleRoute>} />
+
+        {/* PORT */}
+        <Route path="port/assets" element={<RoleRoute pageKey="assets"><AssetsPage /></RoleRoute>} />
+        <Route path="port/assets/:id" element={<RoleRoute pageKey="assets"><AssetDetailPage /></RoleRoute>} />
+        <Route path="port/placements" element={<RoleRoute pageKey="placements"><PlacementsPage /></RoleRoute>} />
+        <Route path="port/contacts" element={<RoleRoute pageKey="contacts"><ContactsPage /></RoleRoute>} />
+        <Route path="port/templates" element={<RoleRoute pageKey="templates"><TemplatesPage /></RoleRoute>} />
+
+        {/* OPS */}
+        <Route path="tasks" element={<RoleRoute pageKey="tasks"><TasksPage /></RoleRoute>} />
+        <Route path="analytics" element={<RoleRoute pageKey="analytics"><AnalyticsPage /></RoleRoute>} />
+        <Route path="business" element={<RoleRoute pageKey="business-ops"><BusinessOpsPage /></RoleRoute>} />
+        <Route path="calendar" element={<RoleRoute pageKey="calendar"><CalendarPage /></RoleRoute>} />
+        <Route path="settings" element={<RoleRoute pageKey="settings"><SettingsPage /></RoleRoute>} />
+
+        {/* ADMIN */}
         <Route
           path="users"
           element={
@@ -68,18 +103,6 @@ function AppRoutes() {
             </AdminRoute>
           }
         />
-        <Route path="pass" element={<PassPage />} />
-        <Route path="pass/*" element={<PassPage />} />
-        <Route path="port/assets" element={<AssetsPage />} />
-        <Route path="port/assets/:id" element={<AssetDetailPage />} />
-        <Route path="port/placements" element={<PlacementsPage />} />
-        <Route path="port/contacts" element={<ContactsPage />} />
-        <Route path="port/templates" element={<TemplatesPage />} />
-        <Route path="tasks" element={<TasksPage />} />
-        <Route path="analytics" element={<AnalyticsPage />} />
-        <Route path="business" element={<BusinessOpsPage />} />
-        <Route path="calendar" element={<CalendarPage />} />
-        <Route path="settings" element={<SettingsPage />} />
         <Route
           path="admin/analytics"
           element={

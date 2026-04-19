@@ -64,6 +64,9 @@ async function authenticate(req, res, next) {
       email: user.email,
       role: user.role,
       token_version: user.token_version,
+      // Impersonation context — passed through from JWT claims
+      is_impersonation: !!decoded.is_impersonation,
+      impersonator_id: decoded.impersonator_id || null,
     };
 
     next();

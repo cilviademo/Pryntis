@@ -19,7 +19,7 @@ export default function PresencePill({ roomId }) {
       try {
         // Dynamic import so socket.io-client is optional
         const { io } = await import('socket.io-client');
-        const token = localStorage.getItem('pryntis_token');
+        const token = sessionStorage.getItem('pryntis_token');
         if (!token || !mounted) return;
 
         socket = io(window.location.origin, {

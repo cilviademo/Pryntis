@@ -5,12 +5,12 @@ import api from '../services/api';
 import { capitalize, objToArray, formatCurrency } from '../utils/formatters';
 import ExportButton from '../components/ExportButton';
 
-const COLORS = ['#0066FF', '#6A00FF', '#00FF84', '#FFB000', '#E10600', '#0066FF', '#00FF84'];
+const COLORS = ['#D4A843', '#4ECDC4', '#34D399', '#FBBF24', '#EF4444', '#D4A843', '#34D399'];
 
 const chartTooltip = {
-  backgroundColor: '#1C2228',
+  backgroundColor: '#1a1a2a',
   borderColor: 'rgba(255,255,255,0.07)',
-  textStyle: { color: '#F4F4F2', fontSize: 12 },
+  textStyle: { color: '#F0EDE8', fontSize: 12 },
 };
 
 export default function AnalyticsPage() {
@@ -63,7 +63,7 @@ export default function AnalyticsPage() {
   const makePieOption = (data) => ({
     backgroundColor: 'transparent',
     tooltip: { trigger: 'item', ...chartTooltip },
-    legend: { bottom: 0, textStyle: { color: '#5f6780', fontSize: 12 } },
+    legend: { bottom: 0, textStyle: { color: '#5c5e78', fontSize: 12 } },
     series: [{
       type: 'pie',
       radius: ['35%', '65%'],
@@ -83,11 +83,11 @@ export default function AnalyticsPage() {
     xAxis: {
       type: 'category',
       data: data.map((d) => d.name),
-      axisLabel: { color: '#5f6780', fontSize: 12 },
+      axisLabel: { color: '#5c5e78', fontSize: 12 },
       axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
       axisTick: { show: false },
     },
-    yAxis: { type: 'value', minInterval: 1, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } }, axisLabel: { color: '#5f6780', fontSize: 12 } },
+    yAxis: { type: 'value', minInterval: 1, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } }, axisLabel: { color: '#5c5e78', fontSize: 12 } },
     series: [{
       type: 'bar',
       data: data.map((d, i) => ({ value: d.value, itemStyle: { color: COLORS[i % COLORS.length] } })),
@@ -326,10 +326,10 @@ export default function AnalyticsPage() {
                   xAxis: {
                     type: 'category',
                     data: monthlyRevenue.map((d) => d.month),
-                    axisLabel: { color: '#5f6780', fontSize: 11, rotate: 30 },
+                    axisLabel: { color: '#5c5e78', fontSize: 11, rotate: 30 },
                     axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
                   },
-                  yAxis: { type: 'value', axisLabel: { color: '#5f6780', formatter: (v) => `$${(v / 1000).toFixed(0)}k` }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } } },
+                  yAxis: { type: 'value', axisLabel: { color: '#5c5e78', formatter: (v) => `$${(v / 1000).toFixed(0)}k` }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } } },
                   series: [{
                     name: 'Revenue',
                     type: 'line',

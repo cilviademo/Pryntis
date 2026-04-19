@@ -18,7 +18,7 @@ router.put(
   '/:id',
   authorize('owner', 'admin'),
   [
-    body('role').optional().isIn(['admin', 'manager', 'viewer']).withMessage('Invalid role'),
+    body('role').optional().isIn(['owner', 'admin', 'manager', 'audio_engineer', 'contributor', 'viewer']).withMessage('Invalid role'),
     body('is_active').optional().isBoolean().withMessage('is_active must be a boolean'),
   ],
   validate,

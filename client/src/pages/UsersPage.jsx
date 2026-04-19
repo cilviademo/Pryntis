@@ -5,9 +5,8 @@ import api from '../services/api';
 import Pagination from '../components/Pagination';
 
 export default function UsersPage() {
-  const { user } = useAuth();
+  const { user, isAdmin, startImpersonation } = useAuth();
   const navigate = useNavigate();
-  const isAdmin = user?.role === 'admin' || user?.role === 'owner';
   const [impersonating, setImpersonating] = useState(false);
 
   const [users, setUsers] = useState([]);
@@ -91,17 +90,19 @@ export default function UsersPage() {
     }
   };
 
+  /**
+   * Impersonate a target user using AuthContext.
+   * No more direct localStorage writes — everything goes through api.setToken().
+   */
   const handleImpersonate = async (targetUser) => {
     if (targetUser.id === user?.id) return;
     if (targetUser.role === 'admin' || targetUser.role === 'owner') return;
     setImpersonating(true);
+    setError('');
     try {
-      const res = await api.post(`/admin/impersonate/${targetUser.id}`);
-      const data = res.data || res;
-      if (data.token) {
-        localStorage.setItem('pryntis_token', data.token);
-        window.location.reload();
-      }
+      await startImpersonation(targetUser.id);
+      // Navigate to dashboard so the impersonated user lands on their home view
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Impersonation failed');
     } finally {
@@ -127,8 +128,11 @@ export default function UsersPage() {
         />
         <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}>
           <option value="">All Roles</option>
+          <option value="owner">Owner</option>
           <option value="admin">Admin</option>
           <option value="manager">Manager</option>
+          <option value="audio_engineer">Audio Engineer</option>
+          <option value="contributor">Contributor</option>
           <option value="viewer">Viewer</option>
         </select>
       </div>
@@ -160,7 +164,7 @@ export default function UsersPage() {
                     <td>{u.email}</td>
                     <td>
                       <span className={`badge badge--${u.role}`}>
-                        {u.role}
+                        {u.role?.replace(/_/g, ' ')}
                       </span>
                     </td>
                     <td>
@@ -205,8 +209,11 @@ export default function UsersPage() {
               <div className="form-group">
                 <label>Role</label>
                 <select value={form.role} onChange={handleChange('role')}>
+                  <option value="owner">Owner</option>
                   <option value="admin">Admin</option>
                   <option value="manager">Manager</option>
+                  <option value="audio_engineer">Audio Engineer</option>
+                  <option value="contributor">Contributor</option>
                   <option value="viewer">Viewer</option>
                 </select>
               </div>

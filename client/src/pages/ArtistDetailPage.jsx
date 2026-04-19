@@ -151,7 +151,7 @@ export default function ArtistDetailPage() {
             <h3 style={{ margin: 0 }}>Key Performance Indicators</h3>
             {canEdit && (
               <button className="btn btn-secondary btn-sm" onClick={() => {
-                const token = localStorage.getItem('pryntis_token');
+                const token = sessionStorage.getItem('pryntis_token');
                 fetch(`/api/v1/pdf/royalty/statements/${id}.pdf`, { headers: { Authorization: `Bearer ${token}` } })
                   .then(r => r.blob())
                   .then(blob => {

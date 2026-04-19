@@ -214,28 +214,28 @@ export default function AssetDetailPage() {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
-      backgroundColor: '#1C2228',
+      backgroundColor: '#1a1a2a',
       borderColor: 'rgba(255,255,255,0.07)',
-      textStyle: { color: '#F4F4F2' },
+      textStyle: { color: '#F0EDE8' },
     },
     grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
     xAxis: {
       type: 'category',
       data: usageRecords.map((r) => r.period || r.date || ''),
-      axisLabel: { color: '#5f6780', fontSize: 11 },
+      axisLabel: { color: '#5c5e78', fontSize: 11 },
       axisLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     yAxis: {
       type: 'value',
       minInterval: 1,
-      axisLabel: { color: '#5f6780', fontSize: 11 },
+      axisLabel: { color: '#5c5e78', fontSize: 11 },
       splitLine: { lineStyle: { color: 'rgba(255,255,255,0.07)' } },
     },
     series: [{
       type: 'line',
       data: usageRecords.map((r) => r.count || r.plays || r.streams || 0),
       smooth: true,
-      lineStyle: { color: '#0066FF', width: 2 },
+      lineStyle: { color: '#D4A843', width: 2 },
       areaStyle: {
         color: {
           type: 'linear',
@@ -246,7 +246,7 @@ export default function AssetDetailPage() {
           ],
         },
       },
-      itemStyle: { color: '#0066FF' },
+      itemStyle: { color: '#D4A843' },
     }],
   } : null;
 
@@ -317,9 +317,9 @@ export default function AssetDetailPage() {
       backgroundColor: 'transparent',
       tooltip: {
         trigger: 'item',
-        backgroundColor: '#1C2228',
+        backgroundColor: '#1a1a2a',
         borderColor: 'rgba(255,255,255,0.07)',
-        textStyle: { color: '#F4F4F2' },
+        textStyle: { color: '#F0EDE8' },
       },
       series: [{
         type: 'sankey',
@@ -330,7 +330,7 @@ export default function AssetDetailPage() {
         links: links,
         lineStyle: { color: 'gradient', curveness: 0.5 },
         itemStyle: { borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)' },
-        label: { color: '#F4F4F2', fontSize: 12 },
+        label: { color: '#F0EDE8', fontSize: 12 },
       }],
     };
   };

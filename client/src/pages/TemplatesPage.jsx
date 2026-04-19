@@ -279,7 +279,7 @@ export default function TemplatesPage() {
               <button className="btn btn-secondary" onClick={() => copyToClipboard(selected)}>Copy to Clipboard</button>
               <button className="btn btn-secondary" onClick={() => downloadAsText(selected)}>Download as Text</button>
               <button className="btn btn-secondary" onClick={() => {
-                const token = localStorage.getItem('pryntis_token');
+                const token = sessionStorage.getItem('pryntis_token');
                 const url = `/api/v1/pdf/templates/${selected.id}/export.pdf`;
                 fetch(url, { headers: { Authorization: `Bearer ${token}` } })
                   .then(res => res.blob())
