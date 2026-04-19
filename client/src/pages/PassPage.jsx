@@ -4,9 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { timeAgo } from '../utils/formatters';
 
-/* ============================================================
-   SVG Icon Components
-   ============================================================ */
+/* SVG Icon Components */
 const IconThumbsUp = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M7 22V11l5-9 2 1-1 5h7a2 2 0 0 1 2 2.2l-1.5 7.5A2 2 0 0 1 18.5 19H7z" />
@@ -119,9 +117,7 @@ const IconPackage = () => (
   </svg>
 );
 
-/* ============================================================
-   Tier color map (preserved from original)
-   ============================================================ */
+/* Tier color map (preserved from original) */
 const TIER_COLORS = {
   Free: '#5a6180',
   Basic: '#0066FF',
@@ -129,9 +125,7 @@ const TIER_COLORS = {
   Enterprise: '#FFB000',
 };
 
-/* ============================================================
-   Static Data
-   ============================================================ */
+/* Static Data */
 const engineeringServices = [
   { id: 1, name: 'Mixing', desc: 'Full mix session -- balancing, EQ, compression, effects, automation', turnaround: '3-5 business days', priceRange: '$300 - $800' },
   { id: 2, name: 'Mastering', desc: 'Final master for distribution -- loudness, stereo width, format delivery', turnaround: '1-2 business days', priceRange: '$100 - $300' },
@@ -161,9 +155,7 @@ const opsChecklists = [
   { id: 6, name: 'Quarterly Royalty Review', items: ['Pull revenue reports by artist', 'Calculate recoupment positions', 'Generate royalty statements', 'Review pending payables', 'Flag disputes or discrepancies', 'Distribute approved payments'], link: '/business' },
 ];
 
-/* ============================================================
-   Helpers
-   ============================================================ */
+/* Helpers */
 function eventTypeIcon(eventType) {
   switch (eventType) {
     case 'asset_created':
@@ -201,9 +193,7 @@ function entityLink(entityType, entityId) {
 const libraryGenres = ['All', 'Trap', 'R&B', 'Cinematic', 'Latin', 'Lo-Fi', 'Hip-Hop', 'Electronic'];
 const libraryTypes = ['All', 'Drum Kit', 'Loop Pack', 'One-Shots', 'Preset Pack'];
 
-/* ============================================================
-   PassPage Component
-   ============================================================ */
+/* PassPage Component */
 export default function PassPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin' || user?.role === 'owner';
@@ -268,9 +258,7 @@ export default function PassPage() {
   const [expandedChecklist, setExpandedChecklist] = useState(null);
   const [checklistState, setChecklistState] = useState({});
 
-  /* ============================================================
-     Data Fetching
-     ============================================================ */
+  /* Data Fetching */
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError('');
@@ -314,9 +302,7 @@ export default function PassPage() {
     fetchFeed();
   }, [fetchData, fetchFeed]);
 
-  /* ============================================================
-     Tier Handlers (preserved)
-     ============================================================ */
+  /* Tier Handlers (preserved) */
   const openCreateTier = () => {
     setEditingTier(null);
     setTierForm({ name: '', description: '', price: '', access_level: '', features: '' });
@@ -366,9 +352,7 @@ export default function PassPage() {
     }
   };
 
-  /* ============================================================
-     Subscription Handlers (preserved)
-     ============================================================ */
+  /* Subscription Handlers (preserved) */
   const openCreateSub = () => {
     setEditingSub(null);
     setSubForm({ artist_id: '', tier_id: '', status: 'active', start_date: '', end_date: '' });
@@ -415,9 +399,7 @@ export default function PassPage() {
     }
   };
 
-  /* ============================================================
-     Reaction Handler
-     ============================================================ */
+  /* Reaction Handler */
   const handleReaction = async (activityId, reaction) => {
     try {
       await api.post(`/activity/${activityId}/reactions`, { reaction });
@@ -427,9 +409,7 @@ export default function PassPage() {
     }
   };
 
-  /* ============================================================
-     Filter helpers
-     ============================================================ */
+  /* Filter helpers */
   const filteredSubs = subscriptions.filter((sub) => {
     if (search) {
       const q = search.toLowerCase();
@@ -495,9 +475,7 @@ export default function PassPage() {
     });
   };
 
-  /* ============================================================
-     Checklist toggle
-     ============================================================ */
+  /* Checklist toggle */
   const toggleCheckItem = (checklistId, idx) => {
     setChecklistState((prev) => {
       const key = `${checklistId}-${idx}`;
@@ -513,14 +491,10 @@ export default function PassPage() {
     return count;
   };
 
-  /* ============================================================
-     Loading gate
-     ============================================================ */
+  /* Loading gate */
   if (loading) return <div className="loading">Loading marketplace data...</div>;
 
-  /* ============================================================
-     Tabs
-     ============================================================ */
+  /* Tabs */
   const tabs = [
     { key: 'feed', label: 'Feed' },
     { key: 'engineering', label: 'Engineering' },
@@ -530,9 +504,7 @@ export default function PassPage() {
     { key: 'subscriptions', label: 'Subscriptions' },
   ];
 
-  /* ============================================================
-     Render
-     ============================================================ */
+  /* Render */
   return (
     <div>
       <div className="page-header">
@@ -564,9 +536,7 @@ export default function PassPage() {
         ))}
       </div>
 
-      {/* ============================================================
-          TAB 1: Feed
-          ============================================================ */}
+      {/* TAB 1: Feed */}
       {activeTab === 'feed' && (
         <div className="detail-section">
           <div className="flex items-center justify-between mb-16">
@@ -666,9 +636,7 @@ export default function PassPage() {
         </div>
       )}
 
-      {/* ============================================================
-          TAB 2: Engineering
-          ============================================================ */}
+      {/* TAB 2: Engineering */}
       {activeTab === 'engineering' && (
         <>
           <div className="detail-section">
@@ -753,9 +721,7 @@ export default function PassPage() {
         </>
       )}
 
-      {/* ============================================================
-          TAB 3: Producer Library
-          ============================================================ */}
+      {/* TAB 3: Producer Library */}
       {activeTab === 'library' && (
         <div className="detail-section">
           <div className="flex items-center justify-between mb-16">
@@ -943,9 +909,7 @@ export default function PassPage() {
         </div>
       )}
 
-      {/* ============================================================
-          TAB 4: Ops Toolkit
-          ============================================================ */}
+      {/* TAB 4: Ops Toolkit */}
       {activeTab === 'ops' && (
         <div className="detail-section">
           <div className="flex items-center justify-between mb-16">
@@ -1038,9 +1002,7 @@ export default function PassPage() {
         </div>
       )}
 
-      {/* ============================================================
-          TAB 5: Roadmap (preserved exactly)
-          ============================================================ */}
+      {/* TAB 5: Roadmap (preserved exactly) */}
       {activeTab === 'roadmap' && (
         <div className="detail-section">
           <h3>Analog Modeling Roadmap</h3>
@@ -1213,9 +1175,7 @@ export default function PassPage() {
         </div>
       )}
 
-      {/* ============================================================
-          TAB 6: Subscriptions (condensed)
-          ============================================================ */}
+      {/* TAB 6: Subscriptions (condensed) */}
       {activeTab === 'subscriptions' && (
         <>
           {/* Tier Cards */}
@@ -1434,9 +1394,7 @@ export default function PassPage() {
         </>
       )}
 
-      {/* ============================================================
-          MODALS
-          ============================================================ */}
+      {/* MODALS */}
 
       {/* Tier Modal (preserved) */}
       {showTierModal && (
@@ -1527,7 +1485,7 @@ export default function PassPage() {
         </div>
       )}
 
-      {/* New Post Modal (placeholder) */}
+      {/* New Post Modal */}
       {showNewPostModal && (
         <div className="modal-overlay" onClick={() => setShowNewPostModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -1547,7 +1505,7 @@ export default function PassPage() {
                 <textarea rows={3} placeholder="What would you like to share?" />
               </div>
               <p className="text-xs text-muted">
-                Post creation is under development. Activity entries are currently generated automatically from system events.
+                Activity entries are generated from system events. Manual posts will be available in a future update.
               </p>
               <div className="modal-actions">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowNewPostModal(false)}>Close</button>

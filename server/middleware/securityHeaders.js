@@ -17,7 +17,7 @@ function securityHeaders(_req, res, next) {
     'camera=(), microphone=(), geolocation=(), payment=()'
   );
 
-  // Prevent clickjacking — Superset embeds allowed via CSP frame-ancestors
+  // Prevent clickjacking
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
 
   next();

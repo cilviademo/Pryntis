@@ -243,12 +243,12 @@ export default function TemplatesPage() {
         </>
       )}
 
-      {/* ============================== */}
+      
       {/* Detail / Preview Modal         */}
-      {/* ============================== */}
+      
       {selected && (
         <div className="modal-overlay" onClick={() => setSelected(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 720 }}>
+          <div className="modal modal--wide" onClick={(e) => e.stopPropagation()}>
             <div className="card-header mb-16">
               <div>
                 <h3 style={{ margin: 0 }}>{selected.title}</h3>
@@ -299,12 +299,12 @@ export default function TemplatesPage() {
         </div>
       )}
 
-      {/* ============================== */}
+      
       {/* Validation Results Modal        */}
-      {/* ============================== */}
+      
       {showValidation && (
         <div className="modal-overlay" onClick={() => setShowValidation(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 640 }}>
+          <div className="modal modal--mid" onClick={(e) => e.stopPropagation()}>
             <h3>Template Validation Results</h3>
             <p className="text-sm mb-16">
               {passedCount} of {validationResults.length} templates passed validation
@@ -338,12 +338,12 @@ export default function TemplatesPage() {
         </div>
       )}
 
-      {/* ============================== */}
+      
       {/* Create / Edit Modal             */}
-      {/* ============================== */}
+      
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 640 }}>
+          <div className="modal modal--mid" onClick={(e) => e.stopPropagation()}>
             <h3>{editing ? 'Edit Template' : 'Add Template'}</h3>
             <form onSubmit={handleSubmit} className="form-stack">
               {formError && <div className="form-error">{formError}</div>}

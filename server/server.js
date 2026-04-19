@@ -65,9 +65,7 @@ app.use(cors({
 }));
 
 // Helmet — secure HTTP headers with CSP
-const supersetOrigin = process.env.SUPERSET_URL || '';
 const frameSources = ["'self'"];
-if (supersetOrigin) frameSources.push(supersetOrigin);
 
 app.use(helmet({
   contentSecurityPolicy: {

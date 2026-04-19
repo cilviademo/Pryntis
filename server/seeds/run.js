@@ -5,9 +5,7 @@ require('dotenv').config();
 async function seed() {
   console.log('Seeding database...\n');
 
-  // ============================================
   // CLEAR ALL TABLES (reverse FK order)
-  // ============================================
   const tablesToClear = [
     'activity_reactions',
     'activity_comments',
@@ -35,9 +33,7 @@ async function seed() {
   }
   console.log('Cleared all tables.\n');
 
-  // ============================================
   // 1. USERS (6) — one per role
-  // ============================================
   const ownerHash    = await bcrypt.hash('owner123', 12);
   const adminHash    = await bcrypt.hash('admin123', 12);
   const managerHash  = await bcrypt.hash('manager123', 12);
@@ -58,9 +54,7 @@ async function seed() {
   );
   console.log(`Users: ${users.length}`);
 
-  // ============================================
   // 2. ARTISTS (35) — 7 case artists + 28 roster
-  // ============================================
   const { rows: artists } = await db.query(`
     INSERT INTO artists (name, stage_name, email, phone, bio, genre, status, notes) VALUES
       -- Case artist 0: MVRK — not recouped
@@ -111,9 +105,7 @@ async function seed() {
   `);
   console.log(`Artists: ${artists.length}`);
 
-  // ============================================
   // 3. PROJECTS (75) — ~21 for case artists, ~54 for roster
-  // ============================================
   const projectValues = [
     // --- MVRK (index 0): 4 projects ---
     [`'Neon Nights EP'`,          `'5-track EP exploring dark electronic hip-hop fusion'`,                    0, `'in_progress'`, `'2025-11-01'`, `'2026-03-15'`],
@@ -252,9 +244,7 @@ async function seed() {
   const { rows: projects } = await db.query(projectSQL, projectParams);
   console.log(`Projects: ${projects.length}`);
 
-  // ============================================
   // 4. PROJECT COLLABORATORS (25)
-  // ============================================
   const collabData = [
     // MVRK projects
     [0, 2, 'Co-producer'],                    // Neon Nights — Sable
@@ -298,9 +288,7 @@ async function seed() {
   }
   console.log(`Project collaborators: ${collabData.length}`);
 
-  // ============================================
   // 5. SUBSCRIPTION TIERS (4)
-  // ============================================
   const { rows: tiers } = await db.query(`
     INSERT INTO subscription_tiers (name, description, access_level, features, price_monthly, is_active) VALUES
       ('Free',       'Basic access to dashboard and limited Port features',
@@ -321,9 +309,7 @@ async function seed() {
   const tierPro = tiers[2].id;
   const tierEnterprise = tiers[3].id;
 
-  // ============================================
   // 6. ARTIST SUBSCRIPTIONS (35 — one per artist)
-  // ============================================
   const subData = [
     // Case artists
     [0, tierPro,        'active',    '2025-06-01', '2026-06-01'],    // MVRK — Pro active
@@ -373,9 +359,7 @@ async function seed() {
   }
   console.log(`Artist subscriptions: ${subData.length}`);
 
-  // ============================================
   // 7. ASSETS (40) — realistic track titles
-  // ============================================
   const assetData = [
     // MVRK assets (0-5)
     ['Midnight Meridian',       'beat',   'midnight_meridian_v3.wav',   'Hip-Hop',     140, 'Cm',  210, 0, 0,  'Lead single from 808 Theology'],
@@ -445,9 +429,7 @@ async function seed() {
   }
   console.log(`Assets: ${assetRows.length}`);
 
-  // ============================================
   // 8. PLACEMENTS (20) — realistic sync/licensing
-  // ============================================
   const placementData = [
     // Sable — Netflix sync (case 2)
     [11, 'sync',    'pending',   'Netflix - Stranger Things S6',                      '2026-02-15', 25000.00, 'Tight deadline — needs clearance by Feb 28'],
@@ -512,9 +494,7 @@ async function seed() {
   }
   console.log(`Placements: ${placementRows.length}`);
 
-  // ============================================
   // 9. OWNERSHIP RECORDS (120)
-  // ============================================
   const ownershipData = [
     // --- MVRK assets (0-5): 6 assets x ~3 records each = ~18 ---
     // Asset 0: Midnight Meridian
@@ -675,9 +655,7 @@ async function seed() {
   }
   console.log(`Ownership records: ${ownershipData.length}`);
 
-  // ============================================
   // 9b. ASSET TAGS — realistic music-industry descriptors
-  // ============================================
   const tagData = [
     // MVRK assets (0-5)
     [0,  ['dark', '808', 'cinematic', 'hip-hop']],
@@ -748,9 +726,7 @@ async function seed() {
   }
   console.log(`Asset tags: ${tagCount}`);
 
-  // ============================================
   // 10. USAGE RECORDS (200)
-  // ============================================
   const platforms = ['Spotify', 'Apple Music', 'YouTube', 'Amazon Music', 'Tidal'];
   const usageTypes = ['stream', 'download', 'sync', 'broadcast'];
   const months = [
@@ -895,9 +871,7 @@ async function seed() {
   }
   console.log(`Usage records: ${usageRecords.length}`);
 
-  // ============================================
   // 11. REVENUE EVENTS (for 7 case artists)
-  // ============================================
   const revenueData = [
     // MVRK — total ~$28k revenue against $57k expenses = not recouped
     [0, 0,  6,  4500.00,  4500.00, 'Spotify streaming Q3 2025',        'Quarterly streaming revenue — Midnight Meridian',       '2025-09-30'],
@@ -981,9 +955,7 @@ async function seed() {
   }
   console.log(`Revenue events: ${revenueData.length}`);
 
-  // ============================================
   // 12. RECOUPABLE EXPENSES (MVRK only — case 0)
-  // ============================================
   const expenseData = [
     [0, 'advance',      25000.00, 'Artist advance — initial signing',                  '2024-06-15'],
     [0, 'advance',      20000.00, 'Artist advance — second tranche',                   '2024-12-01'],
@@ -1016,9 +988,7 @@ async function seed() {
   }
   console.log(`Recoupable expenses: ${expenseData.length}`);
 
-  // ============================================
   // 13. TASKS (~50 for 7 case artists, 6-10 each)
-  // ============================================
   const adminId = users[0].id;
   const managerId = users[1].id;
 
@@ -1099,9 +1069,7 @@ async function seed() {
   }
   console.log(`Tasks: ${taskCount}`);
 
-  // ============================================
   // 14. ACTIVITY FEED (~30)
-  // ============================================
   const activityData = [
     ['artist_created',    adminId,    'artist',    0,  'Created artist profile for MVRK (Marcus Thompson)',                        '2024-06-15'],
     ['artist_created',    adminId,    'artist',    1,  'Created artist profile for Luna Rey (Alicia Reyes)',                       '2024-08-01'],
@@ -1150,9 +1118,7 @@ async function seed() {
   }
   console.log(`Activity feed: ${activityData.length}`);
 
-  // ============================================
   // 15. CONTACTS (15 industry contacts)
-  // ============================================
   const contactData = [
     ['Sarah Chen',         'Neophonic',                  'Music Supervisor',          'sarah.chen@neophonic.com',     '310-555-2001', 'Primary sync contact. Placed Sable tracks. Open to electronic and ambient.',          '{sync,supervisor,film}',     5],
     ['James Park',         'Format Entertainment',       'Music Supervisor',          'jpark@formatent.com',          '323-555-2002', 'Library music specialist. Placed MVRK track. Prefers hip-hop and R&B.',               '{sync,supervisor,tv}',       4],
@@ -1180,15 +1146,12 @@ async function seed() {
   }
   console.log(`Contacts: ${contactData.length}`);
 
-  // ============================================
   // 16. TEMPLATES / SOPs (15 industry templates)
-  // ============================================
   const templateData = [
 
     // 1. Producer Agreement (Single Track)
     ['Producer Agreement (Single Track)', 'Legal',
 `PRODUCER AGREEMENT -- SINGLE TRACK
-========================================================
 
 PARTIES
 -------
@@ -1274,7 +1237,6 @@ ___________________________  Date: ____/____/________
     // 2. Split Sheet (Songwriting + Master)
     ['Split Sheet (Songwriting + Master)', 'Legal',
 `SPLIT SHEET -- SONGWRITING AND MASTER RECORDING
-========================================================
 
 Song Title: [SONG TITLE]
 Working Title (if different): ________________________
@@ -1345,7 +1307,6 @@ Print Name: _______________  PRO: _________  IPI: _____________`, null],
     // 3. Work-for-Hire Agreement (Engineer/Producer)
     ['Work-for-Hire Agreement (Engineer/Producer)', 'Legal',
 `WORK-FOR-HIRE AGREEMENT
-========================================================
 
 PARTIES
 -------
@@ -1432,7 +1393,6 @@ ___________________________  Date: ____/____/________
     // 4. Master Recording License (Non-exclusive)
     ['Master Recording License (Non-exclusive)', 'Legal',
 `MASTER RECORDING LICENSE AGREEMENT (NON-EXCLUSIVE)
-========================================================
 
 LICENSE DATE: ____/____/________
 LICENSE REFERENCE #: ________________________
@@ -1517,7 +1477,6 @@ ___________________________  Date: ____/____/________
     // 5. Sync License One-Pager
     ['Sync License One-Pager', 'Sync',
 `SYNC LICENSE -- QUICK TERMS SUMMARY
-========================================================
 
 TRACK INFORMATION
 ------------------
@@ -1595,7 +1554,6 @@ Licensee`, null],
     // 6. Cue Sheet Template
     ['Cue Sheet Template', 'Sync',
 `CUE SHEET -- FILM / TELEVISION / STREAMING
-========================================================
 
 PRODUCTION INFORMATION
 -----------------------
@@ -1659,7 +1617,6 @@ Contact Email: _________________  Phone: _________________`, null],
     // 7. ISRC/UPC Metadata SOP
     ['ISRC/UPC Metadata SOP', 'Metadata',
 `ISRC / UPC ASSIGNMENT -- STANDARD OPERATING PROCEDURE
-========================================================
 
 PURPOSE
 -------
@@ -1741,7 +1698,6 @@ COMMON ERRORS TO AVOID
     // 8. Release Checklist SOP (DSP Delivery)
     ['Release Checklist SOP (DSP Delivery)', 'Ops',
 `RELEASE CHECKLIST -- DSP DELIVERY SOP
-========================================================
 
 Use this checklist for every commercial release from T-8 weeks
 through post-release monitoring. Check off each item as completed.
@@ -1821,7 +1777,6 @@ POST-RELEASE MONITORING (T+1 to T+4 WEEKS)
     // 9. Royalty Statement Explanation (Artist-friendly)
     ['Royalty Statement Explanation (Artist-friendly)', 'Royalties',
 `UNDERSTANDING YOUR ROYALTY STATEMENT
-========================================================
 A plain-English guide for artists and managers
 
 WHAT IS THIS DOCUMENT?
@@ -1898,7 +1853,6 @@ NOTES FOR MANAGERS
     // 10. Sample Clearance Request Email + SOP
     ['Sample Clearance Request Email + SOP', 'Legal',
 `SAMPLE CLEARANCE REQUEST -- EMAIL TEMPLATE AND SOP
-========================================================
 
 PART 1: EMAIL TEMPLATE
 -----------------------
@@ -1988,7 +1942,6 @@ Fee paid:             $__________  Date: ____/____/________`, null],
     // 11. Distributor Setup SOP
     ['Distributor Setup SOP', 'Ops',
 `DISTRIBUTOR SETUP -- STANDARD OPERATING PROCEDURE
-========================================================
 
 This SOP covers the setup and configuration process for digital
 distribution platforms (DistroKid, TuneCore, CD Baby, AWAL,
@@ -2062,7 +2015,6 @@ STEP 7: REPORTING ACCESS
     // 12. PRO Registration SOP (BMI/ASCAP)
     ['PRO Registration SOP (BMI/ASCAP)', 'Royalties',
 `PRO REGISTRATION -- STANDARD OPERATING PROCEDURE
-========================================================
 
 WHAT IS A PRO?
 --------------
@@ -2146,7 +2098,6 @@ REVENUE COLLECTION TIMELINE
     // 13. Publishing Admin Setup SOP
     ['Publishing Admin Setup SOP', 'Royalties',
 `PUBLISHING ADMINISTRATION SETUP -- SOP
-========================================================
 
 WHAT IS PUBLISHING ADMINISTRATION?
 ------------------------------------
@@ -2233,7 +2184,6 @@ EXPECTED TIMELINES
     // 14. YouTube Content ID / Claims SOP
     ['YouTube Content ID / Claims SOP', 'Ops',
 `YOUTUBE CONTENT ID / CLAIMS -- STANDARD OPERATING PROCEDURE
-========================================================
 
 HOW CONTENT ID WORKS
 ----------------------
@@ -2324,7 +2274,6 @@ COMMON ISSUES
     // 15. Catalog Audit SOP (Quarterly)
     ['Catalog Audit SOP (Quarterly)', 'Ops',
 `CATALOG AUDIT -- QUARTERLY STANDARD OPERATING PROCEDURE
-========================================================
 
 PURPOSE
 -------
@@ -2424,7 +2373,6 @@ Next audit scheduled: ____/____/________`, null],
     // 16. Artist Onboarding Checklist
     ['Artist Onboarding Checklist', 'Ops',
 `ARTIST ONBOARDING CHECKLIST
-========================================================
 
 ARTIST NAME: ________________________
 ONBOARDING MANAGER: ________________________
@@ -2486,7 +2434,6 @@ Artist confirmation: ___________________  Date: ____/____/________`, null],
     // 17. Mechanical License Request Template
     ['Mechanical License Request Template', 'Legal',
 `MECHANICAL LICENSE REQUEST
-========================================================
 
 TO:    [PUBLISHER / COPYRIGHT OWNER NAME]
        [ADDRESS]
@@ -2546,7 +2493,6 @@ ___________________________
     // 18. Distribution Partner Evaluation SOP
     ['Distribution Partner Evaluation SOP', 'Ops',
 `DISTRIBUTION PARTNER EVALUATION -- STANDARD OPERATING PROCEDURE
-========================================================
 
 PURPOSE
 --------
@@ -2617,7 +2563,6 @@ Onboarding Checklist:
     // 19. Revenue Reconciliation SOP
     ['Revenue Reconciliation SOP (Monthly)', 'Royalties',
 `REVENUE RECONCILIATION -- MONTHLY STANDARD OPERATING PROCEDURE
-========================================================
 
 PURPOSE
 --------
@@ -2682,7 +2627,6 @@ Posted to ledger: [ ] Yes  Date: ____/____/________`, null],
     // 20. Session Musician Agreement
     ['Session Musician Agreement', 'Legal',
 `SESSION MUSICIAN AGREEMENT
-========================================================
 
 PARTIES
 --------
@@ -2755,7 +2699,6 @@ ___________________________  Date: ____/____/________
     // 21. Content Takedown / DMCA Notice Template
     ['Content Takedown / DMCA Notice Template', 'Legal',
 `DMCA TAKEDOWN NOTICE
-========================================================
 
 TO:     [SERVICE PROVIDER / DSP NAME]
         DMCA Designated Agent
@@ -2827,12 +2770,8 @@ ___________________________  Date: ____/____/________
   }
   console.log(`Templates: ${templateData.length}`);
 
-  // ============================================
   // FINAL SUMMARY
-  // ============================================
-  console.log('\n========================================');
-  console.log('SEED COMPLETE — Final Counts:');
-  console.log('========================================');
+  // console.log('SEED COMPLETE — Final Counts:');
 
   const countQueries = [
     ['users',                'SELECT COUNT(*) FROM users'],
@@ -2858,10 +2797,8 @@ ___________________________  Date: ____/____/________
     console.log(`  ${label.padEnd(24)} ${rows[0].count}`);
   }
 
-  console.log('\n========================================');
   console.log('DEMO SEED DATA LOADED');
   console.log('See .env.example for test account setup');
-  console.log('========================================\n');
 
 }
 
