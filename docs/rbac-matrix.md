@@ -1,6 +1,6 @@
 # Pryntis Panel -- RBAC Permission Matrix
 
-**Three roles**: admin, manager, viewer
+**Six roles**: owner, admin, manager, audio_engineer, contributor, viewer
 
 ---
 
@@ -29,93 +29,97 @@ authorize('admin')             // Only admin role allowed
 
 ### Panel Core
 
-| Resource | Action | Admin | Manager | Viewer |
-|----------|--------|:-----:|:-------:|:------:|
-| **Users** | List all | Yes | No* | No |
-| **Users** | Get by ID | Yes | Yes | No |
-| **Users** | Update (role, status) | Yes | No | No |
-| **Users** | Deactivate | Yes | No | No |
-| **Auth** | Register new user | Yes | No | No |
-| **Auth** | Login | Yes | Yes | Yes |
-| **Auth** | View own profile | Yes | Yes | Yes |
-| **Auth** | Update own profile | Yes | Yes | Yes |
-| **Artists** | List / Search | Yes | Yes | Yes |
-| **Artists** | Get by ID | Yes | Yes | Yes |
-| **Artists** | Create | Yes | Yes | No |
-| **Artists** | Update | Yes | Yes | No |
-| **Artists** | Delete (soft) | Yes | No | No |
-| **Artists** | Restore | Yes | No | No |
-| **Projects** | List / Search | Yes | Yes | Yes |
-| **Projects** | Get by ID | Yes | Yes | Yes |
-| **Projects** | Create | Yes | Yes | No |
-| **Projects** | Update | Yes | Yes | No |
-| **Projects** | Delete (soft) | Yes | No | No |
-| **Projects** | Restore | Yes | No | No |
-| **Projects** | Add collaborator | Yes | Yes | No |
-| **Projects** | Remove collaborator | Yes | Yes | No |
-| **Dashboard** | View summary | Yes | Yes | Yes |
-| **Dashboard** | View recent activity | Yes | Yes | Yes |
+| Resource | Action | Owner/Admin | Manager | Audio Engineer | Contributor | Viewer |
+|----------|--------|:-----:|:-------:|:------:|:------:|:------:|
+| **Users** | List all | Yes | No* | No | No | No |
+| **Users** | Get by ID | Yes | Yes | No | No | No |
+| **Users** | Update (role, status) | Yes | No | No | No | No |
+| **Users** | Deactivate | Yes | No | No | No | No |
+| **Auth** | Register new user | Yes | No | No | No | No |
+| **Auth** | Login | Yes | Yes | Yes | Yes | Yes |
+| **Auth** | View own profile | Yes | Yes | Yes | Yes | Yes |
+| **Auth** | Update own profile | Yes | Yes | Yes | Yes | Yes |
+| **Artists** | List / Search | Yes | Yes | Yes | Yes | Yes |
+| **Artists** | Get by ID | Yes | Yes | Yes | Yes | Yes |
+| **Artists** | Create | Yes | Yes | No | No | No |
+| **Artists** | Update | Yes | Yes | No | No | No |
+| **Artists** | Delete (soft) | Yes | No | No | No | No |
+| **Artists** | Restore | Yes | No | No | No | No |
+| **Projects** | List / Search | Yes | Yes | Yes | Yes | Yes |
+| **Projects** | Get by ID | Yes | Yes | Yes | Yes | Yes |
+| **Projects** | Create | Yes | Yes | No | No | No |
+| **Projects** | Update | Yes | Yes | No | No | No |
+| **Projects** | Delete (soft) | Yes | No | No | No | No |
+| **Projects** | Restore | Yes | No | No | No | No |
+| **Projects** | Add collaborator | Yes | Yes | No | No | No |
+| **Projects** | Remove collaborator | Yes | Yes | No | No | No |
+| **Dashboard** | View summary | Yes | Yes | Yes | Yes | Yes |
+| **Dashboard** | View recent activity | Yes | Yes | Yes | Yes | Yes |
 
 *\* The route allows admin and manager, but the controller further restricts the full user list to admins only.*
 
 ### Pass Module (Subscriptions)
 
-| Resource | Action | Admin | Manager | Viewer |
-|----------|--------|:-----:|:-------:|:------:|
-| **Tiers** | List | Yes | Yes | Yes |
-| **Tiers** | Create | Yes | No | No |
-| **Tiers** | Update | Yes | No | No |
-| **Subscriptions** | List | Yes | Yes | Yes |
-| **Subscriptions** | Create | Yes | Yes | No |
-| **Subscriptions** | Update | Yes | Yes | No |
+| Resource | Action | Owner/Admin | Manager | Audio Engineer | Contributor | Viewer |
+|----------|--------|:-----:|:-------:|:------:|:------:|:------:|
+| **Tiers** | List | Yes | Yes | Yes | Yes | Yes |
+| **Tiers** | Create | Yes | No | No | No | No |
+| **Tiers** | Update | Yes | No | No | No | No |
+| **Subscriptions** | List | Yes | Yes | Yes | Yes | Yes |
+| **Subscriptions** | Create | Yes | Yes | No | No | No |
+| **Subscriptions** | Update | Yes | Yes | No | No | No |
 
 ### Port Module (Assets, Placements, Ownership, Usage)
 
-| Resource | Action | Admin | Manager | Viewer |
-|----------|--------|:-----:|:-------:|:------:|
-| **Assets** | List | Yes | Yes | Yes |
-| **Assets** | Get by ID | Yes | Yes | Yes |
-| **Assets** | Create | Yes | Yes | No |
-| **Assets** | Update | Yes | Yes | No |
-| **Assets** | Delete (soft) | Yes | No | No |
-| **Assets** | Restore | Yes | No | No |
-| **Assets** | Add tag | Yes | Yes | No |
-| **Assets** | Remove tag | Yes | Yes | No |
-| **Placements** | List | Yes | Yes | Yes |
-| **Placements** | Create | Yes | Yes | No |
-| **Placements** | Update | Yes | Yes | No |
-| **Ownership** | List | Yes | Yes | Yes |
-| **Ownership** | Create | Yes | Yes | No |
-| **Ownership** | Update | Yes | Yes | No |
-| **Usage** | List | Yes | Yes | Yes |
-| **Usage** | Create | Yes | Yes | No |
+| Resource | Action | Owner/Admin | Manager | Audio Engineer | Contributor | Viewer |
+|----------|--------|:-----:|:-------:|:------:|:------:|:------:|
+| **Assets** | List | Yes | Yes | Yes | Yes | Yes |
+| **Assets** | Get by ID | Yes | Yes | Yes | Yes | Yes |
+| **Assets** | Create | Yes | Yes | Yes | No | No |
+| **Assets** | Update | Yes | Yes | Yes | No | No |
+| **Assets** | Delete (soft) | Yes | No | No | No | No |
+| **Assets** | Restore | Yes | No | No | No | No |
+| **Assets** | Add tag | Yes | Yes | Yes | No | No |
+| **Assets** | Remove tag | Yes | Yes | Yes | No | No |
+| **Placements** | List | Yes | Yes | Yes | Yes | Yes |
+| **Placements** | Create | Yes | Yes | No | No | No |
+| **Placements** | Update | Yes | Yes | No | No | No |
+| **Ownership** | List | Yes | Yes | Yes | Yes | Yes |
+| **Ownership** | Create | Yes | Yes | No | No | No |
+| **Ownership** | Update | Yes | Yes | No | No | No |
+| **Usage** | List | Yes | Yes | Yes | Yes | Yes |
+| **Usage** | Create | Yes | Yes | No | No | No |
 
 ### Tasks
 
-| Resource | Action | Admin | Manager | Viewer |
-|----------|--------|:-----:|:-------:|:------:|
-| **Tasks** | List | Yes | Yes | Yes |
-| **Tasks** | Get by ID | Yes | Yes | Yes |
-| **Tasks** | Create | Yes | Yes | No |
-| **Tasks** | Update | Yes | Yes | No |
+| Resource | Action | Owner/Admin | Manager | Audio Engineer | Contributor | Viewer |
+|----------|--------|:-----:|:-------:|:------:|:------:|:------:|
+| **Tasks** | List | Yes | Yes | Yes | Yes | Yes |
+| **Tasks** | Get by ID | Yes | Yes | Yes | Yes | Yes |
+| **Tasks** | Create | Yes | Yes | No | No | No |
+| **Tasks** | Update | Yes | Yes | No | No | No |
 
 ### KPI
 
-| Resource | Action | Admin | Manager | Viewer |
-|----------|--------|:-----:|:-------:|:------:|
-| **KPI** | View artist KPIs | Yes | Yes | Yes |
-| **KPI** | View revenue events | Yes | Yes | Yes |
-| **KPI** | Create revenue event | Yes | Yes | No |
-| **KPI** | View expenses | Yes | Yes | Yes |
-| **KPI** | Create expense | Yes | Yes | No |
+| Resource | Action | Owner/Admin | Manager | Audio Engineer | Contributor | Viewer |
+|----------|--------|:-----:|:-------:|:------:|:------:|:------:|
+| **KPI** | View artist KPIs | Yes | Yes | Yes | Yes | Yes |
+| **KPI** | View revenue events | Yes | Yes | Yes | Yes | Yes |
+| **KPI** | Create revenue event | Yes | Yes | No | No | No |
+| **KPI** | View expenses | Yes | Yes | Yes | Yes | Yes |
+| **KPI** | Create expense | Yes | Yes | No | No | No |
 
 ---
 
 ## Role Summary
 
+### Owner
+
+Full access to all resources and operations, equivalent to admin. Represents the label owner with complete platform control.
+
 ### Admin
 
-Full access to all resources and operations. This is the only role that can:
+Full access to all resources and operations. This is the only role (alongside owner) that can:
 - Register new user accounts
 - Manage user roles and activation status
 - Deactivate users (which also revokes their tokens)
@@ -129,10 +133,18 @@ Read-write access to most operational resources. Managers can create and update 
 - Soft-delete or restore records
 - Create or modify subscription tiers
 
+### Audio Engineer
+
+Project and asset operations. Audio engineers can create and update assets, add tags, and view all resources. They cannot manage placements, ownership, users, or subscriptions.
+
+### Contributor
+
+Limited write access. Contributors can view all resources and update their own profile. Financial amounts in activity feed summaries are redacted for this role.
+
 ### Viewer
 
 Read-only access across all modules. Viewers can:
-- View dashboard summaries and recent activity
+- View dashboard summaries and recent activity (with financial amounts redacted)
 - Browse artists, projects, assets, placements, ownership, usage, tasks, and KPI data
 - View subscription tiers and subscription assignments
 - View and update their own profile

@@ -386,8 +386,16 @@ export default function DashboardPage() {
   } : null;
 
   /* ── Momentum bar click handler ────────────────────────────────── */
-  const onMomentumClick = (_params) => {
-    // Placeholder for future momentum chart drill-down navigation
+  const onMomentumClick = (params) => {
+    if (params?.seriesName === 'Revenue') {
+      navigate('/analytics');
+    } else if (params?.seriesName === 'Placements') {
+      navigate('/port/placements');
+    } else if (params?.seriesName === 'Assets') {
+      navigate('/port/assets');
+    } else if (params?.seriesName === 'Projects') {
+      navigate('/projects');
+    }
   };
 
   /* ── Health score drilldown helpers ────────────────────────────── */
@@ -621,28 +629,31 @@ export default function DashboardPage() {
 
       {isElevated && <InsightsPanel kpi={kpi} healthScores={healthScores} />}
 
-      {/* ROI Projections */}
+      {/* ROI Projections — scenario model using static conversion assumptions */}
       {isElevated && kpi && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '20px' }}>
-          <div style={{ padding: '14px 16px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', borderLeft: '4px solid var(--color-success)' }}>
-            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Expected 30-Day Revenue</div>
-            <div style={{ fontSize: '20px', fontWeight: 700 }}>{formatCurrency((parseFloat(kpi.pipelineValue) || 0) * 0.35)}</div>
-            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Based on pipeline conversion rate</div>
-          </div>
-          <div style={{ padding: '14px 16px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', borderLeft: '4px solid var(--color-warning)' }}>
-            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Expected 60-Day Revenue</div>
-            <div style={{ fontSize: '20px', fontWeight: 700 }}>{formatCurrency((parseFloat(kpi.pipelineValue) || 0) * 0.55)}</div>
-            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Includes confirmed placements</div>
-          </div>
-          <div style={{ padding: '14px 16px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', borderLeft: '4px solid var(--color-info)' }}>
-            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Expected 90-Day Revenue</div>
-            <div style={{ fontSize: '20px', fontWeight: 700 }}>{formatCurrency((parseFloat(kpi.pipelineValue) || 0) * 0.75)}</div>
-            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Full pipeline projection</div>
-          </div>
-          <div style={{ padding: '14px 16px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', borderLeft: '4px solid var(--color-danger)' }}>
-            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Bottleneck Alert</div>
-            <div style={{ fontSize: '14px', fontWeight: 600 }}>{parseInt(kpi.pendingPlacements) > 5 ? `${kpi.pendingPlacements} stalled placements` : 'No bottlenecks detected'}</div>
-            <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Pending &gt; 10 days flagged</div>
+        <div style={{ marginBottom: '20px' }}>
+          <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '6px', fontStyle: 'italic' }}>Scenario model — static conversion assumptions applied to current pipeline value</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+            <div style={{ padding: '14px 16px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', borderLeft: '4px solid var(--color-success)' }}>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Expected 30-Day Revenue</div>
+              <div style={{ fontSize: '20px', fontWeight: 700 }}>{formatCurrency((parseFloat(kpi.pipelineValue) || 0) * 0.35)}</div>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>35% pipeline conversion rate</div>
+            </div>
+            <div style={{ padding: '14px 16px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', borderLeft: '4px solid var(--color-warning)' }}>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Expected 60-Day Revenue</div>
+              <div style={{ fontSize: '20px', fontWeight: 700 }}>{formatCurrency((parseFloat(kpi.pipelineValue) || 0) * 0.55)}</div>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>55% pipeline conversion rate</div>
+            </div>
+            <div style={{ padding: '14px 16px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', borderLeft: '4px solid var(--color-info)' }}>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Expected 90-Day Revenue</div>
+              <div style={{ fontSize: '20px', fontWeight: 700 }}>{formatCurrency((parseFloat(kpi.pipelineValue) || 0) * 0.75)}</div>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>75% pipeline conversion rate</div>
+            </div>
+            <div style={{ padding: '14px 16px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', borderLeft: '4px solid var(--color-danger)' }}>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Bottleneck Alert</div>
+              <div style={{ fontSize: '14px', fontWeight: 600 }}>{parseInt(kpi.pendingPlacements) > 5 ? `${kpi.pendingPlacements} stalled placements` : 'No bottlenecks detected'}</div>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>Pending &gt; 10 days flagged</div>
+            </div>
           </div>
         </div>
       )}

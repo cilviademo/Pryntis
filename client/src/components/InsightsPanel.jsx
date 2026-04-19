@@ -118,9 +118,19 @@ const SEVERITY_COLORS = {
   low: { bg: 'var(--color-info-light)', color: 'var(--color-info)', label: 'LOW' },
 };
 
+const DISMISSED_KEY = 'pryntis_dismissed_insights';
+
+function loadDismissed() {
+  try {
+    return JSON.parse(localStorage.getItem(DISMISSED_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
 export default function InsightsPanel({ kpi, healthScores }) {
   const navigate = useNavigate();
-  const [dismissed, setDismissed] = useState({});
+  const [dismissed, setDismissed] = useState(loadDismissed);
 
   const insights = useMemo(
     () => generateInsights(kpi, healthScores),
@@ -177,7 +187,11 @@ export default function InsightsPanel({ kpi, healthScores }) {
                   <button
                     className="btn btn-sm btn-secondary"
                     style={{ fontSize: '11px', padding: '4px 10px' }}
-                    onClick={() => setDismissed((prev) => ({ ...prev, [insight.id]: true }))}
+                    onClick={() => setDismissed((prev) => {
+                      const next = { ...prev, [insight.id]: true };
+                      localStorage.setItem(DISMISSED_KEY, JSON.stringify(next));
+                      return next;
+                    })}
                   >
                     Dismiss
                   </button>

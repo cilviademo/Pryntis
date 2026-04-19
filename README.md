@@ -13,7 +13,7 @@ Web-based administrative platform for music production operations -- managing ar
 | Backend | Node.js, Express.js, express-validator |
 | Database | PostgreSQL 16 (uuid-ossp, pg_trgm, tsvector FTS) |
 | Auth | JWT + bcrypt (12 rounds), token_version invalidation |
-| Testing | Jest + Supertest (53 integration + security tests) |
+| Testing | Jest + Supertest (53 integration + security tests across 2 suites) |
 | Infra | Docker Compose (PostgreSQL) |
 
 ## Modules
@@ -58,7 +58,7 @@ docs/                   Documentation suite
 scripts/                Utility scripts
   preflight.js         Environment + database check
 tests/                  Integration tests
-  api.test.js          53 endpoint + security tests
+  api.test.js          38 endpoint tests + 15 security tests
 docker-compose.yml      PostgreSQL service
 ```
 
@@ -127,8 +127,11 @@ npm run dev
 
 | Email | Password | Role |
 |-------|----------|------|
+| owner@pryntis.io | owner123 | owner |
 | admin@pryntis.io | admin123 | admin |
 | manager@pryntis.io | manager123 | manager |
+| engineer@pryntis.io | engineer123 | audio_engineer |
+| contributor@pryntis.io | contributor123 | contributor |
 | viewer@pryntis.io | viewer123 | viewer |
 
 ## API Reference
@@ -231,7 +234,7 @@ All endpoints under `/api/v1/`. Protected routes require `Authorization: Bearer 
 ## Seed Data
 
 The seed includes realistic music industry data:
-- 5 users (2 admin, 2 manager, 1 viewer)
+- 6 users (owner, admin, manager, audio_engineer, contributor, viewer)
 - 35 artists including 7 "case artists" representing real scenarios:
   - MVRK -- Unrecouped ($50k advances, $18k earned)
   - Luna Rey -- Split dispute (overlapping ownership claims)
@@ -257,7 +260,7 @@ The seed includes realistic music industry data:
 
 ## RBAC Matrix
 
-| Action | Owner/Admin | Manager | Audio Engineer | Viewer/Intern |
+| Action | Owner/Admin | Manager | Audio Engineer | Contributor/Viewer |
 |--------|:-----:|:-------:|:------:|
 | View dashboard | Y | Y | Y | Y |
 | View artists/projects | Y | Y | Y | Y |

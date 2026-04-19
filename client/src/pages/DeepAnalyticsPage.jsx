@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ReactECharts from 'echarts-for-react';
 import api from '../services/api';
 import { formatCurrency, capitalize } from '../utils/formatters';
@@ -12,6 +12,7 @@ const chartTooltip = {
 };
 
 export default function DeepAnalyticsPage() {
+  const navigate = useNavigate();
   const [coverage, setCoverage] = useState(null);
   const [insights, setInsights] = useState(null);
   const [health, setHealth] = useState(null);
@@ -196,7 +197,7 @@ export default function DeepAnalyticsPage() {
       { name: 'Delivery', max: bd.delivery?.max || 20 },
       { name: 'Revenue', max: bd.revenue?.max || 20 },
       { name: 'Audience', max: bd.audience?.max || 15 },
-      { name: 'Engagement', max: bd.engagement?.max || 10 },
+      { name: 'Engagement', max: bd.engagement?.max || 15 },
       { name: 'Compliance', max: bd.compliance?.max || 10 },
     ];
     const values = [
@@ -312,7 +313,7 @@ export default function DeepAnalyticsPage() {
                   </thead>
                   <tbody>
                     {conflicts.map((c, i) => (
-                      <tr key={i} className="clickable-row" onClick={() => window.location.pathname = `/port/assets/${c.asset_id}`}>
+                      <tr key={i} className="clickable-row" onClick={() => navigate(`/port/assets/${c.asset_id}`)}>
                         <td className="font-semibold">{c.asset_title}</td>
                         <td>{c.owner_count}</td>
                         <td style={{ color: '#ef4444' }}>{c.total_pct}%</td>
@@ -370,7 +371,7 @@ export default function DeepAnalyticsPage() {
                   </thead>
                   <tbody>
                     {covArtists.map((a, i) => (
-                      <tr key={i} className="clickable-row" onClick={() => window.location.pathname = `/artists/${a.artist_id}`}>
+                      <tr key={i} className="clickable-row" onClick={() => navigate(`/artists/${a.artist_id}`)}>
                         <td className="font-semibold">{a.stage_name || a.artist_name}</td>
                         <td>{a.total_assets}</td>
                         {coverageFields.map((f) => (
@@ -412,7 +413,7 @@ export default function DeepAnalyticsPage() {
               </p>
               <div className="chart-grid">
                 {healthScores.map((artist, i) => (
-                  <div key={i} className="card clickable" style={{ cursor: 'pointer' }} onClick={() => window.location.pathname = `/artists/${artist.id}`}>
+                  <div key={i} className="card clickable" style={{ cursor: 'pointer' }} onClick={() => navigate(`/artists/${artist.id}`)}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                       <h3 style={{ margin: 0, fontSize: '14px' }}>{artist.stage_name || artist.name}</h3>
                       <span className="badge" style={{

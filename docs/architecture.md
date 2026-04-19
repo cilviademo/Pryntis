@@ -12,7 +12,7 @@ Pryntis Panel is a monolithic full-stack web application for managing music prod
 +---------------------------------------------------------------+
 |                        BROWSER (Client)                       |
 |  React 18 + Vite + React Router + ECharts                     |
-|  Dark admin UI, SPA routing, token stored in memory           |
+|  Dark admin UI, SPA routing, token stored in sessionStorage   |
 +------------------------------|--------------------------------+
                                | HTTP (JSON)
                                v
@@ -37,7 +37,7 @@ Pryntis Panel is a monolithic full-stack web application for managing music prod
 +---------------------------------------------------------------+
 |                     PostgreSQL 16 (Alpine)                     |
 |  Port 5432  |  Database: pryntis                              |
-|  16 tables  |  UUID PKs  |  tsvector FTS  |  GIN indexes      |
+|  27 tables  |  UUID PKs  |  tsvector FTS  |  GIN indexes      |
 |  Docker volume: pgdata                                        |
 +---------------------------------------------------------------+
 ```
@@ -173,7 +173,7 @@ Pryntis/
     server.js                 # Express app setup and startup
     .env.example
   database/
-    schema.sql                # Full DDL (16 tables, indexes, triggers)
+    schema.sql                # Full DDL (27 tables, indexes, triggers)
   scripts/
     preflight.js              # Pre-run validation script
   docker-compose.yml          # PostgreSQL service definition
@@ -191,7 +191,7 @@ A typical authenticated request follows this path:
    |
    v
 2. api.js (services/api.js)
-   - Attaches Bearer token from memory
+   - Attaches Bearer token from sessionStorage
    - Sends fetch() to /api/v1/*
    |
    v
@@ -238,7 +238,7 @@ A typical authenticated request follows this path:
 1. **Login**: Client sends `POST /api/v1/auth/login` with email and password.
 2. **Verification**: Server checks credentials against bcrypt hash. Verifies account is active.
 3. **Token issuance**: Server signs a JWT containing `{ id, email, role, token_version }` with configurable expiry (default 24h).
-4. **Token storage**: Client stores the token in JavaScript memory (not localStorage, not cookies). The `api.js` module holds the token in a module-scoped variable.
+4. **Token storage**: Client stores the token in `sessionStorage` for persistence across page refreshes within the same tab. The `api.js` module reads and writes the token via `sessionStorage` under the key `pryntis_token`.
 5. **Subsequent requests**: Client attaches `Authorization: Bearer <token>` on every API call.
 6. **Token validation**: Auth middleware verifies the JWT signature, checks that the user exists and is active, and confirms `token_version` matches the database value.
 7. **Token revocation**: Incrementing `token_version` in the database invalidates all outstanding tokens for that user immediately. This happens on user deactivation.
@@ -251,7 +251,7 @@ Role-based access control is enforced at the middleware layer, not in the fronte
 
 - **Middleware**: The `authorize(...allowedRoles)` function returns Express middleware that checks `req.user.role` against the specified roles.
 - **Route-level**: Each route explicitly declares which roles may access it (e.g., `authorize('admin', 'manager')`).
-- **Three roles**: `admin` (full access), `manager` (read-write on most resources), `viewer` (read-only access).
+- **Six roles**: `owner` (full access, label management), `admin` (full access), `manager` (read-write on most resources), `audio_engineer` (project and asset operations), `contributor` (limited write access), `viewer` (read-only access).
 - **Registration**: Only admins can create new user accounts (`POST /api/v1/auth/register` requires admin role).
 
 ---

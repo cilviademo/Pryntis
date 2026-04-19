@@ -50,10 +50,10 @@
 
 ### Artist Health Score Engine
 
-- **Six-dimensional scoring**: Composite health score (0-100) computed from revenue momentum, metadata completeness, catalog depth, audience engagement, pipeline activity, and compliance readiness.
-- **Weighted formula**: Revenue (25%), Metadata (20%), Catalog (15%), Engagement (15%), Pipeline (15%), Compliance (10%).
+- **Six-dimensional scoring**: Composite health score (0-100) computed from momentum, delivery reliability, revenue trajectory, audience signals, team engagement, and compliance readiness.
+- **Weighted formula**: Momentum (20%), Delivery (20%), Revenue (20%), Audience (15%), Engagement (15%), Compliance (10%).
 - **Momentum trends**: 12-month trend tracking with period-over-period comparison.
-- **Next-action recommendations**: AI-driven suggested actions per artist based on weakest health dimensions.
+- **Next-action recommendations**: Rule-based suggested actions per artist based on weakest health dimensions.
 - **Dashboard integration**: Health scores displayed on the main dashboard with color-coded status indicators.
 
 ### Advanced Analytics (Deep Analytics)
@@ -95,7 +95,7 @@
 
 ### RBAC
 
-- **Six-tier role hierarchy**: Owner, admin, manager, audio_engineer, viewer, and intern roles. Enforced via `authorize()` middleware on all API routes.
+- **Six-tier role hierarchy**: Owner, admin, manager, audio_engineer, contributor, and viewer roles. Enforced via `authorize()` middleware on all API routes.
 - **Role-based UI rendering**: Frontend conditionally renders admin controls, edit buttons, and sensitive data based on user role.
 - **Registration restriction**: Only admins can create new user accounts.
 
@@ -126,7 +126,7 @@
 
 ### Testing
 
-- **API integration tests**: 53 test cases covering CRUD operations, RBAC enforcement, input validation, and edge cases across all major endpoints.
+- **API integration tests**: 38 test cases covering CRUD operations, RBAC enforcement, input validation, and edge cases across all major endpoints.
 - **Security tests**: Dedicated security test suite covering authentication, authorization, token invalidation, rate limiting, and injection prevention.
 
 ---

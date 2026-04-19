@@ -161,6 +161,8 @@ const dashboardController = {
   // GET /api/v1/dashboard/recent-activity
   async recentActivity(req, res, next) {
     try {
+      const role = req.user ? req.user.role : 'viewer';
+
       const { rows } = await db.query(`
         SELECT af.id, af.event_type, af.actor_user_id, af.entity_type, af.entity_id,
                af.summary, af.metadata, af.created_at,
@@ -178,7 +180,18 @@ const dashboardController = {
         LIMIT 20
       `);
 
-      success(res, rows, 'Recent activity retrieved');
+      // Redact monetary amounts from summaries for viewer and contributor roles
+      const redactFinancials = role === 'viewer' || role === 'contributor';
+      const result = redactFinancials
+        ? rows.map((row) => ({
+            ...row,
+            summary: row.summary
+              ? row.summary.replace(/\$[\d,]+(\.[\d]{1,2})?/g, '[amount hidden]')
+              : row.summary,
+          }))
+        : rows;
+
+      success(res, result, 'Recent activity retrieved');
     } catch (err) {
       next(err);
     }
