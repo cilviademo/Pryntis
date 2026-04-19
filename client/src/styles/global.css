@@ -3482,7 +3482,7 @@ a.summary-card:hover {
 
 .notification-panel {
   position: fixed;
-  bottom: 60px;
+  bottom: 140px;
   left: 16px;
   width: 320px;
   max-height: 420px;
