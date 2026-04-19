@@ -13,7 +13,7 @@
 - **WebSocket**: Real-time presence indicators
 - **Theme**: Light/Dark mode with localStorage persistence
 - **Admin**: User impersonation with audit trail
-- **Analytics**: Built-in KPI + Apache Superset integration placeholder
+- **Analytics**: Built-in KPI dashboard + Deep Analytics (cross-module insights)
 - **RBAC**: 6-role system (owner, admin, manager, audio_engineer, contributor, viewer)
 
 ---
@@ -99,4 +99,5 @@ See `docs/calendar.md` for calendar system documentation.
 See `docs/exports.md` for PDF/CSV export documentation.
 
 ### Analytics
-See `docs/superset.md` for Apache Superset integration.
+Built-in Deep Analytics module provides metadata coverage, health radar, revenue waterfall, and pipeline funnel.
+For external BI tools, see `docs/architecture.md` (read-only database role).

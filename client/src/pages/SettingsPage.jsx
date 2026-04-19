@@ -129,12 +129,12 @@ export default function SettingsPage() {
 
           <div style={{ padding: '16px', background: 'var(--color-surface-2)', borderRadius: 'var(--radius)', border: '1px solid var(--color-border)', marginBottom: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <span className="font-semibold">Apache Superset</span>
-              <span className="badge">Not Configured</span>
+              <span className="font-semibold">External BI Tools</span>
+              <span className="badge">Optional</span>
             </div>
             <p className="text-sm text-secondary" style={{ lineHeight: '1.6' }}>
-              Connect Apache Superset for advanced SQL analytics and custom dashboards.
-              Navigate to <a href="/admin/analytics">Deep Analytics</a> for setup instructions.
+              The PostgreSQL database can be connected to external BI tools (Metabase, Tableau, etc.) using a read-only role.
+              Built-in analytics are available at <a href="/admin/analytics">Deep Analytics</a>.
             </p>
           </div>
 
