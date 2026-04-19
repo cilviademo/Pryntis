@@ -416,6 +416,196 @@ const analyticsController = {
       next(err);
     }
   },
+
+  // ════════════════════════════════════════════════════════════════════
+  // ADVANCED ANALYTICS — COVERAGE MATRIX
+  // GET /api/v1/port/analytics/coverage
+  // ════════════════════════════════════════════════════════════════════
+  async getCoverageMatrix(req, res, next) {
+    try {
+      // Per-artist metadata completeness
+      const { rows: artistCoverage } = await db.query(
+        `SELECT
+           ar.id AS artist_id,
+           ar.name AS artist_name,
+           ar.stage_name,
+           COUNT(a.id) AS total_assets,
+           COUNT(CASE WHEN a.isrc IS NOT NULL AND a.isrc != '' THEN 1 END) AS has_isrc,
+           COUNT(CASE WHEN a.iswc IS NOT NULL AND a.iswc != '' THEN 1 END) AS has_iswc,
+           COUNT(CASE WHEN a.genre IS NOT NULL AND a.genre != '' THEN 1 END) AS has_genre,
+           COUNT(CASE WHEN a.bpm IS NOT NULL THEN 1 END) AS has_bpm,
+           COUNT(CASE WHEN a.key_signature IS NOT NULL AND a.key_signature != '' THEN 1 END) AS has_key,
+           COUNT(CASE WHEN a.duration IS NOT NULL THEN 1 END) AS has_duration,
+           COALESCE((
+             SELECT COUNT(*) FROM ownership_records o
+             WHERE o.asset_id = ANY(ARRAY_AGG(a.id))
+               AND o.ipi_number IS NOT NULL AND o.ipi_number != ''
+           ), 0) AS has_ipi
+         FROM artists ar
+         LEFT JOIN assets a ON a.artist_id = ar.id AND a.is_deleted = false
+         WHERE ar.is_deleted = false
+         GROUP BY ar.id, ar.name, ar.stage_name
+         HAVING COUNT(a.id) > 0
+         ORDER BY ar.name`
+      );
+
+      const coverage = artistCoverage.map((r) => {
+        const total = parseInt(r.total_assets, 10) || 1;
+        return {
+          artist_id: r.artist_id,
+          artist_name: r.artist_name,
+          stage_name: r.stage_name,
+          total_assets: parseInt(r.total_assets, 10),
+          isrc_pct: Math.round((parseInt(r.has_isrc, 10) / total) * 100),
+          iswc_pct: Math.round((parseInt(r.has_iswc, 10) / total) * 100),
+          genre_pct: Math.round((parseInt(r.has_genre, 10) / total) * 100),
+          bpm_pct: Math.round((parseInt(r.has_bpm, 10) / total) * 100),
+          key_pct: Math.round((parseInt(r.has_key, 10) / total) * 100),
+          duration_pct: Math.round((parseInt(r.has_duration, 10) / total) * 100),
+        };
+      });
+
+      // Overall coverage score
+      const totalAssets = coverage.reduce((s, c) => s + c.total_assets, 0);
+      const avgCoverage = coverage.length > 0
+        ? Math.round(coverage.reduce((s, c) => {
+            const fields = [c.isrc_pct, c.iswc_pct, c.genre_pct, c.bpm_pct, c.key_pct, c.duration_pct];
+            return s + (fields.reduce((a, b) => a + b, 0) / fields.length);
+          }, 0) / coverage.length)
+        : 0;
+
+      success(res, {
+        artists: coverage,
+        summary: { total_artists: coverage.length, total_assets: totalAssets, avg_coverage_pct: avgCoverage },
+      }, 'Coverage matrix retrieved');
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // ════════════════════════════════════════════════════════════════════
+  // ADVANCED ANALYTICS — CROSS-MODULE INSIGHTS
+  // GET /api/v1/port/analytics/insights
+  // ════════════════════════════════════════════════════════════════════
+  async getCrossModuleInsights(req, res, next) {
+    try {
+      // Revenue waterfall: gross → expenses → recouped → net
+      const { rows: waterfallRows } = await db.query(
+        `SELECT
+           COALESCE((SELECT SUM(amount) FROM revenue_events), 0) AS gross_revenue,
+           COALESCE((SELECT SUM(amount) FROM recoupable_expenses), 0) AS total_expenses,
+           COALESCE((SELECT SUM(amount_applied_to_recoupment) FROM revenue_events), 0) AS applied_to_recoupment`
+      );
+      const wf = waterfallRows[0];
+      const waterfall = {
+        gross_revenue: parseFloat(wf.gross_revenue),
+        total_expenses: parseFloat(wf.total_expenses),
+        applied_to_recoupment: parseFloat(wf.applied_to_recoupment),
+        net_payable: Math.max(0, parseFloat(wf.applied_to_recoupment) - parseFloat(wf.total_expenses)),
+      };
+
+      // Placement funnel
+      const { rows: funnelRows } = await db.query(
+        `SELECT status, COUNT(*) AS count, COALESCE(SUM(expected_value), 0) AS value
+         FROM placements WHERE is_deleted = false
+         GROUP BY status
+         ORDER BY CASE status
+           WHEN 'pending' THEN 1 WHEN 'confirmed' THEN 2
+           WHEN 'completed' THEN 3 WHEN 'declined' THEN 4 ELSE 5 END`
+      );
+      const funnel = funnelRows.map((r) => ({
+        status: r.status,
+        count: parseInt(r.count, 10),
+        value: parseFloat(r.value),
+      }));
+
+      // Revenue by month with expenses overlay
+      const { rows: monthlyRows } = await db.query(
+        `SELECT m.month,
+                COALESCE(rev.amount, 0) AS revenue,
+                COALESCE(exp.amount, 0) AS expenses
+         FROM (
+           SELECT TO_CHAR(d, 'YYYY-MM') AS month
+           FROM generate_series(
+             DATE_TRUNC('month', NOW()) - INTERVAL '11 months',
+             DATE_TRUNC('month', NOW()),
+             '1 month'
+           ) d
+         ) m
+         LEFT JOIN (
+           SELECT TO_CHAR(DATE_TRUNC('month', event_date), 'YYYY-MM') AS month,
+                  SUM(amount) AS amount
+           FROM revenue_events
+           WHERE event_date >= DATE_TRUNC('month', NOW()) - INTERVAL '11 months'
+           GROUP BY 1
+         ) rev ON rev.month = m.month
+         LEFT JOIN (
+           SELECT TO_CHAR(DATE_TRUNC('month', expense_date), 'YYYY-MM') AS month,
+                  SUM(amount) AS amount
+           FROM recoupable_expenses
+           WHERE expense_date >= DATE_TRUNC('month', NOW()) - INTERVAL '11 months'
+           GROUP BY 1
+         ) exp ON exp.month = m.month
+         ORDER BY m.month`
+      );
+      const monthly_comparison = monthlyRows.map((r) => ({
+        month: r.month,
+        revenue: parseFloat(r.revenue),
+        expenses: parseFloat(r.expenses),
+      }));
+
+      // Subscription tier vs revenue correlation
+      const { rows: tierRevRows } = await db.query(
+        `SELECT st.name AS tier_name,
+                COUNT(DISTINCT ar.id) AS artist_count,
+                COALESCE(SUM(re.amount), 0) AS total_revenue
+         FROM subscription_tiers st
+         JOIN artist_subscriptions asub ON asub.tier_id = st.id AND asub.status = 'active'
+         JOIN artists ar ON ar.id = asub.artist_id
+         LEFT JOIN revenue_events re ON re.artist_id = ar.id
+         GROUP BY st.id, st.name, st.access_level
+         ORDER BY st.access_level`
+      );
+      const tier_revenue = tierRevRows.map((r) => ({
+        tier_name: r.tier_name,
+        artist_count: parseInt(r.artist_count, 10),
+        total_revenue: parseFloat(r.total_revenue),
+        avg_revenue: parseInt(r.artist_count, 10) > 0
+          ? Math.round(parseFloat(r.total_revenue) / parseInt(r.artist_count, 10))
+          : 0,
+      }));
+
+      // Top ownership conflicts
+      const { rows: conflicts } = await db.query(
+        `SELECT a.id AS asset_id, a.title AS asset_title,
+                SUM(o.percentage) AS total_pct,
+                COUNT(o.id) AS owner_count
+         FROM assets a
+         JOIN ownership_records o ON o.asset_id = a.id
+         WHERE a.is_deleted = false
+         GROUP BY a.id, a.title
+         HAVING SUM(o.percentage) > 100
+         ORDER BY SUM(o.percentage) DESC
+         LIMIT 10`
+      );
+      const ownership_conflicts = conflicts.map((r) => ({
+        asset_id: r.asset_id,
+        asset_title: r.asset_title,
+        total_pct: parseFloat(r.total_pct),
+        owner_count: parseInt(r.owner_count, 10),
+      }));
+
+      success(res, {
+        waterfall,
+        funnel,
+        monthly_comparison,
+        tier_revenue,
+        ownership_conflicts,
+      }, 'Cross-module insights retrieved');
+    } catch (err) {
+      next(err);
+    }
+  },
 };
 
 module.exports = analyticsController;

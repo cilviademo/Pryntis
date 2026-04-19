@@ -411,10 +411,14 @@ export default function AnalyticsPage() {
 
       <div className="detail-section mt-24">
         <h3>Advanced Analytics</h3>
-        <p className="text-sm text-secondary" style={{ lineHeight: '1.6' }}>
-          Apache Superset integration is available for advanced analytics, custom dashboards,
-          and deep data exploration. See <code>docs/architecture.md</code> for setup instructions.
+        <p className="text-sm text-secondary" style={{ lineHeight: '1.6', marginBottom: '12px' }}>
+          Explore deeper cross-module insights including metadata coverage matrices,
+          revenue waterfall analysis, placement pipeline funnels, and subscription-tier
+          performance correlations.
         </p>
+        <Link to="/admin/analytics" className="btn btn-primary btn-sm">
+          Open Deep Analytics
+        </Link>
       </div>
     </div>
   );

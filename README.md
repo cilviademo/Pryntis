@@ -13,7 +13,7 @@ Web-based administrative platform for music production operations -- managing ar
 | Backend | Node.js, Express.js, express-validator |
 | Database | PostgreSQL 16 (uuid-ossp, pg_trgm, tsvector FTS) |
 | Auth | JWT + bcrypt (12 rounds), token_version invalidation |
-| Testing | Jest + Supertest (25+ integration tests) |
+| Testing | Jest + Supertest (53 integration + security tests) |
 | Infra | Docker Compose (PostgreSQL) |
 
 ## Modules
@@ -24,7 +24,9 @@ Web-based administrative platform for music production operations -- managing ar
 | **Pass** (Increment 2) | Subscription tiers, artist subscriptions, tier-gated access middleware |
 | **Port** (Increment 3) | Assets, tags, placements, ownership records, usage records, pipeline analytics |
 | **KPI Engine** | Gross revenue, recoupable balance, pipeline value, at-risk revenue, payable calculation |
-| **Ops** | Tasks, activity feed, contacts, analytics dashboard |
+| **Health Engine** | 6-dimensional artist health scoring, momentum trends, next-action recommendations |
+| **Deep Analytics** | Cross-module insights, metadata coverage matrix, health radar, pipeline funnel |
+| **Ops** | Tasks, activity feed, contacts, analytics, business ops, calendar, settings |
 
 ## Project Structure
 
@@ -33,18 +35,18 @@ client/                 React frontend (Vite)
   src/
     components/         Layout, shared components
     context/            AuthContext (JWT, role state)
-    pages/              13 page components
+    pages/              17 page components
     services/           API client
     styles/             Global CSS (dark slate theme)
 server/                 Express API
   config/               Database pool, environment config
-  controllers/          9 controller modules
+  controllers/          14 controller modules
   middleware/           Auth, RBAC, tierGate, validation, error handling
-  routes/              9 route modules
+  routes/              14 route modules
   seeds/               Seed runner (JS)
   utils/               listQuery (FTS + pagination), response helpers
 database/               SQL schema + seed data
-  schema.sql           16 tables, 12 enums, FTS triggers, GIN indexes
+  schema.sql           27 tables, 14 enums, FTS triggers, GIN indexes
   seed.sql             Comprehensive seed data (all modules)
 docs/                   Documentation suite
   architecture.md      System architecture
@@ -56,7 +58,7 @@ docs/                   Documentation suite
 scripts/                Utility scripts
   preflight.js         Environment + database check
 tests/                  Integration tests
-  api.test.js          25+ endpoint tests
+  api.test.js          53 endpoint + security tests
 docker-compose.yml      PostgreSQL service
 ```
 
@@ -125,11 +127,9 @@ npm run dev
 
 | Email | Password | Role |
 |-------|----------|------|
-| admin@pryntis.com | password123 | admin |
-| admin2@pryntis.com | password123 | admin |
-| manager@pryntis.com | password123 | manager |
-| manager2@pryntis.com | password123 | manager |
-| viewer@pryntis.com | password123 | viewer |
+| admin@pryntis.io | admin123 | admin |
+| manager@pryntis.io | manager123 | manager |
+| viewer@pryntis.io | viewer123 | viewer |
 
 ## API Reference
 
@@ -207,7 +207,7 @@ All endpoints under `/api/v1/`. Protected routes require `Authorization: Bearer 
 
 ## Database
 
-16 tables across all three increments:
+27 tables across all three increments (key tables shown):
 
 | Table | Module | Purpose |
 |-------|--------|---------|
@@ -257,19 +257,21 @@ The seed includes realistic music industry data:
 
 ## RBAC Matrix
 
-| Action | Admin | Manager | Viewer |
+| Action | Owner/Admin | Manager | Audio Engineer | Viewer/Intern |
 |--------|:-----:|:-------:|:------:|
-| View dashboard | Y | Y | Y |
-| View artists/projects | Y | Y | Y |
-| Create/edit artists | Y | Y | N |
-| Delete artists (soft) | Y | Y | N |
-| Restore deleted records | Y | N | N |
-| Manage users | Y | N | N |
-| Create/edit subscriptions | Y | Y | N |
-| Manage subscription tiers | Y | N | N |
-| Create/edit assets | Y | Y | N |
-| Manage placements | Y | Y | N |
-| View analytics | Y | Y | Y |
+| View dashboard | Y | Y | Y | Y |
+| View artists/projects | Y | Y | Y | Y |
+| Create/edit artists | Y | Y | N | N |
+| Delete artists (soft) | Y | Y | N | N |
+| Restore deleted records | Y | N | N | N |
+| Manage users | Y | N | N | N |
+| Create/edit subscriptions | Y | Y | N | N |
+| Manage subscription tiers | Y | N | N | N |
+| Create/edit assets | Y | Y | Y | N |
+| Manage placements | Y | Y | N | N |
+| View analytics | Y | Y | Y | Y |
+| Deep analytics | Y | N | N | N |
+| Impersonate users | Y | N | N | N |
 
 ## Security Features
 
@@ -315,7 +317,7 @@ npm test
 ### Preflight Check
 ```bash
 npm run preflight
-# Verifies: .env exists, DATABASE_URL set, PostgreSQL reachable, all 16 tables present
+# Verifies: .env exists, DATABASE_URL set, PostgreSQL reachable, all 27 tables present
 ```
 
 ### Production Build

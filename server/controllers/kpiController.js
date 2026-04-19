@@ -81,14 +81,14 @@ const kpiController = {
       success(res, {
         artist_id: artistId,
         artist_name: artistCheck[0].name,
-        grossRevenue,
-        totalExpenses,
-        totalAppliedToRecoupment: totalApplied,
-        recoupableBalance,
+        gross_revenue: grossRevenue,
+        total_expenses: totalExpenses,
+        total_applied_to_recoupment: totalApplied,
+        recoupable_balance: recoupableBalance,
         recouped,
-        payableAmount,
-        pipelineValue,
-        atRiskRevenue,
+        payable: payableAmount,
+        pipeline_value: pipelineValue,
+        at_risk_revenue: atRiskRevenue,
       }, 'Artist KPIs retrieved');
     } catch (err) {
       next(err);

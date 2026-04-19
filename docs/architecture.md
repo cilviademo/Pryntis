@@ -256,13 +256,17 @@ Role-based access control is enforced at the middleware layer, not in the fronte
 
 ---
 
-## Apache Superset Integration (Optional)
+## Advanced Analytics (Built-In)
 
-The architecture supports embedding Apache Superset as an optional analytics layer:
+The platform includes a built-in Deep Analytics module accessible to admin users at `/admin/analytics`. This replaces the need for external analytics tools by providing cross-module insights directly within the application:
 
-- **Deployment**: Superset runs as a separate Docker Compose service connected to the same PostgreSQL database.
-- **Integration**: Superset dashboards are embedded in the React client via iframe.
-- **Status**: An iframe stub is provided in the client. Full Superset configuration is optional and not required for core functionality.
+- **Revenue Waterfall**: Gross revenue → expenses → recoupment → net payable visualization.
+- **Monthly Trends**: 12-month revenue vs expenses comparison with area charts.
+- **Subscription Tier Performance**: Revenue correlation by subscription tier with per-artist averages.
+- **Metadata Coverage Matrix**: Per-artist heatmap showing ISRC, ISWC, genre, BPM, key, and duration completeness.
+- **Health Radar Charts**: Six-axis radar visualization for each artist's health dimensions.
+- **Placement Pipeline Funnel**: Visual funnel showing placement flow from pending through confirmed to completed.
+- **Ownership Conflict Detection**: Automated identification of assets where total ownership percentage exceeds 100%.
 
 ---
 
@@ -291,29 +295,15 @@ Configuration is managed via `.env` file at the server root:
 
 ---
 
-## Advanced Analytics (Apache Superset)
+## External Analytics (Optional)
 
-Apache Superset integration is available for advanced analytics, custom dashboards, and deep data exploration.
+For organizations requiring custom SQL exploration beyond the built-in Deep Analytics, the PostgreSQL database can be connected to external BI tools (e.g., Metabase, Tableau, or Apache Superset) using a read-only database role:
 
-### Setup
+```sql
+CREATE ROLE analytics_reader WITH LOGIN PASSWORD 'your_password';
+GRANT CONNECT ON DATABASE pryntis TO analytics_reader;
+GRANT USAGE ON SCHEMA public TO analytics_reader;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO analytics_reader;
+```
 
-1. Deploy a Superset instance (Docker recommended): `docker pull apache/superset`
-2. Connect Superset to the same PostgreSQL database using the `DATABASE_URL` connection string
-3. Configure a read-only database user for Superset to prevent accidental writes:
-   ```sql
-   CREATE ROLE superset_reader WITH LOGIN PASSWORD 'your_password';
-   GRANT CONNECT ON DATABASE pryntis TO superset_reader;
-   GRANT USAGE ON SCHEMA public TO superset_reader;
-   GRANT SELECT ON ALL TABLES IN SCHEMA public TO superset_reader;
-   ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO superset_reader;
-   ```
-4. In Superset, add a new database connection under **Settings > Database Connections**
-5. Use the built-in SQL Lab to explore data or create custom charts and dashboards
-
-### Recommended Dashboards
-
-- **Revenue Analytics**: Revenue events by artist, time period, and source
-- **Streaming Performance**: Usage records aggregated by platform, asset, and month
-- **Placement Pipeline**: Placement status funnel with expected vs. actual revenue
-- **Catalogue Health**: Ownership completeness, asset distribution by genre/type
-- **Recoupment Tracking**: Expense vs. revenue waterfall for recoupable artists
+This is optional and not required for core functionality, as all key analytics are available in the built-in Deep Analytics module.

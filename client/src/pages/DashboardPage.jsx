@@ -601,7 +601,10 @@ export default function DashboardPage() {
       {isElevated && (
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', margin: '16px 0' }}>
           <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: '32px' }}>Quick Views:</span>
-          <button className="btn btn-secondary btn-sm" onClick={() => {/* scroll to health scores, filter at-risk */}}>
+          <button className="btn btn-secondary btn-sm" onClick={() => {
+            const el = document.getElementById('health-scores-section');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}>
             At-Risk Artists
           </button>
           <button className="btn btn-secondary btn-sm" onClick={() => navigate('/business')}>
@@ -804,7 +807,7 @@ export default function DashboardPage() {
 
       {/* Health Scores + Momentum */}
       {isElevated && (
-        <div className="dashboard-bottom-grid">
+        <div id="health-scores-section" className="dashboard-bottom-grid">
           <div className="detail-section">
             <h3>Artist Health Scores</h3>
             {healthScores.length === 0 ? (

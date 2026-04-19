@@ -18,4 +18,10 @@ router.get('/revenue', analyticsController.getRevenueAnalytics);
 // Delivery tracking
 router.get('/deliveries', analyticsController.getDeliveryTracking);
 
+// Advanced analytics - Coverage matrix
+router.get('/coverage', analyticsController.getCoverageMatrix);
+
+// Advanced analytics - Cross-module insights
+router.get('/insights', analyticsController.getCrossModuleInsights);
+
 module.exports = router;
